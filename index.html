@@ -3,16 +3,27 @@
   <head>
     <meta charset="utf-8" />
     <title>WebGL Demo</title>
-    <script
+    <link rel="stylesheet" href="style.css">
+    <!-- <script
       src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
       integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
       crossorigin="anonymous"
       defer
     ></script>
-    <script src="webgl-demo.js" type="module" defer></script>
+    <script src="webgl-demo.js" type="module" defer></script> -->
   </head>
 
   <body>
-    <canvas id="glcanvas" width="640" height="480"></canvas>
+    <canvas id="c"></canvas>
+  <!--
+for most samples webgl-utils only provides shader compiling/linking and
+canvas resizing because why clutter the examples with code that's the same in every sample.
+See https://webgl2fundamentals.org/webgl/lessons/webgl-boilerplate.html
+and https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+for webgl-utils, m3, m4, and webgl-lessons-ui.
+-->
+  <button id="start"></button>
+<script src="basic.js"></script>
+<script src="script2.js"></script>
   </body>
 </html>

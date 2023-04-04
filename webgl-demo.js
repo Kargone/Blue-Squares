@@ -1,184 +1,126 @@
-"use strict";
+import { initBuffers } from "./init-buffers.js";
+import { drawScene } from "./draw-scene.js";
 
-var vs = `#version 300 es
+main();
 
-in vec4 a_position;
-in vec4 a_color;
-
-uniform mat4 u_matrix;
-
-out vec4 v_color;
-
-void main() {
-  // Multiply the position by the matrix.
-  gl_Position = u_matrix * a_position;
-
-  // Pass the color to the fragment shader.
-  v_color = a_color;
-}
-`;
-
-var fs = `#version 300 es
-precision highp float;
-
-// Passed in from the vertex shader.
-in vec4 v_color;
-
-uniform vec4 u_colorMult;
-
-out vec4 outColor;
-
-void main() {
-   outColor = v_color * u_colorMult;
-}
-`;
-
+//
+// start here
+//
 function main() {
-  // Get A WebGL context
-  /** @type {HTMLCanvasElement} */
-  var canvas = document.querySelector("#canvas");
-  var gl = canvas.getContext("webgl2");
-  if (!gl) {
+  const canvas = document.querySelector("#glcanvas");
+  // Initialize the GL context
+  const gl = canvas.getContext("webgl");
+
+  // Only continue if WebGL is available and working
+  if (gl === null) {
+    alert(
+      "Unable to initialize WebGL. Your browser or machine may not support it."
+    );
     return;
   }
 
-  // Tell the twgl to match position with a_position, n
-  // normal with a_normal etc..
-  twgl.setAttributePrefix("a_");
+  // Set clear color to black, fully opaque
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  // Clear the color buffer with specified clear color
+  gl.clear(gl.COLOR_BUFFER_BIT);
 
-  var sphereBufferInfo = flattenedPrimitives.createSphereBufferInfo(gl, 10, 12, 6);
-  var cubeBufferInfo   = flattenedPrimitives.createCubeBufferInfo(gl, 20);
-  var coneBufferInfo   = flattenedPrimitives.createTruncatedConeBufferInfo(gl, 10, 0, 20, 12, 1, true, false);
+  // Vertex shader program
+  const vsSource = `
+    attribute vec4 aVertexPosition;
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+    void main() {
+      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+    }
+`;
 
-  // setup GLSL program
-  var programInfo = twgl.createProgramInfo(gl, [vs, fs]);
+  const fsSource = `
+    void main() {
+      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+  `;
 
-  var sphereVAO = twgl.createVAOFromBufferInfo(gl, programInfo, sphereBufferInfo);
-  var cubeVAO   = twgl.createVAOFromBufferInfo(gl, programInfo, cubeBufferInfo);
-  var coneVAO   = twgl.createVAOFromBufferInfo(gl, programInfo, coneBufferInfo);
+  // Initialize a shader program; this is where all the lighting
+  // for the vertices and so forth is established.
+  const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
 
-  function degToRad(d) {
-    return d * Math.PI / 180;
-  }
-
-  var fieldOfViewRadians = degToRad(60);
-
-  // Uniforms for each object.
-  var sphereUniforms = {
-    u_colorMult: [0.5, 1, 0.5, 1],
-    u_matrix: m4.identity(),
+  // Collect all the info needed to use the shader program.
+  // Look up which attribute our shader program is using
+  // for aVertexPosition and look up uniform locations.
+  const programInfo = {
+    program: shaderProgram,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(
+        shaderProgram,
+        "uProjectionMatrix"
+      ),
+      modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
+    },
   };
-  var cubeUniforms = {
-    u_colorMult: [1, 0.5, 0.5, 1],
-    u_matrix: m4.identity(),
-  };
-  var coneUniforms = {
-    u_colorMult: [0.5, 0.5, 1, 1],
-    u_matrix: m4.identity(),
-  };
-  var sphereTranslation = [  0, 0, 0];
-  var cubeTranslation   = [-40, 0, 0];
-  var coneTranslation   = [ 40, 0, 0];
 
-  function computeMatrix(viewProjectionMatrix, translation, xRotation, yRotation) {
-    var matrix = m4.translate(viewProjectionMatrix,
-        translation[0],
-        translation[1],
-        translation[2]);
-    matrix = m4.xRotate(matrix, xRotation);
-    return m4.yRotate(matrix, yRotation);
-  }
+  // Here's where we call the routine that builds all the
+  // objects we'll be drawing.
+  const buffers = initBuffers(gl);
 
-  requestAnimationFrame(drawScene);
-
-  // Draw the scene.
-  function drawScene(time) {
-    time = time * 0.0005;
-
-    twgl.resizeCanvasToDisplaySize(gl.canvas);
-
-    // Tell WebGL how to convert from clip space to pixels
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    gl.enable(gl.CULL_FACE);
-    gl.enable(gl.DEPTH_TEST);
-
-    // Compute the projection matrix
-    var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-    var projectionMatrix =
-        m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
-
-    // Compute the camera's matrix using look at.
-    var cameraPosition = [0, 0, 100];
-    var target = [0, 0, 0];
-    var up = [0, 1, 0];
-    var cameraMatrix = m4.lookAt(cameraPosition, target, up);
-
-    // Make a view matrix from the camera matrix.
-    var viewMatrix = m4.inverse(cameraMatrix);
-
-    var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
-
-    var sphereXRotation =  time;
-    var sphereYRotation =  time;
-    var cubeXRotation   = -time;
-    var cubeYRotation   =  time;
-    var coneXRotation   =  time;
-    var coneYRotation   = -time;
-
-    gl.useProgram(programInfo.program);
-
-    // ------ Draw the sphere --------
-
-    // Setup all the needed attributes.
-    gl.bindVertexArray(sphereVAO);
-
-    sphereUniforms.u_matrix = computeMatrix(
-        viewProjectionMatrix,
-        sphereTranslation,
-        sphereXRotation,
-        sphereYRotation);
-
-    // Set the uniforms we just computed
-    twgl.setUniforms(programInfo, sphereUniforms);
-
-    twgl.drawBufferInfo(gl, sphereBufferInfo);
-
-    // ------ Draw the cube --------
-
-    // Setup all the needed attributes.
-    gl.bindVertexArray(cubeVAO);
-
-    cubeUniforms.u_matrix = computeMatrix(
-        viewProjectionMatrix,
-        cubeTranslation,
-        cubeXRotation,
-        cubeYRotation);
-
-    // Set the uniforms we just computed
-    twgl.setUniforms(programInfo, cubeUniforms);
-
-    twgl.drawBufferInfo(gl, cubeBufferInfo);
-
-    // ------ Draw the cone --------
-
-    // Setup all the needed attributes.
-    gl.bindVertexArray(coneVAO);
-
-    coneUniforms.u_matrix = computeMatrix(
-        viewProjectionMatrix,
-        coneTranslation,
-        coneXRotation,
-        coneYRotation);
-
-    // Set the uniforms we just computed
-    twgl.setUniforms(programInfo, coneUniforms);
-
-    twgl.drawBufferInfo(gl, coneBufferInfo);
-
-    requestAnimationFrame(drawScene);
-  }
+  // Draw the scene
+  drawScene(gl, programInfo, buffers);
 }
 
-main();
-console.log('shello')
+//
+// Initialize a shader program, so WebGL knows how to draw our data
+//
+function initShaderProgram(gl, vsSource, fsSource) {
+  const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+  const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+  // Create the shader program
+
+  const shaderProgram = gl.createProgram();
+  gl.attachShader(shaderProgram, vertexShader);
+  gl.attachShader(shaderProgram, fragmentShader);
+  gl.linkProgram(shaderProgram);
+
+  // If creating the shader program failed, alert
+
+  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+    alert(
+      `Unable to initialize the shader program: ${gl.getProgramInfoLog(
+        shaderProgram
+      )}`
+    );
+    return null;
+  }
+
+  return shaderProgram;
+}
+
+//
+// creates a shader of the given type, uploads the source and
+// compiles it.
+//
+function loadShader(gl, type, source) {
+  const shader = gl.createShader(type);
+
+  // Send the source to the shader object
+
+  gl.shaderSource(shader, source);
+
+  // Compile the shader program
+
+  gl.compileShader(shader);
+
+  // See if it compiled successfully
+
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    alert(
+      `An error occurred compiling the shaders: ${gl.getShaderInfoLog(shader)}`
+    );
+    gl.deleteShader(shader);
+    return null;
+  }
+
+  return shader;
+}
