@@ -112,6 +112,6 @@ function refreshCanvas() {
   return 'Success';
 }
 
-setInterval(() => {
+setTimeout(() => {
   refreshCanvas();
-}, 1000/10);
+}, 1000);
