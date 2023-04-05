@@ -1,28 +1,65 @@
-const game_canvas = document.getElementById('game-canvas');
-const ctx = game_canvas.getContext('2d');
+// const game_canvas = document.getElementById('game-canvas');
+// const ctx = game_canvas.getContext('2d');
 
-let vh = window.innerHeight * 0.01;
-let aspect_ratio = window.innerWidth / window.innerHeight;
-document.querySelector(':root').style.setProperty('--vh', `${vh}px`);
-game_canvas.style.width = window.innerWidth + 'px';
-game_canvas.style.height = window.innerHeight + 'px';
+// let vh = window.innerHeight * 0.01;
+// let aspect_ratio = window.innerWidth / window.innerHeight;
+// document.querySelector(':root').style.setProperty('--vh', `${vh}px`);
+// game_canvas.style.width = window.innerWidth + 'px';
+// game_canvas.style.height = window.innerHeight + 'px';
 
-window.addEventListener('resize', () => {
-    let vh = window.innerHeight * 0.01;
-    document.querySelector(':root').style.setProperty('--vh', `${vh}px`);
-    game_canvas.style.width = window.innerWidth + 'px';
-    game_canvas.style.height = window.innerHeight + 'px';
-    aspect_ratio = window.innerWidth / window.innerHeight;
-    block_height = BLOCK_WIDTH * aspect_ratio;
-});
+// window.addEventListener('resize', () => {
+//     let vh = window.innerHeight * 0.01;
+//     document.querySelector(':root').style.setProperty('--vh', `${vh}px`);
+//     game_canvas.style.width = window.innerWidth + 'px';
+//     game_canvas.style.height = window.innerHeight + 'px';
+//     aspect_ratio = window.innerWidth / window.innerHeight;
+//     block_height = BLOCK_WIDTH * aspect_ratio;
+// });
 
-const GAME_BLOCK_AMOUNT_WIDTH = 50;
-const GAME_BLOCK_AMOUNT_HEIGHT = 30;
-const BLOCK_WIDTH = 15;
-let block_height = Math.round(BLOCK_WIDTH / aspect_ratio);
-const GAME_BORDER = 4;
-const OUTER_GRASS_COLOR = '#146e10';
-const INNER_GRASS_COLOR = '#1ee317';
+// const GAME_BLOCK_AMOUNT_WIDTH = 50;
+// const GAME_BLOCK_AMOUNT_HEIGHT = 30;
+// const BLOCK_WIDTH = 15;
+// let block_height = Math.round(BLOCK_WIDTH / aspect_ratio);
+// const GAME_BORDER = 4;
+// const OUTER_GRASS_COLOR = '#146e10';
+// const INNER_GRASS_COLOR = '#1ee317';
+
+shapes = [];
+
+class rect {
+  constructor(x, y) {
+    this.width = 50;
+    this.height = 50;
+    this.x = x || 100;
+    this.y = y || 0;
+    this.gl = document.querySelector("#c").getContext("webgl2");
+    this.colorLocation ='';
+    shapes.push(this);
+  }
+  draw() {
+    let x1 = this.x;
+    let x2 = this.x + this.width;
+    let y1 = this.y;
+    let y2 = this.y + this.height;
+    const gl = this.gl;
+    const colorLocation = this.colorLocation;
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+     x1, y1,
+     x2, y1,
+     x1, y2,
+     x1, y2,
+     x2, y1,
+     x2, y2,
+    ]), gl.STATIC_DRAW);
+    // Set a random color.
+    gl.uniform4f(colorLocation, 100/255, 100/255, 100/255, 1);
+    // Draw the rectangle.
+    var primitiveType = gl.TRIANGLES;
+    var offset = 0;
+    var count = 6;
+    gl.drawArrays(primitiveType, offset, count);
+  }
+}
 
 class shape {
     constructor(x, y, width, height, fill) {
@@ -85,111 +122,4 @@ function renderGame() {
     }
 }
 
-gui_disable_antialiasing(ctx);
-
-/* Disable antialiasing */
-function gui_disable_antialiasing (ctx) {
-	ctx.imageSmoothingEnabled       = false;
-	ctx.webkitImageSmoothingEnabled = false;
-	ctx.mozImageSmoothingEnabled    = false;
-	ctx.msImageSmoothingEnabled     = false;
-	ctx.oImageSmoothingEnabled      = false;
-}
-
-renderGame();
-
-
-// /* Get mouse pos in canvas */
-// function get_mouse_pos (can, evt) {
-
-// 	var rect = can.getBoundingClientRect();
-
-// 	return {
-// 		x: evt.clientX - rect.left,
-// 		y: evt.clientY - rect.top
-// 	};
-// }
-
-// var devicePixelRatio = window.devicePixelRatio || 1;
-
-// this.low_quality = function () {
-//     document.getElementById ("high_ing").style.backgroundColor = "#3A2A0D";
-//     document.getElementById ("low_ing").style.backgroundColor  = "#B56D18";
-//     Cookies.set ("starve_quality",  "low", { expires: 30 });
-//     document.getElementById ("input_ratio").value = 0.5 / (devicePixelRatio / backingStoreRatio);
-//     game.change_ratio ();
-//     ui.quality = 0;
-// };
-
-
-// /* Scale ratio */
-// if (Cookies.get ("starve_scale")) {
-
-//     ratio_opt = Number (Cookies.get ("starve_scale"));
-//     document.getElementById ("input_ratio").value = ratio_opt;
-//     ratio_opt *=  (devicePixelRatio / backingStoreRatio);
-//     resize_canvas ();
-// }
-
-// /* Update ratio */
-// this.change_ratio = function () {
-
-//     Cookies.set ("starve_scale", "" + document.getElementById ("input_ratio").value);
-//     ratio_opt = document.getElementById ("input_ratio").value * (devicePixelRatio / backingStoreRatio);
-//     resize_canvas ();
-// }
-
-// var backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
-// 	ctx.mozBackingStorePixelRatio ||
-// 	ctx.msBackingStorePixelRatio ||
-// 	ctx.oBackingStorePixelRatio ||
-// 	ctx.backingStorePixelRatio || 1;
-
-//     game_body.onresize = resize_canvas;
-
-//     function resize_canvas () {
-
-//         if (can.width != window.innerWidth) {
-//             can.width = window.innerWidth;
-//             canw = can.width;
-//             canw2 = can.width  / 2;
-//         }
-    
-//         if (can.height != window.innerHeight) {
-    
-//             can.height = window.innerHeight;
-//             canh = can.height;
-//             canh2 = can.height / 2;
-//         }
-    
-    
-//         canm  = { x : canw2, y : canh2 };
-    
-//         var ow = can.width;
-//         var oh = can.height;
-    
-//         if (ratio_opt === -1)
-//             ratio = devicePixelRatio / backingStoreRatio;
-//         else ratio = ratio_opt;
-    
-//         can.width = ow * ratio;
-//         can.height = oh * ratio;
-//         can.style.width = ow + "px";
-//         can.style.height = oh + "px";
-//         ctx.scale (ratio, ratio);
-    
-//         /* Resize cam of user */
-//         if (user) {
-//             user.cam.rw  = ow;
-//             user.cam.rh  = oh;
-//         }
-    
-//         /* Update loading view configuration */
-//         if (loader.is_run) loader.update ();
-//         /* Update UI configuration */
-//         else if (ui.is_run) ui.update ();
-//         /* Update game scene */
-//         else if (game.is_run) game.update ();
-//         /* Update scoreboard scene */
-//         else if (scoreboard.is_run) scoreboard.update ();
-//     }
+const rectangle = new rect(100, 100);
