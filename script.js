@@ -20,24 +20,34 @@ window.addEventListener('resize', () => {
     // block_height = BLOCK_WIDTH * aspect_ratio;
 });
 
-// const GAME_BLOCK_AMOUNT_WIDTH = 50;
-// const GAME_BLOCK_AMOUNT_HEIGHT = 30;
-// const BLOCK_WIDTH = 15;
-// let block_height = Math.round(BLOCK_WIDTH / aspect_ratio);
-// const GAME_BORDER = 4;
-// const OUTER_GRASS_COLOR = '#146e10';
-// const INNER_GRASS_COLOR = '#1ee317';
+const GAME_BLOCK_AMOUNT_WIDTH = 50;
+const GAME_BLOCK_AMOUNT_HEIGHT = 30;
+const BLOCK_WIDTH = 15;
+let block_height = 15;
+const GAME_BORDER = 4;
+const OUTER_GRASS_COLOR = '(20,110,16)';
+const INNER_GRASS_COLOR = '(30,227,23)';
 
 shapes = [];
 
 class rect {
-  constructor(x, y) {
-    this.width = 50;
-    this.height = 50;
-    this.x = x || 100;
-    this.y = y || 0;
+  constructor(x = 0, y = 0, width, height, rgb) {
+    this.x = x;
+    this.y = y;
+    this.width = width || 10;
+    this.height = height || 10;
+    if (rgb != undefined) {
+        rgb = rgb.split(",");
+        this.r = parseInt(rgb[0].substring(1, rgb[0].length)) || 255;
+        this.g = parseInt(rgb[1]) || 255;
+        this.b = parseInt(rgb[2].substring(0, rgb[0].length - 1)) || 255;
+    } else {
+        this.r = 0;
+        this.g = 0;
+        this.b = 0;
+    }
     this.gl = document.querySelector("#game-canvas").getContext("webgl2");
-    this.colorLocation ='';
+    this.colorLocation = '';
     shapes.push(this);
   }
   draw() {
@@ -56,7 +66,7 @@ class rect {
      x2, y2,
     ]), gl.STATIC_DRAW);
     // Set a random color.
-    gl.uniform4f(colorLocation, 100/255, 100/255, 100/255, 1);
+    gl.uniform4f(colorLocation, this.r/255, this.g/255, this.b/255, 1);
     // Draw the rectangle.
     var primitiveType = gl.TRIANGLES;
     var offset = 0;
@@ -71,36 +81,33 @@ class shape {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.fill = fill || '';
+        this.fill = fill || '(255,255,255)';
     }
     drawRect() {
-        ctx.beginPath();
-        ctx.fillStyle = this.fill;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        ctx.stroke();
+        new rect(this.x, this.y, this.width, this.height, this.fill);
     }
     drawGrass() {
-        if (this.x <= BLOCK_WIDTH * GAME_BORDER) {
-            const grass_block = new shape(this.x, this.y, this.width, this.height, OUTER_GRASS_COLOR);
-            grass_block.drawRect();
-            grass_block.drawGrid();
+        if (this.x < BLOCK_WIDTH * GAME_BORDER) {
+            drawOuterBlockOfGrass(this);
         } else if (this.x >= BLOCK_WIDTH * GAME_BLOCK_AMOUNT_WIDTH - BLOCK_WIDTH * GAME_BORDER) {
-            const grass_block = new shape(this.x, this.y, this.width, this.height, OUTER_GRASS_COLOR);
-            grass_block.drawRect();
-            grass_block.drawGrid();
-        } else if (this.y <= block_height * GAME_BORDER) {
-            const grass_block = new shape(this.x, this.y, this.width, this.height, OUTER_GRASS_COLOR);
-            grass_block.drawRect();
-            grass_block.drawGrid();
+            drawOuterBlockOfGrass(this);
+        } else if (this.y < block_height * GAME_BORDER) {
+            drawOuterBlockOfGrass(this);
         } else if (this.y >= block_height * GAME_BLOCK_AMOUNT_HEIGHT - block_height * GAME_BORDER) {
-            const grass_block = new shape(this.x, this.y, this.width, this.height, OUTER_GRASS_COLOR);
-            grass_block.drawRect();
-            grass_block.drawGrid();
+            drawOuterBlockOfGrass(this);
         } else {
             const grass_block = new shape(this.x, this.y, this.width, this.height, INNER_GRASS_COLOR);
             grass_block.drawRect();
-            grass_block.drawGrid();
+            // grass_block.drawGrid();
         }
+        function drawOuterBlockOfGrass(object) {
+            const grass_block = new shape(object.x, object.y, object.width, object.height, OUTER_GRASS_COLOR);
+            grass_block.drawRect();
+            // grass_block.drawGrid();
+        }
+    }
+    pixelGrass() {
+        new rect(this.x, this.y, this.width, this.height, this.fill);
     }
     drawGrid() {
         const line1 = new shape(this.x, this.y, this.width, this.y, 'black');
@@ -126,4 +133,5 @@ function renderGame() {
     }
 }
 
-const rectangle = new rect(100, 100);
+const grass = new shape(600, 200, 400, 400, OUTER_GRASS_COLOR);
+grass.pixelGrass();
