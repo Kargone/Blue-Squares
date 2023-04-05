@@ -43,7 +43,7 @@ let shapes;
 
 function refreshCanvas() {
   // Get A WebGL context
-  var canvas = document.querySelector("#c");
+  var canvas = document.querySelector("#game-canvas");
   var gl = canvas.getContext("webgl2");
   if (!gl) {
     return;

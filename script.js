@@ -1,20 +1,24 @@
-// const game_canvas = document.getElementById('game-canvas');
-// const ctx = game_canvas.getContext('2d');
+const game_canvas = document.getElementById('game-canvas');
+const body = document.getElementById('body');
 
-// let vh = window.innerHeight * 0.01;
-// let aspect_ratio = window.innerWidth / window.innerHeight;
-// document.querySelector(':root').style.setProperty('--vh', `${vh}px`);
-// game_canvas.style.width = window.innerWidth + 'px';
-// game_canvas.style.height = window.innerHeight + 'px';
+let vh = window.innerHeight * 0.01;
+let aspect_ratio = window.innerWidth / window.innerHeight;
+document.querySelector(':root').style.setProperty('--vh', `${vh}px`);
+game_canvas.style.width = window.innerWidth + 'px';
+game_canvas.style.height = window.innerHeight + 'px';
+body.style.width = window.innerWidth + 'px';
+body.style.height = window.innerHeight + 'px';
 
-// window.addEventListener('resize', () => {
-//     let vh = window.innerHeight * 0.01;
-//     document.querySelector(':root').style.setProperty('--vh', `${vh}px`);
-//     game_canvas.style.width = window.innerWidth + 'px';
-//     game_canvas.style.height = window.innerHeight + 'px';
-//     aspect_ratio = window.innerWidth / window.innerHeight;
-//     block_height = BLOCK_WIDTH * aspect_ratio;
-// });
+window.addEventListener('resize', () => {
+    let vh = window.innerHeight * 0.01;
+    document.querySelector(':root').style.setProperty('--vh', `${vh}px`);
+    game_canvas.style.width = window.innerWidth + 'px';
+    game_canvas.style.height = window.innerHeight + 'px';
+    body.style.width = window.innerWidth + 'px';
+    body.style.height = window.innerHeight + 'px';
+    aspect_ratio = window.innerWidth / window.innerHeight;
+    // block_height = BLOCK_WIDTH * aspect_ratio;
+});
 
 // const GAME_BLOCK_AMOUNT_WIDTH = 50;
 // const GAME_BLOCK_AMOUNT_HEIGHT = 30;
@@ -32,7 +36,7 @@ class rect {
     this.height = 50;
     this.x = x || 100;
     this.y = y || 0;
-    this.gl = document.querySelector("#c").getContext("webgl2");
+    this.gl = document.querySelector("#game-canvas").getContext("webgl2");
     this.colorLocation ='';
     shapes.push(this);
   }
