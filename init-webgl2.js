@@ -114,4 +114,4 @@ function refreshCanvas() {
 
 setTimeout(() => {
   refreshCanvas();
-}, 1000);
+}, 100);
