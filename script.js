@@ -952,7 +952,7 @@ class shape {
     }
     pixelGrass() {
         //each block is 20x20
-        const blockUnit = 2;
+        const blockUnit = 20;
 
         // background block
         new rect(this.x, this.y, this.width, this.height, this.fill);
@@ -966,7 +966,7 @@ class shape {
     }
     pixelGrass2() {
         //each block is 20x20
-        const blockUnit = 2;
+        const blockUnit = this.width/15;
 
         // background block
         new rect(this.x, this.y, this.width, this.height, this.fill);
@@ -1006,6 +1006,6 @@ function random_Negative_Positive_Int(max) { // min and max included
     return Math.floor(Math.random() * max) * (Math.random() < 0.5? -1 : 1);
 }
 
-renderGame();
-// const grass = new shape(600, 200, 300, 300, INNER_GRASS_COLOR);
-// grass.pixelGrass2();
+// renderGame();
+const grass = new shape(600, 200, 300, 300, INNER_GRASS_COLOR);
+grass.pixelGrass2();
