@@ -16,13 +16,12 @@ window.addEventListener('resize', () => {
     body.style.width = window.innerWidth + 'px';
     body.style.height = window.innerHeight + 'px';
     aspect_ratio = window.innerWidth / window.innerHeight;
-    // block_height = BLOCK_WIDTH * aspect_ratio;
 });
 
-const GAME_BLOCK_AMOUNT_WIDTH = 50;
-const GAME_BLOCK_AMOUNT_HEIGHT = 30;
+const GAME_BLOCK_AMOUNT_WIDTH = 54;
+const GAME_BLOCK_AMOUNT_HEIGHT = 27;
 const BLOCK_WIDTH = 30;
-let block_height = 30;
+const BLOCK_HEIGHT = 30;
 const GAME_BORDER = 4;
 const OUTER_GRASS_COLOR = '(20,110,16)';
 const INNER_GRASS_COLOR = '(30,227,23)';
@@ -90,13 +89,15 @@ class shape {
             drawOuterBlockOfGrass(this);
         } else if (this.x >= BLOCK_WIDTH * GAME_BLOCK_AMOUNT_WIDTH - BLOCK_WIDTH * GAME_BORDER) {
             drawOuterBlockOfGrass(this);
-        } else if (this.y < block_height * GAME_BORDER) {
+        } else if (this.y < BLOCK_HEIGHT * GAME_BORDER) {
             drawOuterBlockOfGrass(this);
-        } else if (this.y >= block_height * GAME_BLOCK_AMOUNT_HEIGHT - block_height * GAME_BORDER) {
+        } else if (this.y >= BLOCK_HEIGHT * GAME_BLOCK_AMOUNT_HEIGHT - BLOCK_HEIGHT * GAME_BORDER) {
             drawOuterBlockOfGrass(this);
         } else {
+            const doShade = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
             const grass_block = new shape(this.x, this.y, this.width, this.height, INNER_GRASS_COLOR);
-            grass_block.pixelGrass2();
+            if (doShade === 0) grass_block.pixelGrass2();
+            if (doShade === 1) grass_block.pixelGrass3();
             // grass_block.drawGrid();
         }
         function drawOuterBlockOfGrass(object) {
@@ -107,7 +108,7 @@ class shape {
     }
     pixelGrass() {
         //each block is 20x20
-        const blockUnit = 20;
+        const blockUnit = this.width/15;
 
         // background block
         new rect(this.x, this.y, this.width, this.height, this.fill);
@@ -166,13 +167,13 @@ class shape {
 function renderGame() {
     for (let current_block_height = 0; current_block_height < GAME_BLOCK_AMOUNT_HEIGHT; current_block_height++) {
         for (let current_block_width = 0; current_block_width < GAME_BLOCK_AMOUNT_WIDTH; current_block_width++) {
-            const block = new shape(current_block_width * BLOCK_WIDTH, current_block_height * block_height, BLOCK_WIDTH, block_height);
+            const block = new shape(current_block_width * BLOCK_WIDTH, current_block_height * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
             block.drawGrass();
         }
     }
 }
 
-function random_Negative_Positive_Int(max) { // min and max included 
+function random_Negative_Positive_Int(max) {
     return Math.floor(Math.random() * max) * (Math.random() < 0.5? -1 : 1);
 }
 
