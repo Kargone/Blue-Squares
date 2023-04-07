@@ -39,8 +39,6 @@ void main() {
 }
 `;
 
-let shapes;
-
 function refreshCanvas() {
   // Get A WebGL context
   var canvas = document.querySelector("#game-canvas");
@@ -89,10 +87,6 @@ function refreshCanvas() {
   // Tell WebGL how to convert from clip space to pixels
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  // Clear the canvas
-  gl.clearColor(0, 0, 0, 0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
   // Tell it to use our program (pair of shaders)
   gl.useProgram(program);
 
@@ -111,7 +105,3 @@ function refreshCanvas() {
   });
   return 'Success';
 }
-
-setTimeout(() => {
-  refreshCanvas();
-}, 100);

@@ -36,14 +36,15 @@ class rect {
     this.height = height || 10;
     if (rgb != undefined) {
         rgb = rgb.split(",");
-        this.r = parseInt(rgb[0].substring(1, rgb[0].length)) || 255;
-        this.g = parseInt(rgb[1]) || 255;
-        this.b = parseInt(rgb[2].substring(0, rgb[0].length - 1)) || 255;
+        this.r = parseInt(rgb[0].split('(')[1]);
+        this.g = parseInt(rgb[1]);
+        this.b = parseInt(rgb[2].split(')')[0]);
     } else {
         this.r = 0;
         this.g = 0;
         this.b = 0;
     }
+    console.log(this.r,this.g,this.b)
     this.gl = document.querySelector("#game-canvas").getContext("webgl2");
     this.colorLocation = '';
     shapes.push(this);
@@ -73,16 +74,12 @@ class rect {
   }
 }
 
-class shape {
-    constructor(x, y, width, height, fill) {
+class Grass_Block {
+    constructor(x, y, width, height) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.fill = fill || '(255,255,255)';
-    }
-    drawRect() {
-        new rect(this.x, this.y, this.width, this.height, this.fill);
     }
     drawGrass() {
         if (this.x < BLOCK_WIDTH * GAME_BORDER) {
@@ -95,98 +92,98 @@ class shape {
             drawOuterBlockOfGrass(this);
         } else {
             const doShade = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
-            const grass_block = new shape(this.x, this.y, this.width, this.height, INNER_GRASS_COLOR);
-            if (doShade === 0) grass_block.pixelGrass2();
-            if (doShade === 1) grass_block.pixelGrass3();
-            // grass_block.drawGrid();
+            const grass_block = new Grass_Block(this.x, this.y, this.width, this.height);
+            if (doShade === 0) grass_block.drawInnerGrassBlock1();
+            if (doShade === 1) grass_block.drawInnerGrassBlock2();
         }
         function drawOuterBlockOfGrass(object) {
-            const grass_block = new shape(object.x, object.y, object.width, object.height, OUTER_GRASS_COLOR);
-            grass_block.pixelGrass();
-            // grass_block.drawGrid();
+            const grass_block = new Grass_Block(object.x, object.y, object.width, object.height);
+            grass_block.drawOuterGrassBlock();
         }
     }
-    pixelGrass() {
-        //each block is 20x20
-        const blockUnit = this.width/15;
+    drawOuterGrassBlock() {
+        var image_draw_info = {
+            x: this.x,
+            y: this.y,
+            xScale: this.width / 300,
+            yScale: this.height / 300,
+            textureInfo: textureInfos[2],
+        };
+        image_draw_infos.push(image_draw_info);
+    }
+    drawInnerGrassBlock1() {
+        var image_draw_info = {
+            x: this.x,
+            y: this.y,
+            xScale: this.width / 300,
+            yScale: this.height / 300,
+            textureInfo: textureInfos[1],
+        };
+        image_draw_infos.push(image_draw_info);
+    }
+    drawInnerGrassBlock2() {
+        var image_draw_info = {
+            x: this.x,
+            y: this.y,
+            xScale: this.width / 300,
+            yScale: this.height / 300,
+            textureInfo: textureInfos[0],
+        };
+        image_draw_infos.push(image_draw_info);
+    }
+}
 
-        // background block
-        new rect(this.x, this.y, this.width, this.height, this.fill);
-        
-        // irregularities
-        for (let blockX = 0; blockX < 15; blockX++) {
-            for (let blockY = 0; blockY < 15; blockY++) {
-                new rect(this.x + blockUnit * blockX, this.y + blockUnit * blockY, blockUnit, blockUnit, outer_block_irregularities[`${blockX}_${blockY}`]);
-            }
-        }
-    }
-    pixelGrass2() {
-        //each block is 20x20
-        const blockUnit = this.width/15;
-
-        // background block
-        new rect(this.x, this.y, this.width, this.height, this.fill);
-        
-        // irregularities
-        for (let blockX = 0; blockX < 15; blockX++) {
-            for (let blockY = 0; blockY < 15; blockY++) {
-                new rect(this.x + blockUnit * blockX, this.y + blockUnit * blockY, blockUnit, blockUnit, inner_block_irregularities[`${blockX}_${blockY}`]);
-            }
-        }
-    }
-    pixelGrass3() {
-        //each block is 20x20
-        const blockUnit = this.width/15;
-
-        // background block
-        new rect(this.x, this.y, this.width, this.height, this.fill);
-        
-        // irregularities
-        for (let blockX = 0; blockX < 15; blockX++) {
-            for (let blockY = 0; blockY < 15; blockY++) {
-                // inner_block_irregularities2[`${blockX}_${blockY}`] = `(${30 + random_Negative_Positive_Int(5)},${197 + random_Negative_Positive_Int(5) * 3},${23 + random_Negative_Positive_Int(5)})`;
-                new rect(this.x + blockUnit * blockX, this.y + blockUnit * blockY, blockUnit, blockUnit, inner_block_irregularities2[`${blockX}_${blockY}`]);
-            }
-        }
-    }
-    drawGrid() {
-        const line1 = new shape(this.x, this.y, this.width, this.y, 'black');
-        line1.drawLine();
-        const line2 = new shape(this.x, this.y, this.x, this.height, 'black');
-        line2.drawLine();
-    }
-    drawLine() {
-        ctx.beginPath()
-        ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.width, this.height);
-        ctx.lineWidth = .2;
-        ctx.stroke();
+class blue_square {
+    constructor(x = 100, y = 100) {
+        const widthGameBlocks = 2;
+        const heightGameBlocks = 2;
+        const outlineInline = 2;
+        const inlineInline = 2;
+        this.x = x;
+        this.y = y;
+        this.width = widthGameBlocks * BLOCK_WIDTH;
+        this.height = heightGameBlocks * BLOCK_HEIGHT;
+        this.r = 0;
+        this.g = 0;
+        this.b = 255;
+        this.gl = document.querySelector("#game-canvas").getContext("webgl2");
+        this.colorLocation = '';
+        new rect(
+            this.x + outlineInline,
+            this.y + outlineInline,
+            this.width - (2 * outlineInline),
+            this.height - (2 * outlineInline)
+        );
+        new rect(
+            this.x + outlineInline + inlineInline,
+            this.y + outlineInline + inlineInline,
+            this.width - (2 * outlineInline) - (2 * inlineInline),
+            this.height - (2 * outlineInline) - (2 * inlineInline),
+            '(160,160,255)'
+        );
     }
 }
 
 function renderGame() {
     for (let current_block_height = 0; current_block_height < GAME_BLOCK_AMOUNT_HEIGHT; current_block_height++) {
         for (let current_block_width = 0; current_block_width < GAME_BLOCK_AMOUNT_WIDTH; current_block_width++) {
-            const block = new shape(current_block_width * BLOCK_WIDTH, current_block_height * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
+            const block = new Grass_Block(current_block_width * BLOCK_WIDTH, current_block_height * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
             block.drawGrass();
         }
     }
 }
 
-function random_Negative_Positive_Int(max) {
-    return Math.floor(Math.random() * max) * (Math.random() < 0.5? -1 : 1);
-}
-
-// renderGame();
-const grass = new shape(400, 0, 300, 300, INNER_GRASS_COLOR);
-grass.pixelGrass3();
-const grass2 = new shape(400, 300, 300, 300, INNER_GRASS_COLOR);
-grass2.pixelGrass2();
-const grass3 = new shape(700, 300, 300, 300, INNER_GRASS_COLOR);
-grass3.pixelGrass3();
-const grass4 = new shape(700, 0, 300, 300, INNER_GRASS_COLOR);
-grass4.pixelGrass2();
-const grass5 = new shape(100, 0, 300, 300, INNER_GRASS_COLOR);
-grass5.pixelGrass();
-const grass6 = new shape(100, 300, 300, 300, INNER_GRASS_COLOR);
-grass6.pixelGrass();
+renderGame();
+const firstBlueSquare = new blue_square(120, 120);
+// const grass = new shape(400, 0, 20, 20);
+// grass.drawInnerGrassBlock1();
+// const grass2 = new shape(400, 300, 300, 300);
+// grass2.drawInnerGrassBlock2();
+// const grass3 = new shape(700, 300, 300, 300);
+// grass3.drawInnerGrassBlock1();
+// const grass4 = new shape(700, 0, 300, 300);
+// grass4.drawInnerGrassBlock2();
+// const grass5 = new shape(100, 0, 300, 300);
+// grass5.drawOuterGrassBlock();
+// const grass6 = new shape(100, 300, 300, 300);
+// grass6.drawOuterGrassBlock();
