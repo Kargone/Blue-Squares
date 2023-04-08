@@ -311,10 +311,10 @@ function dragShape() {
     if ((building.x < mouseX) && (mouseX < building.x + building.width)) {
       if ((building.y < mouseX) && (mouseY < building.y + building.height)) {
         console.log('S')
-        building.x = mouseX - building.width / 2;
-        building.y = mouseY - building.height / 2;
-        shapes[1].x = mouseX - shapes[1].width / 2;
-        shapes[1].y = mouseY - shapes[1].height / 2;
+        building.x = Math.round((mouseX - building.width / 2) / 30) * 30;
+        building.y = Math.round((mouseY - building.height / 2) / 30) * 30;
+        shapes[1].x = Math.round((mouseX - shapes[1].width / 2) / 30) * 30;
+        shapes[1].y = Math.round((mouseY - shapes[1].height / 2) / 30) * 30;
       }  
     }
   });
