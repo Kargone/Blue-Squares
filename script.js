@@ -48,6 +48,7 @@ class rect {
     console.log(this.r,this.g,this.b)
     this.gl = document.querySelector("#game-canvas").getContext("webgl2");
     this.colorLocation = '';
+    this.id = getRandomInt();
     shapes.push(this);
   }
   draw() {
@@ -72,6 +73,9 @@ class rect {
     var offset = 0;
     var count = 6;
     gl.drawArrays(primitiveType, offset, count);
+  }
+  getId() {
+    return this.id;
   }
 }
 
@@ -149,20 +153,59 @@ class blue_square {
         this.b = 255;
         this.gl = document.querySelector("#game-canvas").getContext("webgl2");
         this.colorLocation = '';
-        buildings.push(this);
-        new rect(
+        this.outlineInline = outlineInline;
+        this.inlineInline = inlineInline;
+        const outline = new rect(
             this.x + outlineInline,
             this.y + outlineInline,
             this.width - (2 * outlineInline),
             this.height - (2 * outlineInline)
         );
-        new rect(
+        this.outelineId = outline.getId();
+        const square = new rect(
             this.x + outlineInline + inlineInline,
             this.y + outlineInline + inlineInline,
             this.width - (2 * outlineInline) - (2 * inlineInline),
             this.height - (2 * outlineInline) - (2 * inlineInline),
             '(160,160,255)'
         );
+        this.squareId = square.getId();
+        this.selected = false;
+        buildings.push(this);
+    }
+    checkForMouse() {
+        if (!mouse_down) return false;
+        if (this.selected) {
+            if ((this.x - 20 < mouseX) && (mouseX < this.x + this.width + 20)) {
+                if ((this.y - 20 < mouseY) && (mouseY < this.y + this.height + 20)) {
+                    this.selected = true;
+                    return true;
+                }
+            }
+        } else {
+            if ((this.x + this.outlineInline < mouseX) && (mouseX < this.x + this.width - this.outlineInline)) {
+                if ((this.y + this.outlineInline < mouseY) && (mouseY < this.y + this.height - this.outlineInline)) {
+                    this.selected = true;
+                    return true;
+                }
+            }
+        }
+        this.selected = false;
+        return false;
+    }
+    updateXandY() {
+        this.x = Math.round((mouseX - this.width / 2) / BLOCK_WIDTH) * BLOCK_WIDTH;
+        this.y = Math.round((mouseY - this.height / 2) / BLOCK_HEIGHT) * BLOCK_HEIGHT;
+        for (let index in shapes) {
+            let element = shapes[index];
+            if (element.id === this.outelineId) {
+                shapes[index].x = this.x + this.outlineInline;
+                shapes[index].y = this.y + this.outlineInline;
+            } else if (element.id === this.squareId) {
+                shapes[index].x = this.x + this.outlineInline + this.inlineInline;
+                shapes[index].y = this.y + this.outlineInline + this.inlineInline;
+            }
+        }
     }
 }
 
@@ -175,8 +218,15 @@ function renderGame() {
     }
 }
 
+function getRandomInt(max = 1000000000) {
+    return Math.floor(Math.random() * max);
+}
+
 renderGame();
-const firstBlueSquare = new blue_square(120, 120);
+new blue_square(120, 120);
+new blue_square(180, 120);
+new blue_square(120, 180);
+new blue_square(180, 180);
 // const grass = new shape(400, 0, 20, 20);
 // grass.drawInnerGrassBlock1();
 // const grass2 = new shape(400, 300, 300, 300);
