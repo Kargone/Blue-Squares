@@ -27,6 +27,7 @@ const OUTER_GRASS_COLOR = '(20,110,16)';
 const INNER_GRASS_COLOR = '(30,227,23)';
 
 shapes = [];
+buildings = [];
 
 class rect {
   constructor(x = 0, y = 0, width, height, rgb) {
@@ -137,7 +138,7 @@ class blue_square {
     constructor(x = 100, y = 100) {
         const widthGameBlocks = 2;
         const heightGameBlocks = 2;
-        const outlineInline = 2;
+        const outlineInline = 20;
         const inlineInline = 2;
         this.x = x;
         this.y = y;
@@ -148,6 +149,7 @@ class blue_square {
         this.b = 255;
         this.gl = document.querySelector("#game-canvas").getContext("webgl2");
         this.colorLocation = '';
+        buildings.push(this);
         new rect(
             this.x + outlineInline,
             this.y + outlineInline,
