@@ -13,11 +13,34 @@
     <script src="webgl-demo.js" type="module" defer></script> -->
   </head>
   <body id="body">
+    <!-- needed buttons to close the create and info tabs -->
     <canvas id="game-canvas"></canvas>
-    <div id="building-create"></div>
-    <div id="building-info"></div>
-    <div id="settings"></div>
-    <div id="resources"></div>
+    <div id="building-create">
+      <!-- it will show the prices of the buildings that can currently be built, with arrows on the sides when you unlock more -->
+    </div>
+    <div id="building-info">
+      <!-- 
+        Blue Sqaure
+        Level: 10
+        (when hover over upgrade button, -> appears with next level stats)
+        Earnings per second:
+        Earnings per hour:
+        Date created: 
+
+        Upgrade button (with the cost on it)
+        date created
+       -->
+    </div>
+    <div id="settings">
+      <!-- leaderboard
+      settings -->
+    </div>
+    <div id="resources">
+      <p style="margin-left: 10px; margin-right: 10px;">XXXXX<img src="Images/blue_square.png" alt="- Blue squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></p>
+      <p style="margin-left: 10px; margin-right: 10px;">XXXXX<img src="Images/red_square.png" alt="- Red squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></p>
+      <p style="margin-left: 10px; margin-right: 10px;">XXXXX<img src="Images/green_square.png" alt="- Green squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></p>
+      <p style="margin-left: 10px; margin-right: 10px;">XXXXX<img src="Images/purple_square.png" alt="- Purple squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></p>
+    </div>
     <script src="setup-webgl2.js"></script>
     <script src="init-webgl2-images.js"></script>
     <script src="init-webgl2-shapes.js"></script>

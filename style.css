@@ -34,7 +34,7 @@
 }
 
 #resources {
-    min-width: 200px;
+    min-width: 100px;
     width: fit-content;
     min-height: 50px;
     height: fit-content;
