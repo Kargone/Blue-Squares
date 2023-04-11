@@ -20,6 +20,7 @@
     right: -4px;
     border-radius: 10px 0px 0px 10px;
     border: 4px solid brown;
+    text-align: center;
 }
 
 #settings {
@@ -44,6 +45,16 @@
     left: -4px;
     border-radius: 0px 0px 10px 0px;
     border: 4px solid brown;
+}
+
+button {
+    min-width: 80px;
+    width: fit-content;
+    height: 30px;
+    background-color: #43c343;
+    border: none;
+    border-radius: 10px;
+    color: white;
 }
 
 canvas {

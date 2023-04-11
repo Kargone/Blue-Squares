@@ -249,9 +249,18 @@ let image_draw_infos = [];
 
 function dragShape() {
   for (let building of buildings) {
-    if (building.checkForMouse()) {
+    if (!building.selected) continue;
+    if (building.checkForMouseHover()) {
       building.updateXandY();
-      break;
+      building.displaySquare();
+      return true;
+    }
+  }
+  for (let building of buildings) {
+    if (building.checkForMouseHover()) {
+      building.updateXandY();
+      building.displaySquare();
+      return true;
     }
   }
 }

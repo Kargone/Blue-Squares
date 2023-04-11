@@ -28,6 +28,8 @@ const INNER_GRASS_COLOR = '(30,227,23)';
 
 shapes = [];
 buildings = [];
+let blue_squares = 0;
+let blue_square_cost = 0;
 
 class rect {
   constructor(x = 0, y = 0, width, height, rgb) {
@@ -142,14 +144,14 @@ class blue_square {
     constructor(x = 100, y = 100) {
         const widthGameBlocks = 2;
         const heightGameBlocks = 2;
-        const outlineInline = 20;
+        const outlineInline = 22;
         const inlineInline = 2;
         this.x = x;
         this.y = y;
         this.width = widthGameBlocks * BLOCK_WIDTH;
         this.height = heightGameBlocks * BLOCK_HEIGHT;
-        this.r = 0;
-        this.g = 0;
+        this.r = 160;
+        this.g = 160;
         this.b = 255;
         this.gl = document.querySelector("#game-canvas").getContext("webgl2");
         this.colorLocation = '';
@@ -167,14 +169,23 @@ class blue_square {
             this.y + outlineInline + inlineInline,
             this.width - (2 * outlineInline) - (2 * inlineInline),
             this.height - (2 * outlineInline) - (2 * inlineInline),
-            '(160,160,255)'
+            `(${this.r},${this.g},${this.b})`
         );
         this.squareId = square.getId();
         this.selected = false;
+        this.earningsPerSecond = 1;
+        this.earningsPerHour = this.earningsPerSecond * 3600;
+        this.nextLevelUpgradeCost = 1;
+        this.maxLevel = 10;
+        this.level = 1;
+        this.color = 'Blue';
         buildings.push(this);
     }
-    checkForMouse() {
-        if (!mouse_down) return false;
+    checkForMouseHover() {
+        if (!mouse_down) {
+            this.selected = false;
+            return false;
+        }
         if (this.selected) {
             if ((this.x - 20 < mouseX) && (mouseX < this.x + this.width + 20)) {
                 if ((this.y - 20 < mouseY) && (mouseY < this.y + this.height + 20)) {
@@ -207,6 +218,57 @@ class blue_square {
             }
         }
     }
+    upResource() {
+        blue_squares += this.earningsPerSecond;
+    }
+    upgrade() {
+        if (this.level >= this.maxLevel) return;
+        if (blue_squares < this.nextLevelUpgradeCost) return;
+        blue_squares -= this.nextLevelUpgradeCost;
+        this.earningsPerSecond += 1;
+        this.earningsPerHour = this.earningsPerSecond * 3600;
+        this.nextLevelUpgradeCost += 1;
+        this.level += 1;
+        this.outlineInline -= 2;
+        this.r -= 16;
+        this.g -= 16;
+        for (let shape of shapes) {
+            if (shape.id === this.outelineId) {
+                shape.x = this.x + this.outlineInline;
+                shape.y = this.y + this.outlineInline;
+                shape.width = this.width - (2 * this.outlineInline);
+                shape.height = this.height - (2 * this.outlineInline);
+            } else if (shape.id === this.squareId) {
+                shape.x = this.x + this.outlineInline + this.inlineInline;
+                shape.y = this.y + this.outlineInline + this.inlineInline;
+                shape.width = this.width - (2 * this.outlineInline) - (2 * this.inlineInline);
+                shape.height = this.height - (2 * this.outlineInline) - (2 * this.inlineInline);
+                shape.r = this.r;
+                shape.g = this.g;
+                shape.b = this.b;
+            }
+        }
+        document.getElementById("blue-squares-count").innerHTML = `${blue_squares}<img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;">`;
+    }
+    displaySquare() {
+        document.getElementById("building-info-square_type").innerHTML = `${this.color} Square`;
+        document.getElementById("building-info-level").innerHTML = `Level: ${this.level}`;
+        document.getElementById("building-info-earnings_second").innerHTML = `Earnings per second: ${this.earningsPerSecond}`;
+        document.getElementById("building-info-earnings_hour").innerHTML = `Earnings per hour: ${this.earningsPerHour}`;
+        document.getElementById("building-info-upgrade").innerHTML = `Upgrade ${this.nextLevelUpgradeCost} <img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;">`;
+        if (this.maxLevel === this.level) {
+            document.getElementById("building-info-upgrade").style.display = 'none';
+        } else {
+            document.getElementById("building-info-upgrade").style.display = 'inline-block';
+        }
+        let upgrade_button = document.getElementById("building-info-upgrade");
+        upgrade_button.replaceWith(upgrade_button.cloneNode(true));
+        const this_square = this;
+        document.getElementById("building-info-upgrade").addEventListener('click', function () {
+            this_square.upgrade();
+            this_square.displaySquare();
+        });
+    }
 }
 
 function renderGame() {
@@ -223,10 +285,19 @@ function getRandomInt(max = 1000000000) {
 }
 
 renderGame();
-new blue_square(120, 120);
-new blue_square(180, 120);
-new blue_square(120, 180);
-new blue_square(180, 180);
+document.getElementById("blue-square-buy").addEventListener('click', function () {
+    if (blue_squares < blue_square_cost) return;
+    new blue_square((getRandomInt(30) + 4) * 30, (getRandomInt(18) + 4) * 30);
+    blue_squares -= blue_square_cost;
+    blue_square_cost = blue_square_cost + 2 * 2;
+    this.innerHTML = `Buy ${blue_square_cost}<img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;">`;
+});
+setInterval(() => {
+    for (let building of buildings) {
+        building.upResource();
+    }
+    document.getElementById("blue-squares-count").innerHTML = `${blue_squares}<img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;">`;
+}, 1000);
 // const grass = new shape(400, 0, 20, 20);
 // grass.drawInnerGrassBlock1();
 // const grass2 = new shape(400, 300, 300, 300);
