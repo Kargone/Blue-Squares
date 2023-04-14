@@ -179,6 +179,7 @@ class blue_square {
         this.maxLevel = 10;
         this.level = 1;
         this.color = 'Blue';
+        this.displayed = false;
         buildings.push(this);
     }
     checkForMouseHover() {
@@ -248,26 +249,38 @@ class blue_square {
                 shape.b = this.b;
             }
         }
-        document.getElementById("blue-squares-count").innerHTML = `${blue_squares}<img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;">`;
+        document.getElementById("blue-squares-count").textContent = blue_squares;
     }
     displaySquare() {
-        document.getElementById("building-info-square_type").innerHTML = `${this.color} Square`;
-        document.getElementById("building-info-level").innerHTML = `Level: ${this.level}`;
-        document.getElementById("building-info-earnings_second").innerHTML = `Earnings per second: ${this.earningsPerSecond}`;
-        document.getElementById("building-info-earnings_hour").innerHTML = `Earnings per hour: ${this.earningsPerHour}`;
-        document.getElementById("building-info-upgrade").innerHTML = `Upgrade ${this.nextLevelUpgradeCost} <img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;">`;
+        console.log('h')
+        if (this.displayed) return;
+        for (let building of buildings) {
+            building.displayed = false;
+            building.removeUpgradeListener();
+        }
+        this.displayed = true;
+        document.getElementById("building-info-square_type").textContent = `${this.color} Square`;
+        document.getElementById("building-info-level").textContent = `Level: ${this.level}`;
+        document.getElementById("building-info-earnings_second").textContent = `Earnings per second: ${this.earningsPerSecond}`;
+        document.getElementById("building-info-earnings_hour").textContent = `Earnings per hour: ${this.earningsPerHour}`;
+        document.getElementById("building-info-upgrade-number").textContent = this.nextLevelUpgradeCost;
         if (this.maxLevel === this.level) {
             document.getElementById("building-info-upgrade").style.display = 'none';
         } else {
             document.getElementById("building-info-upgrade").style.display = 'inline-block';
         }
         let upgrade_button = document.getElementById("building-info-upgrade");
-        upgrade_button.replaceWith(upgrade_button.cloneNode(true));
         const this_square = this;
-        document.getElementById("building-info-upgrade").addEventListener('click', function () {
+        this.upgradeButtonListner = function upgradeSquare() {
+            this_square.displayed = false;
             this_square.upgrade();
             this_square.displaySquare();
-        });
+        }
+        upgrade_button.addEventListener('click', this.upgradeButtonListner, {'once': true});
+    }
+    removeUpgradeListener() {
+        let upgrade_button = document.getElementById("building-info-upgrade");
+        upgrade_button.removeEventListener('click', this.upgradeButtonListner);
     }
 }
 
@@ -290,13 +303,13 @@ document.getElementById("blue-square-buy").addEventListener('click', function ()
     new blue_square((getRandomInt(30) + 4) * 30, (getRandomInt(18) + 4) * 30);
     blue_squares -= blue_square_cost;
     blue_square_cost = blue_square_cost + 2 * 2;
-    this.innerHTML = `Buy ${blue_square_cost}<img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;">`;
+    document.getElementById("blue-square-cost").textContent = blue_square_cost;
 });
 setInterval(() => {
     for (let building of buildings) {
         building.upResource();
     }
-    document.getElementById("blue-squares-count").innerHTML = `${blue_squares}<img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;">`;
+    document.getElementById("blue-squares-count").textContent = blue_squares;
 }, 1000);
 // const grass = new shape(400, 0, 20, 20);
 // grass.drawInnerGrassBlock1();
