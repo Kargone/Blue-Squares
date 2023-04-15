@@ -139,6 +139,7 @@ function main() {
         dstX, dstY, dstWidth, dstHeight);
     });
     dragShape();
+    updateResourceDisplays();
     refreshCanvas();
   }
   setInterval(() => {
@@ -264,5 +265,12 @@ function dragShape() {
       building.displaySquare();
       return true;
     }
+  }
+}
+
+function updateResourceDisplays() {
+  for (let building_key of Object.keys(buildings)) {
+    let building = buildings[building_key];
+    building.updateResourceDisplay();
   }
 }

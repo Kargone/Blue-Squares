@@ -47,7 +47,6 @@ class rect {
         this.g = 0;
         this.b = 0;
     }
-    console.log(this.r,this.g,this.b)
     this.gl = document.querySelector("#game-canvas").getContext("webgl2");
     this.colorLocation = '';
     this.id = getRandomInt();
@@ -183,16 +182,24 @@ class blue_square {
         this.color = 'Blue';
         this.displayed = false;
         this.id = getRandomInt();
+        document.getElementById('resource-displays').innerHTML += `
+            <p id="resource-display-${this.id}" class="resource-display">+
+                <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
+                <img src="Images/blue_square.png" style="margin-left: 2px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;">
+            </p>
+        `;
         buildings[this.id] = this;
     }
     checkForMouseHover() {
         if (!mouse_down) {
+            document.getElementById(`resource-display-${this.id}`).style.display = 'inline-block';
             this.selected = false;
             return false;
         }
         if (this.selected) {
             if ((this.x - 20 < mouseX) && (mouseX < this.x + this.width + 20)) {
                 if ((this.y - 20 < mouseY) && (mouseY < this.y + this.height + 20)) {
+                    document.getElementById(`resource-display-${this.id}`).style.display = 'none';
                     this.selected = true;
                     return true;
                 }
@@ -200,11 +207,13 @@ class blue_square {
         } else {
             if ((this.x + this.outlineInline < mouseX) && (mouseX < this.x + this.width - this.outlineInline)) {
                 if ((this.y + this.outlineInline < mouseY) && (mouseY < this.y + this.height - this.outlineInline)) {
+                    document.getElementById(`resource-display-${this.id}`).style.display = 'none';
                     this.selected = true;
                     return true;
                 }
             }
         }
+        document.getElementById(`resource-display-${this.id}`).style.display = 'inline-block';
         this.selected = false;
         return false;
     }
@@ -217,16 +226,6 @@ class blue_square {
         let square_object = shapes[this.squareId];
         square_object.x = this.x + this.outlineInline + this.inlineInline;
         square_object.y = this.y + this.outlineInline + this.inlineInline;
-        // for (let index in shapes) {
-        //     let element = shapes[index];
-        //     if (element.id === this.outelineId) {
-        //         shapes[index].x = this.x + this.outlineInline;
-        //         shapes[index].y = this.y + this.outlineInline;
-        //     } else if (element.id === this.squareId) {
-        //         shapes[index].x = this.x + this.outlineInline + this.inlineInline;
-        //         shapes[index].y = this.y + this.outlineInline + this.inlineInline;
-        //     }
-        // }
     }
     upResource() {
         blue_squares += this.earningsPerSecond;
@@ -255,26 +254,10 @@ class blue_square {
         square_object.r = this.r;
         square_object.g = this.g;
         square_object.b = this.b;
-        // for (let shape of shapes) {
-        //     if (shape.id === this.outelineId) {
-        //         shape.x = this.x + this.outlineInline;
-        //         shape.y = this.y + this.outlineInline;
-        //         shape.width = this.width - (2 * this.outlineInline);
-        //         shape.height = this.height - (2 * this.outlineInline);
-        //     } else if (shape.id === this.squareId) {
-        //         shape.x = this.x + this.outlineInline + this.inlineInline;
-        //         shape.y = this.y + this.outlineInline + this.inlineInline;
-        //         shape.width = this.width - (2 * this.outlineInline) - (2 * this.inlineInline);
-        //         shape.height = this.height - (2 * this.outlineInline) - (2 * this.inlineInline);
-        //         shape.r = this.r;
-        //         shape.g = this.g;
-        //         shape.b = this.b;
-        //     }
-        // }
+        document.getElementById(`resource-display-${this.id}-count`).textContent = this.earningsPerSecond;
         document.getElementById("blue-squares-count").textContent = blue_squares;
     }
     displaySquare() {
-        console.log('h')
         if (this.displayed) return;
         for (let building_key of Object.keys(buildings)) {
             let building = buildings[building_key];
@@ -304,6 +287,10 @@ class blue_square {
     removeUpgradeListener() {
         let upgrade_button = document.getElementById("building-info-upgrade");
         upgrade_button.removeEventListener('click', this.upgradeButtonListner);
+    }
+    updateResourceDisplay() {
+        document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 2) + 'px';
+        document.getElementById(`resource-display-${this.id}`).style.left = (this.x + 10)+ 'px';
     }
 }
 
@@ -335,15 +322,3 @@ setInterval(() => {
     }
     document.getElementById("blue-squares-count").textContent = blue_squares;
 }, 1000);
-// const grass = new shape(400, 0, 20, 20);
-// grass.drawInnerGrassBlock1();
-// const grass2 = new shape(400, 300, 300, 300);
-// grass2.drawInnerGrassBlock2();
-// const grass3 = new shape(700, 300, 300, 300);
-// grass3.drawInnerGrassBlock1();
-// const grass4 = new shape(700, 0, 300, 300);
-// grass4.drawInnerGrassBlock2();
-// const grass5 = new shape(100, 0, 300, 300);
-// grass5.drawOuterGrassBlock();
-// const grass6 = new shape(100, 300, 300, 300);
-// grass6.drawOuterGrassBlock();
