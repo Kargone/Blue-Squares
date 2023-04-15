@@ -26,8 +26,8 @@ const GAME_BORDER = 4;
 const OUTER_GRASS_COLOR = '(20,110,16)';
 const INNER_GRASS_COLOR = '(30,227,23)';
 
-shapes = [];
-buildings = [];
+shapes = {};
+buildings = {};
 let blue_squares = 0;
 let blue_square_cost = 0;
 
@@ -51,7 +51,8 @@ class rect {
     this.gl = document.querySelector("#game-canvas").getContext("webgl2");
     this.colorLocation = '';
     this.id = getRandomInt();
-    shapes.push(this);
+    this.z = 1;
+    shapes[this.id] = this;
   }
   draw() {
     let x1 = this.x;
@@ -171,6 +172,7 @@ class blue_square {
             this.height - (2 * outlineInline) - (2 * inlineInline),
             `(${this.r},${this.g},${this.b})`
         );
+        square.z = 2;
         this.squareId = square.getId();
         this.selected = false;
         this.earningsPerSecond = 1;
@@ -180,7 +182,8 @@ class blue_square {
         this.level = 1;
         this.color = 'Blue';
         this.displayed = false;
-        buildings.push(this);
+        this.id = getRandomInt();
+        buildings[this.id] = this;
     }
     checkForMouseHover() {
         if (!mouse_down) {
@@ -208,16 +211,22 @@ class blue_square {
     updateXandY() {
         this.x = Math.round((mouseX - this.width / 2) / BLOCK_WIDTH) * BLOCK_WIDTH;
         this.y = Math.round((mouseY - this.height / 2) / BLOCK_HEIGHT) * BLOCK_HEIGHT;
-        for (let index in shapes) {
-            let element = shapes[index];
-            if (element.id === this.outelineId) {
-                shapes[index].x = this.x + this.outlineInline;
-                shapes[index].y = this.y + this.outlineInline;
-            } else if (element.id === this.squareId) {
-                shapes[index].x = this.x + this.outlineInline + this.inlineInline;
-                shapes[index].y = this.y + this.outlineInline + this.inlineInline;
-            }
-        }
+        let outline_object = shapes[this.outelineId];
+        outline_object.x = this.x + this.outlineInline;
+        outline_object.y = this.y + this.outlineInline;
+        let square_object = shapes[this.squareId];
+        square_object.x = this.x + this.outlineInline + this.inlineInline;
+        square_object.y = this.y + this.outlineInline + this.inlineInline;
+        // for (let index in shapes) {
+        //     let element = shapes[index];
+        //     if (element.id === this.outelineId) {
+        //         shapes[index].x = this.x + this.outlineInline;
+        //         shapes[index].y = this.y + this.outlineInline;
+        //     } else if (element.id === this.squareId) {
+        //         shapes[index].x = this.x + this.outlineInline + this.inlineInline;
+        //         shapes[index].y = this.y + this.outlineInline + this.inlineInline;
+        //     }
+        // }
     }
     upResource() {
         blue_squares += this.earningsPerSecond;
@@ -233,28 +242,42 @@ class blue_square {
         this.outlineInline -= 2;
         this.r -= 16;
         this.g -= 16;
-        for (let shape of shapes) {
-            if (shape.id === this.outelineId) {
-                shape.x = this.x + this.outlineInline;
-                shape.y = this.y + this.outlineInline;
-                shape.width = this.width - (2 * this.outlineInline);
-                shape.height = this.height - (2 * this.outlineInline);
-            } else if (shape.id === this.squareId) {
-                shape.x = this.x + this.outlineInline + this.inlineInline;
-                shape.y = this.y + this.outlineInline + this.inlineInline;
-                shape.width = this.width - (2 * this.outlineInline) - (2 * this.inlineInline);
-                shape.height = this.height - (2 * this.outlineInline) - (2 * this.inlineInline);
-                shape.r = this.r;
-                shape.g = this.g;
-                shape.b = this.b;
-            }
-        }
+        let outline_object = shapes[this.outelineId];
+        outline_object.x = this.x + this.outlineInline;
+        outline_object.y = this.y + this.outlineInline;
+        outline_object.width = this.width - (2 * this.outlineInline);
+        outline_object.height = this.height - (2 * this.outlineInline);
+        let square_object = shapes[this.squareId];
+        square_object.x = this.x + this.outlineInline + this.inlineInline;
+        square_object.y = this.y + this.outlineInline + this.inlineInline;
+        square_object.width = this.width - (2 * this.outlineInline) - (2 * this.inlineInline);
+        square_object.height = this.height - (2 * this.outlineInline) - (2 * this.inlineInline);
+        square_object.r = this.r;
+        square_object.g = this.g;
+        square_object.b = this.b;
+        // for (let shape of shapes) {
+        //     if (shape.id === this.outelineId) {
+        //         shape.x = this.x + this.outlineInline;
+        //         shape.y = this.y + this.outlineInline;
+        //         shape.width = this.width - (2 * this.outlineInline);
+        //         shape.height = this.height - (2 * this.outlineInline);
+        //     } else if (shape.id === this.squareId) {
+        //         shape.x = this.x + this.outlineInline + this.inlineInline;
+        //         shape.y = this.y + this.outlineInline + this.inlineInline;
+        //         shape.width = this.width - (2 * this.outlineInline) - (2 * this.inlineInline);
+        //         shape.height = this.height - (2 * this.outlineInline) - (2 * this.inlineInline);
+        //         shape.r = this.r;
+        //         shape.g = this.g;
+        //         shape.b = this.b;
+        //     }
+        // }
         document.getElementById("blue-squares-count").textContent = blue_squares;
     }
     displaySquare() {
         console.log('h')
         if (this.displayed) return;
-        for (let building of buildings) {
+        for (let building_key of Object.keys(buildings)) {
+            let building = buildings[building_key];
             building.displayed = false;
             building.removeUpgradeListener();
         }
@@ -306,7 +329,8 @@ document.getElementById("blue-square-buy").addEventListener('click', function ()
     document.getElementById("blue-square-cost").textContent = blue_square_cost;
 });
 setInterval(() => {
-    for (let building of buildings) {
+    for (let building_key of Object.keys(buildings)) {
+        let building = buildings[building_key];
         building.upResource();
     }
     document.getElementById("blue-squares-count").textContent = blue_squares;

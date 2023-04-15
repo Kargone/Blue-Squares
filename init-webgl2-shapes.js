@@ -99,9 +99,13 @@ function refreshCanvas() {
 
   // draw 50 random rectangles in random colors
   // Put a rectangle in the position buffer
-  shapes.forEach(function (object) {
-    object.colorLocation = colorLocation;
-    object.draw();
-  });
+  for (let zindex of [1, 2]) {
+    Object.keys(shapes).forEach(function (key) {
+      let object = shapes[key];
+      if (object.z != zindex) return;
+      object.colorLocation = colorLocation;
+      object.draw();
+    });
+  }
   return 'Success';
 }

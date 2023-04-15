@@ -248,7 +248,8 @@ const textureInfos = [
 let image_draw_infos = [];
 
 function dragShape() {
-  for (let building of buildings) {
+  for (let building_key of Object.keys(buildings)) {
+    let building = buildings[building_key];
     if (!building.selected) continue;
     if (building.checkForMouseHover()) {
       building.updateXandY();
@@ -256,7 +257,8 @@ function dragShape() {
       return true;
     }
   }
-  for (let building of buildings) {
+  for (let building_key of Object.keys(buildings)) {
+    let building = buildings[building_key];
     if (building.checkForMouseHover()) {
       building.updateXandY();
       building.displaySquare();
