@@ -196,7 +196,6 @@ function main() {
   });
   gl.canvas.addEventListener('mousedown', (e) => {
     mouse_down = true;
-    console.log(mouseX, mouseY)
   });
   gl.canvas.addEventListener('mouseup', (e) => {
     mouse_down = false;

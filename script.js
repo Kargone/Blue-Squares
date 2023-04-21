@@ -182,6 +182,7 @@ class blue_square {
         this.color = 'Blue';
         this.displayed = false;
         this.id = getRandomInt();
+        this.totalCost = blue_square_cost;
         document.getElementById('resource-displays').innerHTML += `
             <p id="resource-display-${this.id}" class="resource-display">+
                 <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
@@ -192,14 +193,14 @@ class blue_square {
     }
     checkForMouseHover() {
         if (!mouse_down) {
-            document.getElementById(`resource-display-${this.id}`).style.display = 'inline-block';
+            document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
             this.selected = false;
             return false;
         }
         if (this.selected) {
             if ((this.x - 20 < mouseX) && (mouseX < this.x + this.width + 20)) {
                 if ((this.y - 20 < mouseY) && (mouseY < this.y + this.height + 20)) {
-                    document.getElementById(`resource-display-${this.id}`).style.display = 'none';
+                    document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
                     this.selected = true;
                     return true;
                 }
@@ -207,13 +208,13 @@ class blue_square {
         } else {
             if ((this.x + this.outlineInline < mouseX) && (mouseX < this.x + this.width - this.outlineInline)) {
                 if ((this.y + this.outlineInline < mouseY) && (mouseY < this.y + this.height - this.outlineInline)) {
-                    document.getElementById(`resource-display-${this.id}`).style.display = 'none';
+                    document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
                     this.selected = true;
                     return true;
                 }
             }
         }
-        document.getElementById(`resource-display-${this.id}`).style.display = 'inline-block';
+        document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
         this.selected = false;
         return false;
     }
@@ -234,6 +235,7 @@ class blue_square {
         if (this.level >= this.maxLevel) return;
         if (blue_squares < this.nextLevelUpgradeCost) return;
         blue_squares -= this.nextLevelUpgradeCost;
+        this.totalCost += this.nextLevelUpgradeCost;
         this.earningsPerSecond += 1;
         this.earningsPerHour = this.earningsPerSecond * 3600;
         this.nextLevelUpgradeCost += 1;
@@ -263,6 +265,7 @@ class blue_square {
             let building = buildings[building_key];
             building.displayed = false;
             building.removeUpgradeListener();
+            building.removeDeleteListener();
         }
         this.displayed = true;
         document.getElementById("building-info-square_type").textContent = `${this.color} Square`;
@@ -270,23 +273,38 @@ class blue_square {
         document.getElementById("building-info-earnings_second").textContent = `Earnings per second: ${this.earningsPerSecond}`;
         document.getElementById("building-info-earnings_hour").textContent = `Earnings per hour: ${this.earningsPerHour}`;
         document.getElementById("building-info-upgrade-number").textContent = this.nextLevelUpgradeCost;
+        document.getElementById("building-info-delete-number").textContent = this.totalCost;
         if (this.maxLevel === this.level) {
             document.getElementById("building-info-upgrade").style.display = 'none';
         } else {
             document.getElementById("building-info-upgrade").style.display = 'inline-block';
         }
-        let upgrade_button = document.getElementById("building-info-upgrade");
         const this_square = this;
+        let upgrade_button = document.getElementById("building-info-upgrade");
         this.upgradeButtonListner = function upgradeSquare() {
             this_square.displayed = false;
             this_square.upgrade();
             this_square.displaySquare();
         }
         upgrade_button.addEventListener('click', this.upgradeButtonListner, {'once': true});
+        let delete_button = document.getElementById("building-info-delete");
+        this.deleteButtonListner = function deleteSquare() {
+            delete buildings[this_square.id];
+            delete shapes[this_square.outelineId];
+            delete shapes[this_square.squareId];
+            blue_squares += this_square.totalCost;
+            document.getElementById(`resource-display-${this_square.id}`).remove();
+            this_square.removeUpgradeListener();
+        }
+        delete_button.addEventListener('click', this.deleteButtonListner, {'once': true});
     }
     removeUpgradeListener() {
         let upgrade_button = document.getElementById("building-info-upgrade");
         upgrade_button.removeEventListener('click', this.upgradeButtonListner);
+    }
+    removeDeleteListener() {
+        let delete_button = document.getElementById("building-info-delete");
+        delete_button.removeEventListener('click', this.deleteButtonListner);
     }
     updateResourceDisplay() {
         document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 2) + 'px';
@@ -308,6 +326,7 @@ function getRandomInt(max = 1000000000) {
 }
 
 renderGame();
+
 document.getElementById("blue-square-buy").addEventListener('click', function () {
     if (blue_squares < blue_square_cost) return;
     new blue_square((getRandomInt(30) + 4) * 30, (getRandomInt(18) + 4) * 30);
@@ -315,7 +334,8 @@ document.getElementById("blue-square-buy").addEventListener('click', function ()
     blue_square_cost = blue_square_cost + 2 * 2;
     document.getElementById("blue-square-cost").textContent = blue_square_cost;
 });
-setInterval(() => {
+
+const UP_RESOURCES = setInterval(() => {
     for (let building_key of Object.keys(buildings)) {
         let building = buildings[building_key];
         building.upResource();
