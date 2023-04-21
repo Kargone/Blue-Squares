@@ -28,6 +28,7 @@ const INNER_GRASS_COLOR = '(30,227,23)';
 
 shapes = {};
 buildings = {};
+let grid = {};
 let blue_squares = 0;
 let blue_square_cost = 0;
 
@@ -100,6 +101,7 @@ class Grass_Block {
         } else {
             const doShade = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
             const grass_block = new Grass_Block(this.x, this.y, this.width, this.height);
+            grid[`${this.x / BLOCK_WIDTH - GAME_BORDER}_${this.y / BLOCK_HEIGHT - GAME_BORDER}`] = '';
             if (doShade === 0) grass_block.drawInnerGrassBlock1();
             if (doShade === 1) grass_block.drawInnerGrassBlock2();
         }
@@ -141,13 +143,11 @@ class Grass_Block {
 }
 
 class blue_square {
-    constructor(x = 100, y = 100) {
+    constructor(object) {
         const widthGameBlocks = 2;
         const heightGameBlocks = 2;
         const outlineInline = 22;
         const inlineInline = 2;
-        this.x = x;
-        this.y = y;
         this.width = widthGameBlocks * BLOCK_WIDTH;
         this.height = heightGameBlocks * BLOCK_HEIGHT;
         this.r = 160;
@@ -155,6 +155,28 @@ class blue_square {
         this.b = 255;
         this.gl = document.querySelector("#game-canvas").getContext("webgl2");
         this.colorLocation = '';
+        this.x = 20;
+        this.y = 20;
+        this.coordX = 0;
+        this.corrdY = 0;
+        for (let x_y of Object.keys(grid)) {
+            x_y = x_y.split('_');
+            const gridX = parseInt(x_y[0]);
+            const gridY = parseInt(x_y[1]);
+            if (grid[`${gridX}_${gridY}`] != '') continue;
+            if (grid[`${gridX + 1}_${gridY}`] != '') continue;
+            if (grid[`${gridX}_${gridY + 1}`] != '') continue;
+            if (grid[`${gridX + 1}_${gridY + 1}`] != '') continue;
+            this.x = (GAME_BORDER + gridX) * BLOCK_WIDTH;
+            this.y = (GAME_BORDER + gridY) * BLOCK_HEIGHT;
+            grid[`${gridX}_${gridY}`] = 'occupied';
+            grid[`${gridX + 1}_${gridY}`] = 'occupied';
+            grid[`${gridX}_${gridY + 1}`] = 'occupied';
+            grid[`${gridX + 1}_${gridY + 1}`] = 'occupied';
+            this.coordX = gridX;
+            this.corrdY = gridY;
+            break;
+        }
         this.outlineInline = outlineInline;
         this.inlineInline = inlineInline;
         const outline = new rect(
@@ -329,7 +351,7 @@ renderGame();
 
 document.getElementById("blue-square-buy").addEventListener('click', function () {
     if (blue_squares < blue_square_cost) return;
-    new blue_square((getRandomInt(30) + 4) * 30, (getRandomInt(18) + 4) * 30);
+    new blue_square();
     blue_squares -= blue_square_cost;
     blue_square_cost = blue_square_cost + 2 * 2;
     document.getElementById("blue-square-cost").textContent = blue_square_cost;
