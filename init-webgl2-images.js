@@ -195,9 +195,13 @@ function main() {
     mouseY = e.clientY - rect.top;
   });
   gl.canvas.addEventListener('touchmove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    mouseX = e.clientX - rect.left;
-    mouseY = e.clientY - rect.top;
+    const touch = e.targetTouches[0];
+    if (e.targetTouches.length > 1) {
+      mouse_down = false;
+      return;
+    }
+    mouseX = touch.clientX;
+    mouseY = touch.clientY;
   });
   gl.canvas.addEventListener('mousedown', (e) => {
     mouse_down = true;
