@@ -219,21 +219,22 @@ class blue_square {
             this.selected = false;
             return false;
         }
-        if (this.selected) {
-            if ((this.x - 20 < mouseX) && (mouseX < this.x + this.width + 20)) {
-                if ((this.y - 20 < mouseY) && (mouseY < this.y + this.height + 20)) {
-                    document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
-                    this.selected = true;
-                    return true;
-                }
-            }
-        } else {
-            if ((this.x + this.outlineInline < mouseX) && (mouseX < this.x + this.width - this.outlineInline)) {
-                if ((this.y + this.outlineInline < mouseY) && (mouseY < this.y + this.height - this.outlineInline)) {
-                    document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
-                    this.selected = true;
-                    return true;
-                }
+        // if (this.selected) {
+            
+        // } else {
+        //     if ((this.x + this.outlineInline < mouseX) && (mouseX < this.x + this.width - this.outlineInline)) {
+        //         if ((this.y + this.outlineInline < mouseY) && (mouseY < this.y + this.height - this.outlineInline)) {
+        //             document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
+        //             this.selected = true;
+        //             return true;
+        //         }
+        //     }
+        // }
+        if ((this.x - 20 < mouseX) && (mouseX < this.x + this.width + 20)) {
+            if ((this.y - 20 < mouseY) && (mouseY < this.y + this.height + 20)) {
+                document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
+                this.selected = true;
+                return true;
             }
         }
         document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
