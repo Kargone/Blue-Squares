@@ -194,10 +194,21 @@ function main() {
     mouseX = e.clientX - rect.left;
     mouseY = e.clientY - rect.top;
   });
+  gl.canvas.addEventListener('touchmove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
+  });
   gl.canvas.addEventListener('mousedown', (e) => {
     mouse_down = true;
   });
+  gl.canvas.addEventListener('touchstart', (e) => {
+    mouse_down = true;
+  });
   gl.canvas.addEventListener('mouseup', (e) => {
+    mouse_down = false;
+  });
+  gl.canvas.addEventListener('touchend', (e) => {
     mouse_down = false;
   });
 }
