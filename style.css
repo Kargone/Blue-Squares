@@ -25,6 +25,54 @@
     z-index: 100;
 }
 
+#toggle-building-info-div {
+    position: absolute;
+    width: 15px;
+    height: 60px;
+    z-index: 100;
+    top: 25px;
+    left: -23px;
+    background: #d6c289;
+    border: 4px solid brown;
+    border-radius: 40px 0px 0px 40px;
+}
+
+#toggle-building-info-div > button {
+    height: 52px;
+    width: 13px;
+    min-width: 0px;
+    background: black;
+
+}
+
+.collapse-building-info {
+    animation: ease-out collapse-building-info 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes collapse-building-info {
+    from {
+        transform : scale(1);
+    }
+    to {
+        transform: translateX(calc(100% - 8px));
+    }
+}
+
+.open-building-info {
+    animation: ease-out open-building-info 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes open-building-info {
+    from {
+        transform : translateX(calc(100% - 8px));
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
 #settings {
     width: 130px;
     height: 40px;

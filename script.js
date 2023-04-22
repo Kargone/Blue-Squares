@@ -31,6 +31,7 @@ buildings = {};
 let grid = {};
 let blue_squares = 0;
 let blue_square_cost = 0;
+let building_info_open = true;
 
 class rect {
   constructor(x = 0, y = 0, width, height, rgb) {
@@ -356,6 +357,15 @@ document.getElementById("blue-square-buy").addEventListener('click', function ()
     blue_squares -= blue_square_cost;
     blue_square_cost = blue_square_cost + 2 * 2;
     document.getElementById("blue-square-cost").textContent = blue_square_cost;
+});
+
+document.getElementById("toggle-building-info").addEventListener('click', function () {
+    building_info_open = !building_info_open;
+    if (building_info_open) {
+        document.getElementById("building-info").className = "collapse-building-info open-building-info";
+    } else {
+        document.getElementById("building-info").className = "collapse-building-info";
+    }
 });
 
 const UP_RESOURCES = setInterval(() => {
