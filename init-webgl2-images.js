@@ -205,33 +205,35 @@ function main() {
   });
   gl.canvas.addEventListener('mousedown', (e) => {
     mouse_down = true;
-    for (let building_key of Object.keys(buildings)) {
-      let building = buildings[building_key];
-      if (building.checkForMouseHover()) {
-        building.displaySquare();
-        building_info_open = true;
-        document.getElementById("building-info").className = "collapse-building-info open-building-info";
-        return;
-      }
-    }
   });
   gl.canvas.addEventListener('touchstart', (e) => {
     mouse_down = true;
+  });
+  gl.canvas.addEventListener('mouseup', (e) => {
+    if (!mouse_down) return;
     for (let building_key of Object.keys(buildings)) {
       let building = buildings[building_key];
       if (building.checkForMouseHover()) {
         building.displaySquare();
         building_info_open = true;
         document.getElementById("building-info").className = "collapse-building-info open-building-info";
+        mouse_down = false;
         return;
       }
     }
   });
-  gl.canvas.addEventListener('mouseup', (e) => {
-    mouse_down = false;
-  });
   gl.canvas.addEventListener('touchend', (e) => {
-    mouse_down = false;
+    if (!mouse_down) return;
+    for (let building_key of Object.keys(buildings)) {
+      let building = buildings[building_key];
+      if (building.checkForMouseHover()) {
+        building.displaySquare();
+        building_info_open = true;
+        document.getElementById("building-info").className = "collapse-building-info open-building-info";
+        mouse_down = false;
+        return;
+      }
+    }
   });
 }
 

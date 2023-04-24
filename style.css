@@ -12,6 +12,83 @@
     z-index: 100;
 }
 
+#toggle-building-create {
+    position: absolute;
+    width: 80px;
+    height: 15px;
+    z-index: 100;
+    top: -27px;
+    left: calc(50% - 40px);
+    border-radius: 40px 40px 0px 0px;
+    padding: 2px;
+    border: 4px solid brown;
+    background: #d6c289;
+    text-align: center;
+}
+
+#toggle-building-create > p {
+    margin-bottom: 0px;
+    margin-top: -2px;
+}
+
+.collapse-building-create {
+    animation: ease-out collapse-building-create 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes collapse-building-create {
+    from {
+        transform: translateX(-50%);
+    }
+    to {
+        transform: translateY(calc(100% - 11px)) translateX(-50%);
+    }
+}
+
+.collapse-building-create > #toggle-building-create > p {
+    animation: ease-out rotate-up-arrow 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes rotate-up-arrow {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: rotate(180deg) translateY(2px);
+    }
+}
+
+.open-building-create {
+    animation: ease-out open-building-create 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes open-building-create {
+    from {
+        transform: translateY(calc(100% - 11px)) translateX(-50%);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.open-building-create > #toggle-building-create > p {
+    animation: ease-out rotate-down-arrow 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes rotate-down-arrow {
+    from {
+        transform: rotate(180deg) translateY(2px);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+/*                                                   */
+
 #building-info {
     height: 50%;
     aspect-ratio: 4 / 8;
@@ -25,24 +102,17 @@
     z-index: 100;
 }
 
-#toggle-building-info-div {
+#toggle-building-info {
     position: absolute;
     width: 15px;
     height: 60px;
     z-index: 100;
     top: 25px;
-    left: -23px;
+    left: -27px;
     background: #d6c289;
     border: 4px solid brown;
     border-radius: 40px 0px 0px 40px;
-}
-
-#toggle-building-info-div > button {
-    height: 52px;
-    width: 13px;
-    min-width: 0px;
-    background: black;
-
+    padding: 2px;
 }
 
 .collapse-building-info {
@@ -52,10 +122,24 @@
 
 @keyframes collapse-building-info {
     from {
-        transform : scale(1);
+        transform: scale(1);
     }
     to {
         transform: translateX(calc(100% - 8px));
+    }
+}
+
+.collapse-building-info > #toggle-building-info > p {
+    animation: ease-out rotate-left-arrow 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes rotate-left-arrow {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: rotate(180deg);
     }
 }
 
@@ -66,7 +150,21 @@
 
 @keyframes open-building-info {
     from {
-        transform : translateX(calc(100% - 8px));
+        transform: translateX(calc(100% - 8px));
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.open-building-info > #toggle-building-info > p {
+    animation: ease-out rotate-right-arrow 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes rotate-right-arrow {
+    from {
+        transform: rotate(180deg);
     }
     to {
         transform: scale(1);
@@ -114,6 +212,57 @@
         transform : translate(0px, -30px);
         opacity   : 0;
     }
+}
+
+.notification {
+    margin-top: 5px;
+    margin-bottom: 0px;
+    color: black;
+    background: white;
+    border: 2px solid black;
+    padding: 5px;
+    padding-right: 30px;
+    padding-left: 30px;
+    font-size: 15px;
+    font-family: sans-serif;
+    text-align: center;
+    max-width: 90vw;
+    width: fit-content;
+    border-radius: 13px;
+    position: relative;
+    pointer-events: auto;
+}
+
+.deleteNotification {
+    visibility: visible;
+    position: absolute;
+    right: 10px;
+    top: -4.5px;
+    color: gray;
+}
+
+.notification .deleteNotification{
+    visibility: hidden;
+}
+
+.notification:hover .deleteNotification{
+    visibility: visible;
+}
+
+.notificationText {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: var(--text_color);
+}
+
+#notifications {
+	z-index: 2000;
+    text-align: center;
+    text-align: -webkit-center;
+    position: fixed;
+    width: 100vw;
+    top: 20px;
+    pointer-events: none;
 }
 
 button {

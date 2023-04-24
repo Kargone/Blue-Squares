@@ -16,12 +16,16 @@
   <body id="body">
     <!-- needed buttons to close the create and info tabs -->
     <canvas id="game-canvas"></canvas>
-    <div id="building-create" style="display: grid;">
+    <div id="notifications"></div>
+    <div id="building-create" style="display: grid;" class="collapse-building-create open-building-create">
       <!-- it will show the prices of the buildings that can currently be built, with arrows on the sides when you unlock more -->
       <img src="Images/blue_square.png" alt="Blue Square" style="margin-left: 30px; margin-top: 5px; width: 60px; height: 60px; border: 2px solid black;">
       <button id="blue-square-buy" style="margin-left: 23px;">Buy <span id="blue-square-cost">0</span><img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></button>
+      <div id="toggle-building-create">
+        <p>🢃</p>
+       </div>
     </div>
-    <div id="building-info">
+    <div id="building-info" class="collapse-building-info open-building-info">
       <!-- 
         Blue Sqaure
         Level: 10
@@ -39,8 +43,8 @@
        <button id="building-info-upgrade">Upgrade <span id="building-info-upgrade-number"></span><img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></button>
        <p style="font-size: 10px;">*square will be 100% refunded*</p>
        <button id="building-info-delete">Delete <span id="building-info-delete-number"></span><img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></button>
-       <div id="toggle-building-info-div">
-        <button id="toggle-building-info"></button>
+       <div id="toggle-building-info">
+        <p>🢂</p>
        </div>
     </div>
     <div id="settings">
@@ -48,7 +52,7 @@
       settings -->
     </div>
     <div id="resources">
-      <p style="margin-left: 10px; margin-right: 10px;"><span id="blue-squares-count">XXXXX</span><img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></p>
+      <p style="margin-left: 10px; margin-right: 10px;"><span id="blue-squares-count">XXXXX</span><img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; width: 10px; height: 10px; border: 2px solid black;"></p>
       <!-- <p style="margin-left: 10px; margin-right: 10px;">XXXXX<img src="Images/red_square.png" alt="- Red Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></p>
       <p style="margin-left: 10px; margin-right: 10px;">XXXXX<img src="Images/green_square.png" alt="- Green Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></p>
       <p style="margin-left: 10px; margin-right: 10px;">XXXXX<img src="Images/purple_square.png" alt="- Purple Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></p> -->

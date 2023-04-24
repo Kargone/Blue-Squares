@@ -32,6 +32,8 @@ let grid = {};
 let blue_squares = 0;
 let blue_square_cost = 0;
 let building_info_open = true;
+let building_create_open = true;
+let notificationRemoved = {'id':'removed or not'};
 
 class rect {
   constructor(x = 0, y = 0, width, height, rgb) {
@@ -312,13 +314,18 @@ class blue_square {
         }
         upgrade_button.addEventListener('click', this.upgradeButtonListner, {'once': true});
         let delete_button = document.getElementById("building-info-delete");
-        this.deleteButtonListner = function deleteSquare() {
-            delete buildings[this_square.id];
-            delete shapes[this_square.outelineId];
-            delete shapes[this_square.squareId];
-            blue_squares += this_square.totalCost;
-            document.getElementById(`resource-display-${this_square.id}`).remove();
-            this_square.removeUpgradeListener();
+        this.deleteButtonListner = function tryToDeleteSquare() {
+            notification('Are you sure?');
+            this_square.deleteButtonListner = function deleteSquare() {
+                delete buildings[this_square.id];
+                delete shapes[this_square.outelineId];
+                delete shapes[this_square.squareId];
+                blue_squares += this_square.totalCost;
+                document.getElementById(`resource-display-${this_square.id}`).remove();
+                this_square.removeUpgradeListener();
+            }
+            let delete_button = document.getElementById("building-info-delete");
+            delete_button.addEventListener('click', this_square.deleteButtonListner, {'once': true});
         }
         delete_button.addEventListener('click', this.deleteButtonListner, {'once': true});
     }
@@ -349,6 +356,30 @@ function getRandomInt(max = 1000000000) {
     return Math.floor(Math.random() * max);
 }
 
+function notification(text) {
+    let x = getRandomInt();
+    document.getElementById("notifications").innerHTML += `
+        <div class="notification" id="noti${x}">
+            <p class="notificationText">${text}</p>
+            <p class="deleteNotification" id="delete${x}">X</p>
+        </div>
+    `;
+    notificationRemoved[x] = false;
+    for (notificationId of Object.keys(notificationRemoved)) {
+        if (notificationRemoved[notificationId]) continue;
+        let tempNotificationId = notificationId;
+        document.getElementById("delete"+tempNotificationId).addEventListener('click', function () {
+            document.getElementById("noti"+tempNotificationId).remove();
+            notificationRemoved[tempNotificationId] = true;
+        });
+    }
+    setTimeout(function() {
+        if (notificationRemoved[x]) return;
+        document.getElementById("noti"+x).remove();
+        notificationRemoved[x] = true;
+    }, 3000);
+}
+
 renderGame();
 
 document.getElementById("blue-square-buy").addEventListener('click', function () {
@@ -365,6 +396,15 @@ document.getElementById("toggle-building-info").addEventListener('click', functi
         document.getElementById("building-info").className = "collapse-building-info open-building-info";
     } else {
         document.getElementById("building-info").className = "collapse-building-info";
+    }
+});
+
+document.getElementById("toggle-building-create").addEventListener('click', function () {
+    building_create_open = !building_create_open;
+    if (building_create_open) {
+        document.getElementById("building-create").className = "collapse-building-create open-building-create";
+    } else {
+        document.getElementById("building-create").className = "collapse-building-create";
     }
 });
 
