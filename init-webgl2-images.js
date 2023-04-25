@@ -214,6 +214,7 @@ function main() {
     for (let building_key of Object.keys(buildings)) {
       let building = buildings[building_key];
       if (building.checkForMouseHover()) {
+        building.selected = false;
         building.displaySquare();
         building_info_open = true;
         document.getElementById("building-info").className = "collapse-building-info open-building-info";
@@ -221,12 +222,14 @@ function main() {
         return;
       }
     }
+    mouse_down = false;
   });
   gl.canvas.addEventListener('touchend', (e) => {
     if (!mouse_down) return;
     for (let building_key of Object.keys(buildings)) {
       let building = buildings[building_key];
       if (building.checkForMouseHover()) {
+        building.selected = false;
         building.displaySquare();
         building_info_open = true;
         document.getElementById("building-info").className = "collapse-building-info open-building-info";
@@ -234,6 +237,7 @@ function main() {
         return;
       }
     }
+    mouse_down = false;
   });
 }
 
