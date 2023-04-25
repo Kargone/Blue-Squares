@@ -287,6 +287,8 @@ class blue_square {
     }
     displaySquare() {
         if (this.displayed) return;
+        document.getElementById('building-info-no-content').style.display = 'none';
+        document.getElementById('building-info-content').style.visibility = 'visible';
         for (let building_key of Object.keys(buildings)) {
             let building = buildings[building_key];
             building.displayed = false;
@@ -323,6 +325,8 @@ class blue_square {
                 blue_squares += THIS_SQUARE.totalCost;
                 document.getElementById(`resource-display-${THIS_SQUARE.id}`).remove();
                 THIS_SQUARE.removeUpgradeListener();
+                document.getElementById('building-info-no-content').style.display = 'block';
+                document.getElementById('building-info-content').style.visibility = 'hidden';
             }
             let delete_button = document.getElementById("building-info-delete");
             delete_button.addEventListener('click', THIS_SQUARE.deleteButtonListner, {'once': true});

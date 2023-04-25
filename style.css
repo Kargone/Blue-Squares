@@ -113,7 +113,11 @@
     z-index: 100;
 }
 
-#building-info > #refund-text {
+#building-info > #building-info-content {
+    visibility: hidden;
+}
+
+#building-info > #building-info-content > #refund-text {
     font-size: 10px;
 }
 
