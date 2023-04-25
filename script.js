@@ -102,15 +102,15 @@ class Grass_Block {
         } else if (this.y >= BLOCK_HEIGHT * GAME_BLOCK_AMOUNT_HEIGHT - BLOCK_HEIGHT * GAME_BORDER) {
             drawOuterBlockOfGrass(this);
         } else {
-            const doShade = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
-            const grass_block = new Grass_Block(this.x, this.y, this.width, this.height);
+            const DO_SHADe = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
+            const GRASS_BLOCK = new Grass_Block(this.x, this.y, this.width, this.height);
             grid[`${this.x / BLOCK_WIDTH - GAME_BORDER}_${this.y / BLOCK_HEIGHT - GAME_BORDER}`] = '';
-            if (doShade === 0) grass_block.drawInnerGrassBlock1();
-            if (doShade === 1) grass_block.drawInnerGrassBlock2();
+            if (DO_SHADe === 0) GRASS_BLOCK.drawInnerGrassBlock1();
+            if (DO_SHADe === 1) GRASS_BLOCK.drawInnerGrassBlock2();
         }
         function drawOuterBlockOfGrass(object) {
-            const grass_block = new Grass_Block(object.x, object.y, object.width, object.height);
-            grass_block.drawOuterGrassBlock();
+            const GRASS_BLOCK = new Grass_Block(object.x, object.y, object.width, object.height);
+            GRASS_BLOCK.drawOuterGrassBlock();
         }
     }
     drawOuterGrassBlock() {
@@ -147,12 +147,12 @@ class Grass_Block {
 
 class blue_square {
     constructor(object) {
-        const widthGameBlocks = 2;
-        const heightGameBlocks = 2;
-        const outlineInline = 22;
-        const inlineInline = 2;
-        this.width = widthGameBlocks * BLOCK_WIDTH;
-        this.height = heightGameBlocks * BLOCK_HEIGHT;
+        const WIDTH_GAME_BLOCKS = 2;
+        const HEIGHT_GAME_BLOCKS = 2;
+        const BLOCK_INLINE = 22;
+        const BORDER_WIDTH = 2;
+        this.width = WIDTH_GAME_BLOCKS * BLOCK_WIDTH;
+        this.height = HEIGHT_GAME_BLOCKS * BLOCK_HEIGHT;
         this.r = 160;
         this.g = 160;
         this.b = 255;
@@ -180,24 +180,24 @@ class blue_square {
             this.corrdY = gridY;
             break;
         }
-        this.outlineInline = outlineInline;
-        this.inlineInline = inlineInline;
-        const outline = new rect(
-            this.x + outlineInline,
-            this.y + outlineInline,
-            this.width - (2 * outlineInline),
-            this.height - (2 * outlineInline)
+        this.blockInline = BLOCK_INLINE;
+        this.borderWidth = BORDER_WIDTH;
+        const OUTLINE = new rect(
+            this.x + BLOCK_INLINE,
+            this.y + BLOCK_INLINE,
+            this.width - (2 * BLOCK_INLINE),
+            this.height - (2 * BLOCK_INLINE)
         );
-        this.outelineId = outline.getId();
-        const square = new rect(
-            this.x + outlineInline + inlineInline,
-            this.y + outlineInline + inlineInline,
-            this.width - (2 * outlineInline) - (2 * inlineInline),
-            this.height - (2 * outlineInline) - (2 * inlineInline),
+        this.outelineId = OUTLINE.getId();
+        const SQUARE = new rect(
+            this.x + BLOCK_INLINE + BORDER_WIDTH,
+            this.y + BLOCK_INLINE + BORDER_WIDTH,
+            this.width - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
+            this.height - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
             `(${this.r},${this.g},${this.b})`
         );
-        square.z = 2;
-        this.squareId = square.getId();
+        SQUARE.z = 2;
+        this.squareId = SQUARE.getId();
         this.selected = false;
         this.earningsPerSecond = 1;
         this.earningsPerHour = this.earningsPerSecond * 3600;
@@ -211,7 +211,7 @@ class blue_square {
         document.getElementById('resource-displays').innerHTML += `
             <p id="resource-display-${this.id}" class="resource-display">+
                 <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
-                <img src="Images/blue_square.png" style="margin-left: 2px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;">
+                <img src="Images/blue_square.png" class="resource-image">
             </p>
         `;
         buildings[this.id] = this;
@@ -225,8 +225,8 @@ class blue_square {
         // if (this.selected) {
             
         // } else {
-        //     if ((this.x + this.outlineInline < mouseX) && (mouseX < this.x + this.width - this.outlineInline)) {
-        //         if ((this.y + this.outlineInline < mouseY) && (mouseY < this.y + this.height - this.outlineInline)) {
+        //     if ((this.x + this.blockInline < mouseX) && (mouseX < this.x + this.width - this.blockInline)) {
+        //         if ((this.y + this.blockInline < mouseY) && (mouseY < this.y + this.height - this.blockInline)) {
         //             document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
         //             this.selected = true;
         //             return true;
@@ -248,11 +248,11 @@ class blue_square {
         this.x = Math.round((mouseX - this.width / 2) / BLOCK_WIDTH) * BLOCK_WIDTH;
         this.y = Math.round((mouseY - this.height / 2) / BLOCK_HEIGHT) * BLOCK_HEIGHT;
         let outline_object = shapes[this.outelineId];
-        outline_object.x = this.x + this.outlineInline;
-        outline_object.y = this.y + this.outlineInline;
+        outline_object.x = this.x + this.blockInline;
+        outline_object.y = this.y + this.blockInline;
         let square_object = shapes[this.squareId];
-        square_object.x = this.x + this.outlineInline + this.inlineInline;
-        square_object.y = this.y + this.outlineInline + this.inlineInline;
+        square_object.x = this.x + this.blockInline + this.borderWidth;
+        square_object.y = this.y + this.blockInline + this.borderWidth;
     }
     upResource() {
         blue_squares += this.earningsPerSecond;
@@ -266,19 +266,19 @@ class blue_square {
         this.earningsPerHour = this.earningsPerSecond * 3600;
         this.nextLevelUpgradeCost += 1;
         this.level += 1;
-        this.outlineInline -= 2;
+        this.blockInline -= 2;
         this.r -= 16;
         this.g -= 16;
         let outline_object = shapes[this.outelineId];
-        outline_object.x = this.x + this.outlineInline;
-        outline_object.y = this.y + this.outlineInline;
-        outline_object.width = this.width - (2 * this.outlineInline);
-        outline_object.height = this.height - (2 * this.outlineInline);
+        outline_object.x = this.x + this.blockInline;
+        outline_object.y = this.y + this.blockInline;
+        outline_object.width = this.width - (2 * this.blockInline);
+        outline_object.height = this.height - (2 * this.blockInline);
         let square_object = shapes[this.squareId];
-        square_object.x = this.x + this.outlineInline + this.inlineInline;
-        square_object.y = this.y + this.outlineInline + this.inlineInline;
-        square_object.width = this.width - (2 * this.outlineInline) - (2 * this.inlineInline);
-        square_object.height = this.height - (2 * this.outlineInline) - (2 * this.inlineInline);
+        square_object.x = this.x + this.blockInline + this.borderWidth;
+        square_object.y = this.y + this.blockInline + this.borderWidth;
+        square_object.width = this.width - (2 * this.blockInline) - (2 * this.borderWidth);
+        square_object.height = this.height - (2 * this.blockInline) - (2 * this.borderWidth);
         square_object.r = this.r;
         square_object.g = this.g;
         square_object.b = this.b;
@@ -305,27 +305,27 @@ class blue_square {
         } else {
             document.getElementById("building-info-upgrade").style.display = 'inline-block';
         }
-        const this_square = this;
+        const THIS_SQUARE = this;
         let upgrade_button = document.getElementById("building-info-upgrade");
         this.upgradeButtonListner = function upgradeSquare() {
-            this_square.displayed = false;
-            this_square.upgrade();
-            this_square.displaySquare();
+            THIS_SQUARE.displayed = false;
+            THIS_SQUARE.upgrade();
+            THIS_SQUARE.displaySquare();
         }
         upgrade_button.addEventListener('click', this.upgradeButtonListner, {'once': true});
         let delete_button = document.getElementById("building-info-delete");
         this.deleteButtonListner = function tryToDeleteSquare() {
             notification('Are you sure?');
-            this_square.deleteButtonListner = function deleteSquare() {
-                delete buildings[this_square.id];
-                delete shapes[this_square.outelineId];
-                delete shapes[this_square.squareId];
-                blue_squares += this_square.totalCost;
-                document.getElementById(`resource-display-${this_square.id}`).remove();
-                this_square.removeUpgradeListener();
+            THIS_SQUARE.deleteButtonListner = function deleteSquare() {
+                delete buildings[THIS_SQUARE.id];
+                delete shapes[THIS_SQUARE.outelineId];
+                delete shapes[THIS_SQUARE.squareId];
+                blue_squares += THIS_SQUARE.totalCost;
+                document.getElementById(`resource-display-${THIS_SQUARE.id}`).remove();
+                THIS_SQUARE.removeUpgradeListener();
             }
             let delete_button = document.getElementById("building-info-delete");
-            delete_button.addEventListener('click', this_square.deleteButtonListner, {'once': true});
+            delete_button.addEventListener('click', THIS_SQUARE.deleteButtonListner, {'once': true});
         }
         delete_button.addEventListener('click', this.deleteButtonListner, {'once': true});
     }
@@ -346,8 +346,8 @@ class blue_square {
 function renderGame() {
     for (let current_block_height = 0; current_block_height < GAME_BLOCK_AMOUNT_HEIGHT; current_block_height++) {
         for (let current_block_width = 0; current_block_width < GAME_BLOCK_AMOUNT_WIDTH; current_block_width++) {
-            const block = new Grass_Block(current_block_width * BLOCK_WIDTH, current_block_height * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
-            block.drawGrass();
+            const BLOCK = new Grass_Block(current_block_width * BLOCK_WIDTH, current_block_height * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
+            BLOCK.drawGrass();
         }
     }
 }

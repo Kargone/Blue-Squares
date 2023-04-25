@@ -10,6 +10,19 @@
     max-width: 750px;
     transform: translateX(-50%);
     z-index: 100;
+    display: grid;
+}
+
+#building-create > img {
+    margin-left: 30px;
+    margin-top: 5px;
+    width: 60px;
+    height: 60px;
+    border: 2px solid black;
+}
+
+#building-create > #blue-square-buy {
+    margin-left: 23px;
 }
 
 #toggle-building-create {
@@ -98,6 +111,10 @@
     border: 4px solid brown;
     text-align: center;
     z-index: 100;
+}
+
+#building-info > #refund-text {
+    font-size: 10px;
 }
 
 #toggle-building-info {
@@ -199,6 +216,11 @@
     z-index: 100;
 }
 
+#resources > p {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
 .resource-display {
     position: fixed;
     font-size: 15px;
@@ -265,6 +287,14 @@
     width: 100vw;
     top: 20px;
     pointer-events: none;
+}
+
+.resource-image {
+    margin-left: 10px; 
+    margin-bottom: -2px; 
+    width: 10px; 
+    height: 10px; 
+    border: 2px solid black;
 }
 
 button {

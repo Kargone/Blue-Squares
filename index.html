@@ -17,10 +17,10 @@
     <!-- needed buttons to close the create and info tabs -->
     <canvas id="game-canvas"></canvas>
     <div id="notifications"></div>
-    <div id="building-create" style="display: grid;" class="collapse-building-create open-building-create">
+    <div id="building-create" class="collapse-building-create open-building-create">
       <!-- it will show the prices of the buildings that can currently be built, with arrows on the sides when you unlock more -->
-      <img src="Images/blue_square.png" alt="Blue Square" style="margin-left: 30px; margin-top: 5px; width: 60px; height: 60px; border: 2px solid black;">
-      <button id="blue-square-buy" style="margin-left: 23px;">Buy <span id="blue-square-cost">0</span><img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></button>
+      <img src="Images/blue_square.png" alt="Blue Square">
+      <button id="blue-square-buy">Buy <span id="blue-square-cost">0</span><img src="Images/blue_square.png" alt="- Blue Squares" class="resource-image"></button>
       <div id="toggle-building-create">
         <p>▼</p>
        </div>
@@ -40,9 +40,9 @@
        <h3 id="building-info-level">Level: </h3>
        <p id="building-info-earnings_second">Earnings per second: </p>
        <p id="building-info-earnings_hour">Earnings per second: </p>
-       <button id="building-info-upgrade">Upgrade <span id="building-info-upgrade-number"></span><img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></button>
-       <p style="font-size: 10px;">*square will be 100% refunded*</p>
-       <button id="building-info-delete">Delete <span id="building-info-delete-number"></span><img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></button>
+       <button id="building-info-upgrade">Upgrade <span id="building-info-upgrade-number"></span><img src="Images/blue_square.png" alt="- Blue Squares" class="resource-image"></button>
+       <p id="refund-text">*square will be 100% refunded*</p>
+       <button id="building-info-delete">Delete <span id="building-info-delete-number"></span><img src="Images/blue_square.png" alt="- Blue Squares" class="resource-image"></button>
        <div id="toggle-building-info">
         <p>▶</p>
        </div>
@@ -52,10 +52,10 @@
       settings -->
     </div>
     <div id="resources">
-      <p style="margin-left: 10px; margin-right: 10px;"><span id="blue-squares-count">XXXXX</span><img src="Images/blue_square.png" alt="- Blue Squares" style="margin-left: 10px; width: 10px; height: 10px; border: 2px solid black;"></p>
-      <!-- <p style="margin-left: 10px; margin-right: 10px;">XXXXX<img src="Images/red_square.png" alt="- Red Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></p>
-      <p style="margin-left: 10px; margin-right: 10px;">XXXXX<img src="Images/green_square.png" alt="- Green Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></p>
-      <p style="margin-left: 10px; margin-right: 10px;">XXXXX<img src="Images/purple_square.png" alt="- Purple Squares" style="margin-left: 10px; margin-bottom: -2px; width: 10px; height: 10px; border: 2px solid black;"></p> -->
+      <p><span id="blue-squares-count">XXXXX</span><img src="Images/blue_square.png" alt="- Blue Squares" class="resource-image"></p>
+      <!-- <p>XXXXX<img src="Images/red_square.png" alt="- Red Squares" class="resource-image"></p>
+      <p>XXXXX<img src="Images/green_square.png" alt="- Green Squares" class="resource-image"></p>
+      <p>XXXXX<img src="Images/purple_square.png" alt="- Purple Squares" class="resource-image"></p> -->
     </div>
     <div id="resource-displays"></div>
     <script src="setup-webgl2.js"></script>
