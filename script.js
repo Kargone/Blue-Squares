@@ -83,6 +83,10 @@ class rect {
   getId() {
     return this.id;
   }
+  translateX_Y(x, y) {
+    this.x += x;
+    this.y += y;
+}
 }
 
 class Grass_Block {
@@ -142,6 +146,10 @@ class Grass_Block {
             textureInfo: textureInfos[0],
         };
         image_draw_infos.push(image_draw_info);
+    }
+    translateX_Y(x, y) {
+        this.x += x;
+        this.y += y;
     }
 }
 
@@ -344,6 +352,10 @@ class blue_square {
     updateResourceDisplay() {
         document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 2) + 'px';
         document.getElementById(`resource-display-${this.id}`).style.left = (this.x + 10)+ 'px';
+    }
+    translateX_Y(x, y) {
+        this.x += x;
+        this.y += y;
     }
 }
 

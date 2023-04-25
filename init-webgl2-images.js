@@ -34,6 +34,8 @@ let buildings;
 let mouseX = -1;
 let mouseY = -1;
 let mouse_down = false;
+let mouseStartX_Y = {'x': -1, 'y': -1};
+let draggingBoard = false;
 
 function main() {
   // Get A WebGL context
@@ -205,26 +207,31 @@ function main() {
   });
   gl.canvas.addEventListener('mousedown', (e) => {
     mouse_down = true;
+    const rect = canvas.getBoundingClientRect();
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
+    mouseStartX_Y.x = mouseX;
+    mouseStartX_Y.y = mouseY;
   });
   gl.canvas.addEventListener('touchstart', (e) => {
     mouse_down = true;
+    const touch = e.targetTouches[0];
+    if (e.targetTouches.length > 1) {
+      mouse_down = false;
+      return;
+    }
+    mouseX = touch.clientX;
+    mouseY = touch.clientY;
+    mouseStartX_Y.x = mouseX;
+    mouseStartX_Y.y = mouseY;
   });
   gl.canvas.addEventListener('mouseup', (e) => {
-    if (!mouse_down) return;
-    for (let building_key of Object.keys(buildings)) {
-      let building = buildings[building_key];
-      if (building.checkForMouseHover()) {
-        building.selected = false;
-        building.displaySquare();
-        building_info_open = true;
-        document.getElementById("building-info").className = "collapse-building-info open-building-info";
-        mouse_down = false;
-        return;
-      }
-    }
-    mouse_down = false;
+    mouseEnd();
   });
   gl.canvas.addEventListener('touchend', (e) => {
+    mouseEnd();
+  });
+  function mouseEnd() {
     if (!mouse_down) return;
     for (let building_key of Object.keys(buildings)) {
       let building = buildings[building_key];
@@ -233,12 +240,14 @@ function main() {
         building.displaySquare();
         building_info_open = true;
         document.getElementById("building-info").className = "collapse-building-info open-building-info";
+        draggingBoard = false;
         mouse_down = false;
         return;
       }
     }
+    draggingBoard = false;
     mouse_down = false;
-  });
+  }
 }
 
 main();
@@ -293,6 +302,7 @@ function dragShape() {
     if (building.checkForMouseHover()) {
       building.updateXandY();
       building.displaySquare();
+      draggingBoard = false;
       return true;
     }
   }
@@ -301,9 +311,21 @@ function dragShape() {
     if (building.checkForMouseHover()) {
       building.updateXandY();
       building.displaySquare();
+      draggingBoard = false;
       return true;
     }
   }
+  draggingBoard = true;
+  // const translateX = mouseX - mouseStartX_Y.x;
+  // const translateY = mouseY - mouseStartX_Y.y;
+  // for (let building_key of Object.keys(buildings)) {
+  //   let building = buildings[building_key];
+  //   building.translateX_Y(translateX, translateY);
+  // }
+  // for (let shape_key of Object.keys(shapes)) {
+  //   let shape = shapes[shape_key];
+  //   shape.translateX_Y(translateX, translateY);
+  // }
 }
 
 function updateResourceDisplays() {
