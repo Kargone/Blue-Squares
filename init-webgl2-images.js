@@ -128,7 +128,8 @@ function main() {
     // Clear the canvas
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    image_draw_infos.forEach(function(drawInfo) {
+    Object.keys(image_draw_infos).forEach(function(drawInfoKey) {
+      let drawInfo = image_draw_infos[drawInfoKey];
       var dstX      = drawInfo.x;
       var dstY      = drawInfo.y;
       var dstWidth  = drawInfo.textureInfo.width  * drawInfo.xScale;
@@ -212,6 +213,18 @@ function main() {
     mouseY = e.clientY - rect.top;
     mouseStartX_Y.x = mouseX;
     mouseStartX_Y.y = mouseY;
+    for (let building_key of Object.keys(buildings)) {
+      let building = buildings[building_key];
+      building.updateDistFromStartX_Y();
+    }
+    for (let shape_key of Object.keys(shapes)) {
+      let shape = shapes[shape_key];
+      shape.updateDistFromStartX_Y();
+    }
+    for (let image_key of Object.keys(image_draw_infos)) {
+      let image = image_draw_infos[image_key];
+      image.updateDistFromStartX_Y();
+    }
   });
   gl.canvas.addEventListener('touchstart', (e) => {
     mouse_down = true;
@@ -224,6 +237,18 @@ function main() {
     mouseY = touch.clientY;
     mouseStartX_Y.x = mouseX;
     mouseStartX_Y.y = mouseY;
+    for (let building_key of Object.keys(buildings)) {
+      let building = buildings[building_key];
+      building.updateDistFromStartX_Y();
+    }
+    for (let shape_key of Object.keys(shapes)) {
+      let shape = shapes[shape_key];
+      shape.updateDistFromStartX_Y();
+    }
+    for (let image_key of Object.keys(image_draw_infos)) {
+      let image = image_draw_infos[image_key];
+      image.updateDistFromStartX_Y();
+    }
   });
   gl.canvas.addEventListener('mouseup', (e) => {
     mouseEnd();
@@ -293,7 +318,7 @@ const textureInfos = [
   loadImageAndCreateTextureInfo('Images/outerBlock.png'),
 ];
 
-let image_draw_infos = [];
+let image_draw_infos = {};
 
 function dragShape() {
   for (let building_key of Object.keys(buildings)) {
@@ -315,17 +340,22 @@ function dragShape() {
       return true;
     }
   }
+  if (!mouse_down) return;
   draggingBoard = true;
-  // const translateX = mouseX - mouseStartX_Y.x;
-  // const translateY = mouseY - mouseStartX_Y.y;
-  // for (let building_key of Object.keys(buildings)) {
-  //   let building = buildings[building_key];
-  //   building.translateX_Y(translateX, translateY);
-  // }
-  // for (let shape_key of Object.keys(shapes)) {
-  //   let shape = shapes[shape_key];
-  //   shape.translateX_Y(translateX, translateY);
-  // }
+  const translateX = mouseX - mouseStartX_Y.x;
+  const translateY = mouseY - mouseStartX_Y.y;
+  for (let building_key of Object.keys(buildings)) {
+    let building = buildings[building_key];
+    building.translateX_YfromStartX_Y(translateX, translateY);
+  }
+  for (let shape_key of Object.keys(shapes)) {
+    let shape = shapes[shape_key];
+    shape.translateX_YfromStartX_Y(translateX, translateY);
+  }
+  for (let image_key of Object.keys(image_draw_infos)) {
+    let image = image_draw_infos[image_key];
+    image.translateX_YfromStartX_Y(translateX, translateY);
+  }
 }
 
 function updateResourceDisplays() {

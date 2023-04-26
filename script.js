@@ -36,65 +36,74 @@ let building_create_open = true;
 let notificationRemoved = {'id':'removed or not'};
 
 class rect {
-  constructor(x = 0, y = 0, width, height, rgb) {
-    this.x = x;
-    this.y = y;
-    this.width = width || 10;
-    this.height = height || 10;
-    if (rgb != undefined) {
-        rgb = rgb.split(",");
-        this.r = parseInt(rgb[0].split('(')[1]);
-        this.g = parseInt(rgb[1]);
-        this.b = parseInt(rgb[2].split(')')[0]);
-    } else {
-        this.r = 0;
-        this.g = 0;
-        this.b = 0;
+    constructor(x = 0, y = 0, width, height, rgb) {
+        this.x = x;
+        this.y = y;
+        this.distFromStartX = -1;
+        this.distFromStartY = -1;
+        this.width = width || 10;
+        this.height = height || 10;
+        if (rgb != undefined) {
+            rgb = rgb.split(",");
+            this.r = parseInt(rgb[0].split('(')[1]);
+            this.g = parseInt(rgb[1]);
+            this.b = parseInt(rgb[2].split(')')[0]);
+        } else {
+            this.r = 0;
+            this.g = 0;
+            this.b = 0;
+        }
+        this.gl = document.querySelector("#game-canvas").getContext("webgl2");
+        this.colorLocation = '';
+        this.id = getRandomInt();
+        this.z = 1;
+        shapes[this.id] = this;
     }
-    this.gl = document.querySelector("#game-canvas").getContext("webgl2");
-    this.colorLocation = '';
-    this.id = getRandomInt();
-    this.z = 1;
-    shapes[this.id] = this;
-  }
-  draw() {
-    let x1 = this.x;
-    let x2 = this.x + this.width;
-    let y1 = this.y;
-    let y2 = this.y + this.height;
-    const gl = this.gl;
-    const colorLocation = this.colorLocation;
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-     x1, y1,
-     x2, y1,
-     x1, y2,
-     x1, y2,
-     x2, y1,
-     x2, y2,
-    ]), gl.STATIC_DRAW);
-    // Set a random color.
-    gl.uniform4f(colorLocation, this.r/255, this.g/255, this.b/255, 1);
-    // Draw the rectangle.
-    var primitiveType = gl.TRIANGLES;
-    var offset = 0;
-    var count = 6;
-    gl.drawArrays(primitiveType, offset, count);
-  }
-  getId() {
-    return this.id;
-  }
-  translateX_Y(x, y) {
-    this.x += x;
-    this.y += y;
-}
+    draw() {
+        let x1 = this.x;
+        let x2 = this.x + this.width;
+        let y1 = this.y;
+        let y2 = this.y + this.height;
+        const gl = this.gl;
+        const colorLocation = this.colorLocation;
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        x1, y1,
+        x2, y1,
+        x1, y2,
+        x1, y2,
+        x2, y1,
+        x2, y2,
+        ]), gl.STATIC_DRAW);
+        // Set a random color.
+        gl.uniform4f(colorLocation, this.r/255, this.g/255, this.b/255, 1);
+        // Draw the rectangle.
+        var primitiveType = gl.TRIANGLES;
+        var offset = 0;
+        var count = 6;
+        gl.drawArrays(primitiveType, offset, count);
+    }
+    getId() {
+        return this.id;
+    }
+    translateX_YfromStartX_Y(x, y) {
+        this.x = mouseStartX_Y.x + x + this.distFromStartX;
+        this.y = mouseStartX_Y.y + y + this.distFromStartY;
+    }
+    updateDistFromStartX_Y() {
+        this.distFromStartX = this.x - mouseStartX_Y.x;
+        this.distFromStartY = this.y - mouseStartX_Y.y;
+    }
 }
 
 class Grass_Block {
     constructor(x, y, width, height) {
         this.x = x;
         this.y = y;
+        this.distFromStartX = -1;
+        this.distFromStartY = -1;
         this.width = width;
         this.height = height;
+        this.id = getRandomInt();
     }
     drawGrass() {
         if (this.x < BLOCK_WIDTH * GAME_BORDER) {
@@ -118,38 +127,32 @@ class Grass_Block {
         }
     }
     drawOuterGrassBlock() {
-        var image_draw_info = {
-            x: this.x,
-            y: this.y,
-            xScale: this.width / 300,
-            yScale: this.height / 300,
-            textureInfo: textureInfos[2],
-        };
-        image_draw_infos.push(image_draw_info);
+        this.xScale = this.width / 300;
+        this.yScale = this.height / 300;
+        this.textureInfo = textureInfos[2];
+        image_draw_infos[this.id] = this;
     }
     drawInnerGrassBlock1() {
-        var image_draw_info = {
-            x: this.x,
-            y: this.y,
-            xScale: this.width / 300,
-            yScale: this.height / 300,
-            textureInfo: textureInfos[1],
-        };
-        image_draw_infos.push(image_draw_info);
+        this.xScale = this.width / 300;
+        this.yScale = this.height / 300;
+        this.textureInfo = textureInfos[1];
+        image_draw_infos[this.id] = this;
     }
     drawInnerGrassBlock2() {
-        var image_draw_info = {
-            x: this.x,
-            y: this.y,
-            xScale: this.width / 300,
-            yScale: this.height / 300,
-            textureInfo: textureInfos[0],
-        };
-        image_draw_infos.push(image_draw_info);
+        this.xScale = this.width / 300;
+        this.yScale = this.height / 300;
+        this.textureInfo = textureInfos[0];
+        image_draw_infos[this.id] = this;
     }
-    translateX_Y(x, y) {
-        this.x += x;
-        this.y += y;
+    translateX_YfromStartX_Y(x, y) {
+        this.x = mouseStartX_Y.x + x + this.distFromStartX;
+        this.y = mouseStartX_Y.y + y + this.distFromStartY;
+        image_draw_infos[this.id]['x'] = this.x;
+        image_draw_infos[this.id]['y'] = this.y;
+    }
+    updateDistFromStartX_Y() {
+        this.distFromStartX = this.x - mouseStartX_Y.x;
+        this.distFromStartY = this.y - mouseStartX_Y.y;
     }
 }
 
@@ -168,6 +171,8 @@ class blue_square {
         this.colorLocation = '';
         this.x = 20;
         this.y = 20;
+        this.distFromStartX = -1;
+        this.distFromStartY = -1;
         this.coordX = 0;
         this.corrdY = 0;
         for (let x_y of Object.keys(grid)) {
@@ -353,9 +358,13 @@ class blue_square {
         document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 2) + 'px';
         document.getElementById(`resource-display-${this.id}`).style.left = (this.x + 10)+ 'px';
     }
-    translateX_Y(x, y) {
-        this.x += x;
-        this.y += y;
+    translateX_YfromStartX_Y(x, y) {
+        this.x = mouseStartX_Y.x + x + this.distFromStartX;
+        this.y = mouseStartX_Y.y + y + this.distFromStartY;
+    }
+    updateDistFromStartX_Y() {
+        this.distFromStartX = this.x - mouseStartX_Y.x;
+        this.distFromStartY = this.y - mouseStartX_Y.y;
     }
 }
 
