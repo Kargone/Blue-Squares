@@ -28,7 +28,7 @@ const INNER_GRASS_COLOR = '(30,227,23)';
 
 shapes = {};
 buildings = {};
-let grid = {};
+let grid = {'x': (GAME_BORDER - 1) * BLOCK_WIDTH, 'y': (GAME_BORDER - 1) * BLOCK_HEIGHT};
 let blue_squares = 0;
 let blue_square_cost = 0;
 let building_info_open = true;
@@ -117,7 +117,7 @@ class Grass_Block {
         } else {
             const DO_SHADe = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
             const GRASS_BLOCK = new Grass_Block(this.x, this.y, this.width, this.height);
-            grid[`${this.x / BLOCK_WIDTH - GAME_BORDER}_${this.y / BLOCK_HEIGHT - GAME_BORDER}`] = '';
+            grid[`${this.x / BLOCK_WIDTH - GAME_BORDER + 1}_${this.y / BLOCK_HEIGHT - GAME_BORDER + 1}`] = '';
             if (DO_SHADe === 0) GRASS_BLOCK.drawInnerGrassBlock1();
             if (DO_SHADe === 1) GRASS_BLOCK.drawInnerGrassBlock2();
         }
@@ -171,10 +171,12 @@ class blue_square {
         this.colorLocation = '';
         this.x = 20;
         this.y = 20;
+        this.originalX = copy(this.x);
+        this.originalY = copy(this.y);
         this.distFromStartX = -1;
         this.distFromStartY = -1;
         this.coordX = 0;
-        this.corrdY = 0;
+        this.coordY = 0;
         for (let x_y of Object.keys(grid)) {
             x_y = x_y.split('_');
             const gridX = parseInt(x_y[0]);
@@ -183,14 +185,16 @@ class blue_square {
             if (grid[`${gridX + 1}_${gridY}`] != '') continue;
             if (grid[`${gridX}_${gridY + 1}`] != '') continue;
             if (grid[`${gridX + 1}_${gridY + 1}`] != '') continue;
-            this.x = (GAME_BORDER + gridX) * BLOCK_WIDTH;
-            this.y = (GAME_BORDER + gridY) * BLOCK_HEIGHT;
-            grid[`${gridX}_${gridY}`] = 'occupied';
-            grid[`${gridX + 1}_${gridY}`] = 'occupied';
-            grid[`${gridX}_${gridY + 1}`] = 'occupied';
-            grid[`${gridX + 1}_${gridY + 1}`] = 'occupied';
+            this.x = gridX * BLOCK_WIDTH + grid.x;
+            this.y = gridY * BLOCK_HEIGHT + grid.y;
+            this.originalX = copy(this.x);
+            this.originalY = copy(this.y);
+            grid[`${gridX}_${gridY}`] = 'blue_square';
+            grid[`${gridX + 1}_${gridY}`] = 'blue_square';
+            grid[`${gridX}_${gridY + 1}`] = 'blue_square';
+            grid[`${gridX + 1}_${gridY + 1}`] = 'blue_square';
             this.coordX = gridX;
-            this.corrdY = gridY;
+            this.coordY = gridY;
             break;
         }
         this.blockInline = BLOCK_INLINE;
@@ -231,6 +235,9 @@ class blue_square {
     }
     checkForMouseHover() {
         if (!mouse_down) {
+            if (this.selected) {
+                this.checkXandY();
+            }
             document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
             this.selected = false;
             return false;
@@ -248,10 +255,19 @@ class blue_square {
         // }
         if ((this.x - 20 < mouseX) && (mouseX < this.x + this.width + 20)) {
             if ((this.y - 20 < mouseY) && (mouseY < this.y + this.height + 20)) {
+                if (!this.selected) {
+                    grid[`${this.coordX}_${this.coordY}`] = '';
+                    grid[`${this.coordX + 1}_${this.coordY}`] = '';
+                    grid[`${this.coordX}_${this.coordY + 1}`] = '';
+                    grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
+                }
                 document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
                 this.selected = true;
                 return true;
             }
+        }
+        if (this.selected) {
+            this.checkXandY();
         }
         document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
         this.selected = false;
@@ -266,6 +282,45 @@ class blue_square {
         let square_object = shapes[this.squareId];
         square_object.x = this.x + this.blockInline + this.borderWidth;
         square_object.y = this.y + this.blockInline + this.borderWidth;
+        this.setCoordXandY();
+    }
+    checkXandY() {
+        console.log('g')
+        this.selected = false;
+        if (
+            (this.x > 0) && 
+            (this.x > grid.x) && 
+            (grid[`${this.coordX}_${this.coordY}`] === '') &&
+            (grid[`${this.coordX + 1}_${this.coordY}`] === '') &&
+            (grid[`${this.coordX}_${this.coordY + 1}`] === '') &&
+            (grid[`${this.coordX + 1}_${this.coordY + 1}`] === '')
+        ) {
+            this.originalX = this.x;
+            this.originalY = this.y;
+            this.setCoordXandY();
+            grid[`${this.coordX}_${this.coordY}`] = 'blue_square';
+            grid[`${this.coordX + 1}_${this.coordY}`] = 'blue_square';
+            grid[`${this.coordX}_${this.coordY + 1}`] = 'blue_square';
+            grid[`${this.coordX + 1}_${this.coordY + 1}`] = 'blue_square';
+        } else {
+            this.x = copy(this.originalX);
+            this.y = copy(this.originalY);
+            this.setCoordXandY();
+            grid[`${this.coordX}_${this.coordY}`] = 'blue_square';
+            grid[`${this.coordX + 1}_${this.coordY}`] = 'blue_square';
+            grid[`${this.coordX}_${this.coordY + 1}`] = 'blue_square';
+            grid[`${this.coordX + 1}_${this.coordY + 1}`] = 'blue_square';
+            let outline_object = shapes[this.outelineId];
+            outline_object.x = this.x + this.blockInline;
+            outline_object.y = this.y + this.blockInline;
+            let square_object = shapes[this.squareId];
+            square_object.x = this.x + this.blockInline + this.borderWidth;
+            square_object.y = this.y + this.blockInline + this.borderWidth;
+        }
+    }
+    setCoordXandY() {
+        this.coordX = (this.x - grid.x) / BLOCK_WIDTH;
+        this.coordY = (this.y - grid.y) / BLOCK_WIDTH;
     }
     upResource() {
         blue_squares += this.earningsPerSecond;
@@ -403,6 +458,10 @@ function notification(text) {
         document.getElementById("noti"+x).remove();
         notificationRemoved[x] = true;
     }, 3000);
+}
+
+function copy(value) {
+    return JSON.parse(JSON.stringify(value));
 }
 
 renderGame();

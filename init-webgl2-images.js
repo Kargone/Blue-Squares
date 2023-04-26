@@ -261,7 +261,6 @@ function main() {
     for (let building_key of Object.keys(buildings)) {
       let building = buildings[building_key];
       if (building.checkForMouseHover()) {
-        building.selected = false;
         building.displaySquare();
         building_info_open = true;
         document.getElementById("building-info").className = "collapse-building-info open-building-info";
