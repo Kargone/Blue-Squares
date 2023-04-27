@@ -35,7 +35,7 @@ let mouseX = -1;
 let mouseY = -1;
 let mouse_down = false;
 let mouseStartX_Y = {'x': -1, 'y': -1};
-let draggingBoard = false;
+let canDragBoard = true;
 
 function main() {
   // Get A WebGL context
@@ -213,15 +213,15 @@ function main() {
     mouseY = e.clientY - rect.top;
     mouseStartX_Y.x = mouseX;
     mouseStartX_Y.y = mouseY;
-    for (let building_key of Object.keys(buildings)) {
+    for (const building_key of Object.keys(buildings)) {
       let building = buildings[building_key];
       building.updateDistFromStartX_Y();
     }
-    for (let shape_key of Object.keys(shapes)) {
+    for (const shape_key of Object.keys(shapes)) {
       let shape = shapes[shape_key];
       shape.updateDistFromStartX_Y();
     }
-    for (let image_key of Object.keys(image_draw_infos)) {
+    for (const image_key of Object.keys(image_draw_infos)) {
       let image = image_draw_infos[image_key];
       image.updateDistFromStartX_Y();
     }
@@ -237,15 +237,15 @@ function main() {
     mouseY = touch.clientY;
     mouseStartX_Y.x = mouseX;
     mouseStartX_Y.y = mouseY;
-    for (let building_key of Object.keys(buildings)) {
+    for (const building_key of Object.keys(buildings)) {
       let building = buildings[building_key];
       building.updateDistFromStartX_Y();
     }
-    for (let shape_key of Object.keys(shapes)) {
+    for (const shape_key of Object.keys(shapes)) {
       let shape = shapes[shape_key];
       shape.updateDistFromStartX_Y();
     }
-    for (let image_key of Object.keys(image_draw_infos)) {
+    for (const image_key of Object.keys(image_draw_infos)) {
       let image = image_draw_infos[image_key];
       image.updateDistFromStartX_Y();
     }
@@ -264,12 +264,10 @@ function main() {
         building.displaySquare();
         building_info_open = true;
         document.getElementById("building-info").className = "collapse-building-info open-building-info";
-        draggingBoard = false;
-        mouse_down = false;
-        return;
+        break;
       }
     }
-    draggingBoard = false;
+    canDragBoard = true;
     mouse_down = false;
   }
 }
@@ -320,45 +318,44 @@ const textureInfos = [
 let image_draw_infos = {};
 
 function dragShape() {
-  for (let building_key of Object.keys(buildings)) {
+  for (const building_key of Object.keys(buildings)) {
     let building = buildings[building_key];
     if (!building.selected) continue;
     if (building.checkForMouseHover()) {
       building.updateXandY();
       building.displaySquare();
-      draggingBoard = false;
+      canDragBoard = false;
       return true;
     }
   }
-  for (let building_key of Object.keys(buildings)) {
+  for (const building_key of Object.keys(buildings)) {
     let building = buildings[building_key];
     if (building.checkForMouseHover()) {
       building.updateXandY();
       building.displaySquare();
-      draggingBoard = false;
+      canDragBoard = false;
       return true;
     }
   }
-  if (!mouse_down) return;
-  draggingBoard = true;
+  if ((!mouse_down) || (!canDragBoard)) return;
   const translateX = mouseX - mouseStartX_Y.x;
   const translateY = mouseY - mouseStartX_Y.y;
-  for (let building_key of Object.keys(buildings)) {
+  for (const building_key of Object.keys(buildings)) {
     let building = buildings[building_key];
     building.translateX_YfromStartX_Y(translateX, translateY);
   }
-  for (let shape_key of Object.keys(shapes)) {
+  for (const shape_key of Object.keys(shapes)) {
     let shape = shapes[shape_key];
     shape.translateX_YfromStartX_Y(translateX, translateY);
   }
-  for (let image_key of Object.keys(image_draw_infos)) {
+  for (const image_key of Object.keys(image_draw_infos)) {
     let image = image_draw_infos[image_key];
     image.translateX_YfromStartX_Y(translateX, translateY);
   }
 }
 
 function updateResourceDisplays() {
-  for (let building_key of Object.keys(buildings)) {
+  for (const building_key of Object.keys(buildings)) {
     let building = buildings[building_key];
     building.updateResourceDisplay();
   }

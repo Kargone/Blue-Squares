@@ -357,7 +357,7 @@ class blue_square {
         if (this.displayed) return;
         document.getElementById('building-info-no-content').style.display = 'none';
         document.getElementById('building-info-content').style.visibility = 'visible';
-        for (let building_key of Object.keys(buildings)) {
+        for (const building_key of Object.keys(buildings)) {
             let building = buildings[building_key];
             building.displayed = false;
             building.removeUpgradeListener();
@@ -493,7 +493,7 @@ document.getElementById("toggle-building-create").addEventListener('click', func
 });
 
 const UP_RESOURCES = setInterval(() => {
-    for (let building_key of Object.keys(buildings)) {
+    for (const building_key of Object.keys(buildings)) {
         let building = buildings[building_key];
         building.upResource();
     }
