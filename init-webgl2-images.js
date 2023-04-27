@@ -36,6 +36,7 @@ let mouseY = -1;
 let mouse_down = false;
 let mouseStartX_Y = {'x': -1, 'y': -1};
 let canDragBoard = true;
+let grid;
 
 function main() {
   // Get A WebGL context
@@ -213,6 +214,8 @@ function main() {
     mouseY = e.clientY - rect.top;
     mouseStartX_Y.x = mouseX;
     mouseStartX_Y.y = mouseY;
+    grid.distFromStartX = grid.x - mouseStartX_Y.x;
+    grid.distFromStartY = grid.y - mouseStartX_Y.y;
     for (const building_key of Object.keys(buildings)) {
       let building = buildings[building_key];
       building.updateDistFromStartX_Y();
@@ -237,6 +240,8 @@ function main() {
     mouseY = touch.clientY;
     mouseStartX_Y.x = mouseX;
     mouseStartX_Y.y = mouseY;
+    grid.distFromStartX = grid.x - mouseStartX_Y.x;
+    grid.distFromStartY = grid.y - mouseStartX_Y.y;
     for (const building_key of Object.keys(buildings)) {
       let building = buildings[building_key];
       building.updateDistFromStartX_Y();
@@ -340,6 +345,8 @@ function dragShape() {
   if ((!mouse_down) || (!canDragBoard)) return;
   const translateX = mouseX - mouseStartX_Y.x;
   const translateY = mouseY - mouseStartX_Y.y;
+  grid.x = mouseStartX_Y.x + translateX + grid.distFromStartX;
+  grid.y = mouseStartX_Y.y + translateY + grid.distFromStartY;
   for (const building_key of Object.keys(buildings)) {
     let building = buildings[building_key];
     building.translateX_YfromStartX_Y(translateX, translateY);

@@ -28,7 +28,12 @@ const INNER_GRASS_COLOR = '(30,227,23)';
 
 shapes = {};
 buildings = {};
-let grid = {'x': (GAME_BORDER - 1) * BLOCK_WIDTH, 'y': (GAME_BORDER - 1) * BLOCK_HEIGHT};
+grid = {
+    'x': (GAME_BORDER) * BLOCK_WIDTH, 
+    'y': (GAME_BORDER) * BLOCK_HEIGHT,
+    'distFromStartX': -1,
+    'distFromStartY': -1,
+};
 let blue_squares = 0;
 let blue_square_cost = 0;
 let building_info_open = true;
@@ -185,8 +190,8 @@ class blue_square {
             if (grid[`${gridX + 1}_${gridY}`] != '') continue;
             if (grid[`${gridX}_${gridY + 1}`] != '') continue;
             if (grid[`${gridX + 1}_${gridY + 1}`] != '') continue;
-            this.x = gridX * BLOCK_WIDTH + grid.x;
-            this.y = gridY * BLOCK_HEIGHT + grid.y;
+            this.x = (gridX - 1) * BLOCK_WIDTH + grid.x;
+            this.y = (gridY - 1) * BLOCK_HEIGHT + grid.y;
             this.originalX = copy(this.x);
             this.originalY = copy(this.y);
             grid[`${gridX}_${gridY}`] = 'blue_square';
@@ -276,20 +281,24 @@ class blue_square {
     updateXandY() {
         this.x = Math.round((mouseX - this.width / 2) / BLOCK_WIDTH) * BLOCK_WIDTH;
         this.y = Math.round((mouseY - this.height / 2) / BLOCK_HEIGHT) * BLOCK_HEIGHT;
+        this.setCoordXandY();
+        this.x = (this.coordX - 1) * BLOCK_WIDTH + grid.x;
+        this.y = (this.coordY - 1) * BLOCK_HEIGHT + grid.y;
         let outline_object = shapes[this.outelineId];
         outline_object.x = this.x + this.blockInline;
         outline_object.y = this.y + this.blockInline;
         let square_object = shapes[this.squareId];
         square_object.x = this.x + this.blockInline + this.borderWidth;
         square_object.y = this.y + this.blockInline + this.borderWidth;
-        this.setCoordXandY();
     }
     checkXandY() {
         console.log('g')
         this.selected = false;
         if (
             (this.x > 0) && 
-            (this.x > grid.x) && 
+            (this.x >= grid.x) && 
+            (this.y > 0) && 
+            (this.y >= grid.y) && 
             (grid[`${this.coordX}_${this.coordY}`] === '') &&
             (grid[`${this.coordX + 1}_${this.coordY}`] === '') &&
             (grid[`${this.coordX}_${this.coordY + 1}`] === '') &&
@@ -319,8 +328,8 @@ class blue_square {
         }
     }
     setCoordXandY() {
-        this.coordX = (this.x - grid.x) / BLOCK_WIDTH;
-        this.coordY = (this.y - grid.y) / BLOCK_WIDTH;
+        this.coordX = Math.round((this.x - grid.x) / BLOCK_WIDTH) + 1;
+        this.coordY = Math.round((this.y - grid.y) / BLOCK_WIDTH) + 1;
     }
     upResource() {
         blue_squares += this.earningsPerSecond;
