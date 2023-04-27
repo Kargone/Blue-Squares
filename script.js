@@ -132,20 +132,20 @@ class Grass_Block {
         }
     }
     drawOuterGrassBlock() {
-        this.xScale = this.width / 300;
-        this.yScale = this.height / 300;
+        this.xScale = this.width / 299;
+        this.yScale = this.height / 298;
         this.textureInfo = textureInfos[2];
         image_draw_infos[this.id] = this;
     }
     drawInnerGrassBlock1() {
-        this.xScale = this.width / 300;
+        this.xScale = this.width / 299;
         this.yScale = this.height / 300;
         this.textureInfo = textureInfos[1];
         image_draw_infos[this.id] = this;
     }
     drawInnerGrassBlock2() {
-        this.xScale = this.width / 300;
-        this.yScale = this.height / 300;
+        this.xScale = this.width / 299;
+        this.yScale = this.height / 298;
         this.textureInfo = textureInfos[0];
         image_draw_infos[this.id] = this;
     }
@@ -474,6 +474,14 @@ function copy(value) {
 }
 
 renderGame();
+// const BLOCK1 = new Grass_Block(100 + 300, 100, 200, 200);
+// BLOCK1.drawInnerGrassBlock1();
+// const BLOCK2 = new Grass_Block(300 + 300, 100, 200, 200);
+// BLOCK2.drawInnerGrassBlock2();
+// const BLOCK3 = new Grass_Block(100 + 300, 300, 200, 200);
+// BLOCK3.drawInnerGrassBlock2();
+// const BLOCK4 = new Grass_Block(300 + 300, 300, 200, 200);
+// BLOCK4.drawInnerGrassBlock1();
 
 document.getElementById("blue-square-buy").addEventListener('click', function () {
     if (blue_squares < blue_square_cost) return;
