@@ -20,8 +20,8 @@ window.addEventListener('resize', () => {
 
 const GAME_BLOCK_AMOUNT_WIDTH = 54;
 const GAME_BLOCK_AMOUNT_HEIGHT = 27;
-const BLOCK_WIDTH = 30 * 5;
-const BLOCK_HEIGHT = 30 * 5;
+const BLOCK_WIDTH = 30;
+const BLOCK_HEIGHT = 30;
 const GAME_BORDER = 4;
 const OUTER_GRASS_COLOR = '(20,110,16)';
 const INNER_GRASS_COLOR = '(30,227,23)';
@@ -165,8 +165,8 @@ class blue_square {
     constructor(object) {
         const WIDTH_GAME_BLOCKS = 2;
         const HEIGHT_GAME_BLOCKS = 2;
-        const BLOCK_INLINE = 22 * 5;
-        const BORDER_WIDTH = 2 * 5;
+        const BLOCK_INLINE = 22;
+        const BORDER_WIDTH = 2;
         this.width = WIDTH_GAME_BLOCKS * BLOCK_WIDTH;
         this.height = HEIGHT_GAME_BLOCKS * BLOCK_HEIGHT;
         this.r = 160;
@@ -236,7 +236,6 @@ class blue_square {
                 <img src="Images/blue_square.png" class="resource-image">
             </p>
         `;
-        document.getElementById('resource-displays').style.display = 'none';
         buildings[this.id] = this;
     }
     checkForMouseHover() {
@@ -474,21 +473,21 @@ function copy(value) {
     return JSON.parse(JSON.stringify(value));
 }
 
-// renderGame();
-const BLOCK1 = new Grass_Block(100 + 565, 100 + 85, 150, 150);
-BLOCK1.drawInnerGrassBlock1();
-const BLOCK2 = new Grass_Block(250 + 565, 100 + 85, 150, 150);
-BLOCK2.drawInnerGrassBlock2();
-const BLOCK3 = new Grass_Block(100 + 565, 250 + 85, 150, 150);
-BLOCK3.drawInnerGrassBlock2();
-const BLOCK4 = new Grass_Block(250 + 565, 250 + 85, 150, 150);
-BLOCK4.drawInnerGrassBlock1();
+renderGame();
+// const BLOCK1 = new Grass_Block(100 + 565, 100 + 85, 150, 150);
+// BLOCK1.drawInnerGrassBlock1();
+// const BLOCK2 = new Grass_Block(250 + 565, 100 + 85, 150, 150);
+// BLOCK2.drawInnerGrassBlock2();
+// const BLOCK3 = new Grass_Block(100 + 565, 250 + 85, 150, 150);
+// BLOCK3.drawInnerGrassBlock2();
+// const BLOCK4 = new Grass_Block(250 + 565, 250 + 85, 150, 150);
+// BLOCK4.drawInnerGrassBlock1();
 
 document.getElementById("blue-square-buy").addEventListener('click', function () {
     if (blue_squares < blue_square_cost) return;
     new blue_square();
     blue_squares -= blue_square_cost;
-    blue_square_cost = blue_square_cost + 2 * 2;
+    blue_square_cost = blue_square_cost + 2;
     document.getElementById("blue-square-cost").textContent = blue_square_cost;
 });
 
