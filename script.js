@@ -34,6 +34,64 @@ grid = {
     'distFromStartX': -1,
     'distFromStartY': -1,
 };
+const colors = {
+    'Blue': {
+        'r': 160,
+        'g': 160,
+        'b': 255,
+        'r2': 16,
+        'g2': 16,
+        'b2': 255,
+    },
+    'Red': {
+        'r': 255,
+        'g': 160,
+        'b': 160,
+        'r2': 255,
+        'g2': 16,
+        'b2': 16,
+    },
+    'Green': {
+        'r': 160,
+        'g': 255,
+        'b': 160,
+        'r2': 16,
+        'g2': 255,
+        'b2': 16,
+    },
+    'Purple': {
+        'r': 200,
+        'g': 150,
+        'b': 255,
+        'r2': 180,
+        'g2': 0,
+        'b2': 255,
+    },
+    'Orange': {
+        'r': 255,
+        'g': 200,
+        'b': 160,
+        'r2': 255,
+        'g2': 180,
+        'b2': 0,
+    },
+    'Yellow': {
+        'r': 255,
+        'g': 255,
+        'b': 160,
+        'r2': 255,
+        'g2': 255,
+        'b2': 0,
+    },
+    'White': {
+        'r': 80,
+        'g': 80,
+        'b': 80,
+        'r2': 250,
+        'g2': 250,
+        'b2': 250,
+    },
+};
 let blue_squares = 0;
 let blue_square_cost = 0;
 let building_info_open = true;
@@ -163,25 +221,81 @@ class Grass_Block {
 
 class blue_square {
     constructor(object) {
-        const WIDTH_GAME_BLOCKS = 2;
-        const HEIGHT_GAME_BLOCKS = 2;
-        const BLOCK_INLINE = 22;
-        const BORDER_WIDTH = 2;
+        if (object == undefined) object = {};
+        const WIDTH_GAME_BLOCKS = object.gameBlockWidth ?? 2;
+        const HEIGHT_GAME_BLOCKS = object.gameBlockHeight ?? 2;
         this.width = WIDTH_GAME_BLOCKS * BLOCK_WIDTH;
         this.height = HEIGHT_GAME_BLOCKS * BLOCK_HEIGHT;
-        this.r = 160;
-        this.g = 160;
-        this.b = 255;
         this.gl = document.querySelector("#game-canvas").getContext("webgl2");
         this.colorLocation = '';
-        this.x = 100 + 565;
-        this.y = 100 + 85;
+        this.x = object.x ?? 100;
+        this.y = object.y ?? 100;
         this.originalX = copy(this.x);
         this.originalY = copy(this.y);
         this.distFromStartX = -1;
         this.distFromStartY = -1;
-        this.coordX = 0;
-        this.coordY = 0;
+        this.coordX = object.coordX ?? 0;
+        this.coordY = object.coordY ?? 0;
+        if ((this.coordX != 0) && (this.coordY != 0)) {
+            if ((grid[`${this.coordX}_${this.coordY}`] != '') ||
+                (grid[`${this.coordX + 1}_${this.coordY}`] != '') ||
+                (grid[`${this.coordX}_${this.coordY + 1}`] != '') ||
+                (grid[`${this.coordX + 1}_${this.coordY + 1}`] != '')
+                ) this.assignCoords();
+            this.x = (this.coordX - 1) * BLOCK_WIDTH + grid.x;
+            this.y = (this.coordY - 1) * BLOCK_HEIGHT + grid.y;
+            this.originalX = copy(this.x);
+            this.originalY = copy(this.y);
+            grid[`${this.coordX}_${this.coordY}`] = 'blue_square';
+            grid[`${this.coordX + 1}_${this.coordY}`] = 'blue_square';
+            grid[`${this.coordX}_${this.coordY + 1}`] = 'blue_square';
+            grid[`${this.coordX + 1}_${this.coordY + 1}`] = 'blue_square';
+        } else this.assignCoords();
+        this.level = object.level ?? 1;
+        this.maxLevel = object.maxLevel ?? 10;
+        this.color = object.color ?? 'Blue';
+        this.rChangePerLevel = (colors[this.color]['r2'] - colors[this.color]['r']) / (this.maxLevel - 1);
+        this.gChangePerLevel = (colors[this.color]['g2'] - colors[this.color]['g']) / (this.maxLevel - 1);
+        this.bChangePerLevel = (colors[this.color]['b2'] - colors[this.color]['b']) / (this.maxLevel - 1);
+        this.r = object.r ?? colors[this.color]['r'] + (this.level - 1) * this.rChangePerLevel;
+        this.g = object.g ?? colors[this.color]['g'] + (this.level - 1) * this.gChangePerLevel;
+        this.b = object.b ?? colors[this.color]['b'] + (this.level - 1) * this.bChangePerLevel;
+        const BLOCK_INLINE = 24 - this.level * 2;
+        const BORDER_WIDTH = 2;
+        this.blockInline = BLOCK_INLINE;
+        this.borderWidth = BORDER_WIDTH;
+        const OUTLINE = new rect(
+            this.x + BLOCK_INLINE,
+            this.y + BLOCK_INLINE,
+            this.width - (2 * BLOCK_INLINE),
+            this.height - (2 * BLOCK_INLINE)
+        );
+        this.outelineId = OUTLINE.getId();
+        const SQUARE = new rect(
+            this.x + BLOCK_INLINE + BORDER_WIDTH,
+            this.y + BLOCK_INLINE + BORDER_WIDTH,
+            this.width - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
+            this.height - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
+            `(${this.r},${this.g},${this.b})`
+        );
+        SQUARE.z = 2;
+        this.squareId = SQUARE.getId();
+        this.selected = false;
+        this.nextLevelUpgradeCost = object.nextLevelCost ?? this.level;
+        this.earningsPerSecond = object.earningsPerSecond ?? this.level;
+        this.earningsPerHour = this.earningsPerSecond * 3600;
+        this.displayed = false;
+        this.id = getRandomInt();
+        this.totalCost = object.totalCost ?? blue_square_cost;
+        document.getElementById('resource-displays').innerHTML += `
+            <p id="resource-display-${this.id}" class="resource-display">+
+                <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
+                <img src="Images/blue_square.png" class="resource-image">
+            </p>
+        `;
+        buildings[this.id] = this;
+    }
+    assignCoords() {
         for (let x_y of Object.keys(grid)) {
             x_y = x_y.split('_');
             const gridX = parseInt(x_y[0]);
@@ -202,41 +316,6 @@ class blue_square {
             this.coordY = gridY;
             break;
         }
-        this.blockInline = BLOCK_INLINE;
-        this.borderWidth = BORDER_WIDTH;
-        const OUTLINE = new rect(
-            this.x + BLOCK_INLINE,
-            this.y + BLOCK_INLINE,
-            this.width - (2 * BLOCK_INLINE),
-            this.height - (2 * BLOCK_INLINE)
-        );
-        this.outelineId = OUTLINE.getId();
-        const SQUARE = new rect(
-            this.x + BLOCK_INLINE + BORDER_WIDTH,
-            this.y + BLOCK_INLINE + BORDER_WIDTH,
-            this.width - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
-            this.height - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
-            `(${this.r},${this.g},${this.b})`
-        );
-        SQUARE.z = 2;
-        this.squareId = SQUARE.getId();
-        this.selected = false;
-        this.earningsPerSecond = 1;
-        this.earningsPerHour = this.earningsPerSecond * 3600;
-        this.nextLevelUpgradeCost = 1;
-        this.maxLevel = 10;
-        this.level = 1;
-        this.color = 'Blue';
-        this.displayed = false;
-        this.id = getRandomInt();
-        this.totalCost = blue_square_cost;
-        document.getElementById('resource-displays').innerHTML += `
-            <p id="resource-display-${this.id}" class="resource-display">+
-                <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
-                <img src="Images/blue_square.png" class="resource-image">
-            </p>
-        `;
-        buildings[this.id] = this;
     }
     checkForMouseHover() {
         if (!mouse_down) {
@@ -292,7 +371,6 @@ class blue_square {
         square_object.y = this.y + this.blockInline + this.borderWidth;
     }
     checkXandY() {
-        console.log('g')
         this.selected = false;
         if (
             (this.x > 0) && 
@@ -344,8 +422,9 @@ class blue_square {
         this.nextLevelUpgradeCost += 1;
         this.level += 1;
         this.blockInline -= 2;
-        this.r -= 16;
-        this.g -= 16;
+        this.r += this.rChangePerLevel;
+        this.g += this.gChangePerLevel;
+        this.b += this.bChangePerLevel;
         let outline_object = shapes[this.outelineId];
         outline_object.x = this.x + this.blockInline;
         outline_object.y = this.y + this.blockInline;
@@ -483,13 +562,15 @@ renderGame();
 // const BLOCK4 = new Grass_Block(250 + 565, 250 + 85, 150, 150);
 // BLOCK4.drawInnerGrassBlock1();
 
-document.getElementById("blue-square-buy").addEventListener('click', function () {
-    if (blue_squares < blue_square_cost) return;
-    new blue_square();
-    blue_squares -= blue_square_cost;
-    blue_square_cost = blue_square_cost + 2;
-    document.getElementById("blue-square-cost").textContent = blue_square_cost;
-});
+for (const color of Object.keys(colors)) {
+    document.getElementById(`${color.toLowerCase()}-square-buy`).addEventListener('click', function () {
+        if (blue_squares < blue_square_cost) return;
+        new blue_square({'level': getRandomInt(10), 'coordX': getRandomInt(10), 'coordY': getRandomInt(10), 'color': color});
+        blue_squares -= blue_square_cost;
+        blue_square_cost = blue_square_cost + 2;
+        document.getElementById("blue-square-cost").textContent = blue_square_cost;
+    });
+}
 
 document.getElementById("toggle-building-info").addEventListener('click', function () {
     building_info_open = !building_info_open;

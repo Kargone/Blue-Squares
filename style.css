@@ -27,9 +27,26 @@
     position: fixed;
     top: calc(100% - 124px);
     left: 50%;
+    max-width: 740px;
     border-radius: 10px 10px 0px 0px;
     border: 4px solid brown;
-    max-width: 750px;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    margin: auto;
+    padding: 8px 0px 0px 0px;
+}
+
+#buy-buttons {
+    width: 100%;
+    height: 120px;
+    background: #d6c289;
+    position: fixed;
+    top: calc(100% - 124px);
+    left: 50%;
+    max-width: 740px;
     transform: translateX(-50%);
     z-index: 100;
     display: flex;
@@ -41,49 +58,13 @@
     padding: 8px 0px 0px 0px;
 }
 
-#building-create > div {
-    display: grid;
-}
-
-#building-create > div > button {
-    margin-left: 23px;
-    margin-top: 0px;
-}
-
-#building-create > #last-buy > button {
-    margin-right: 30px;
-}
-
-#building-create > #last-buy > image {
-    margin-right: 23px;
-}
-
-/* #building-create > #first-buy > button {
-    margin-right: 0px;
-}
-
-#building-create > #first-buy > image {
-    margin-right: 0px;
-} */
-
-#building-create > div > img {
-    margin-left: 30px;
-    width: 60px;
-    height: 60px;
-    border: 2px solid black;
-}
-
-#building-create > #blue-square-buy {
-    margin-left: 23px;
-}
-
 #toggle-building-create {
     position: absolute;
     width: 80px;
     height: 15px;
     z-index: 100;
     top: -27px;
-    left: calc(50% - 40px);
+    left: calc(50% - 46px);
     border-radius: 40px 40px 0px 0px;
     padding: 2px;
     border: 4px solid brown;
@@ -106,7 +87,7 @@
         transform: translateX(-50%);
     }
     to {
-        transform: translateY(calc(100% - 11px)) translateX(-50%);
+        transform: translateY(calc(100% - 16px)) translateX(-50%);
     }
 }
 
@@ -131,7 +112,7 @@
 
 @keyframes open-building-create {
     from {
-        transform: translateY(calc(100% - 11px)) translateX(-50%);
+        transform: translateY(calc(100% - 16px)) translateX(-50%);
     }
     to {
         transform: translateX(-50%);
@@ -150,6 +131,34 @@
     to {
         transform: scale(1);
     }
+}
+
+#buy-buttons > div {
+    display: grid;
+}
+
+#buy-buttons > div > button {
+    margin-left: 23px;
+    margin-top: 0px;
+}
+
+#buy-buttons > #last-buy > button {
+    margin-right: 23px;
+}
+
+#buy-buttons > #last-buy > img {
+    margin-right: 30px;
+}
+
+#buy-buttons > div > img {
+    margin-left: 30px;
+    width: 60px;
+    height: 60px;
+    border: 2px solid black;
+}
+
+#buy-buttons > #blue-square-buy {
+    margin-left: 23px;
 }
 
 #building-info {
@@ -281,6 +290,10 @@
     position: fixed;
     font-size: 15px;
     animation: up 1s infinite;
+}
+
+#resource-displays > p > img {
+    margin-left: 0px;
 }
 
 @keyframes up {
