@@ -92,11 +92,27 @@ const colors = {
         'b2': 250,
     },
 };
-let blue_squares = 0;
-let blue_square_cost = 0;
 let building_info_open = true;
 let building_create_open = true;
-let notificationRemoved = {'id':'removed or not'};
+let notificationRemoved = {'id': 'removed or not'};
+let currencies = {
+    'blue_squares': 0,
+    'red_squares': 0,
+    'green_squares': 0,
+    'purple_squares': 0,
+    'orange_squares': 0,
+    'yellow_squares': 0,
+    'white_squares': 0,
+};
+let buy_costs = {
+    'blue_squares': 0,
+    'red_squares': 0,
+    'green_squares': 0,
+    'purple_squares': 0,
+    'orange_squares': 0,
+    'yellow_squares': 0,
+    'white_squares': 0,
+};
 
 class rect {
     constructor(x = 0, y = 0, width, height, rgb) {
@@ -286,11 +302,11 @@ class blue_square {
         this.earningsPerHour = this.earningsPerSecond * 3600;
         this.displayed = false;
         this.id = getRandomInt();
-        this.totalCost = object.totalCost ?? blue_square_cost;
+        this.totalCost = object.totalCost ?? buy_costs[`${this.color.toLowerCase()}_squares`];
         document.getElementById('resource-displays').innerHTML += `
             <p id="resource-display-${this.id}" class="resource-display">+
                 <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
-                <img src="Images/blue_square.png" class="resource-image">
+                <img src="Images/${this.color.toLowerCase()}_square.png" class="resource-image">
             </p>
         `;
         buildings[this.id] = this;
@@ -410,12 +426,12 @@ class blue_square {
         this.coordY = Math.round((this.y - grid.y) / BLOCK_WIDTH) + 1;
     }
     upResource() {
-        blue_squares += this.earningsPerSecond;
+        currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond;
     }
     upgrade() {
         if (this.level >= this.maxLevel) return;
-        if (blue_squares < this.nextLevelUpgradeCost) return;
-        blue_squares -= this.nextLevelUpgradeCost;
+        if (currencies[`${this.color.toLowerCase()}_squares`] < this.nextLevelUpgradeCost) return;
+        currencies[`${this.color.toLowerCase()}_squares`] -= this.nextLevelUpgradeCost;
         this.totalCost += this.nextLevelUpgradeCost;
         this.earningsPerSecond += 1;
         this.earningsPerHour = this.earningsPerSecond * 3600;
@@ -439,7 +455,7 @@ class blue_square {
         square_object.g = this.g;
         square_object.b = this.b;
         document.getElementById(`resource-display-${this.id}-count`).textContent = this.earningsPerSecond;
-        document.getElementById("blue-squares-count").textContent = blue_squares;
+        document.getElementById(`${this.color.toLowerCase()}-squares-count`).textContent = currencies[`${this.color.toLowerCase()}_squares`];
     }
     displaySquare() {
         if (this.displayed) return;
@@ -478,7 +494,7 @@ class blue_square {
                 delete buildings[THIS_SQUARE.id];
                 delete shapes[THIS_SQUARE.outelineId];
                 delete shapes[THIS_SQUARE.squareId];
-                blue_squares += THIS_SQUARE.totalCost;
+                currencies[`${THIS_SQUARE.color.toLowerCase()}_squares`] += THIS_SQUARE.totalCost;
                 document.getElementById(`resource-display-${THIS_SQUARE.id}`).remove();
                 THIS_SQUARE.removeUpgradeListener();
                 document.getElementById('building-info-no-content').style.display = 'block';
@@ -564,11 +580,11 @@ renderGame();
 
 for (const color of Object.keys(colors)) {
     document.getElementById(`${color.toLowerCase()}-square-buy`).addEventListener('click', function () {
-        if (blue_squares < blue_square_cost) return;
+        if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`]) return;
         new blue_square({'level': getRandomInt(10), 'coordX': getRandomInt(10), 'coordY': getRandomInt(10), 'color': color});
-        blue_squares -= blue_square_cost;
-        blue_square_cost = blue_square_cost + 2;
-        document.getElementById("blue-square-cost").textContent = blue_square_cost;
+        currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_squares`];
+        buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
+        document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = buy_costs[`${color.toLowerCase()}_squares`];
     });
 }
 
@@ -595,5 +611,7 @@ const UP_RESOURCES = setInterval(() => {
         let building = buildings[building_key];
         building.upResource();
     }
-    document.getElementById("blue-squares-count").textContent = blue_squares;
+    for (const color of Object.keys(colors)) {
+        document.getElementById(`${color.toLowerCase()}-squares-count`).textContent = currencies[`${color.toLowerCase()}_squares`];
+    }
 }, 1000);
