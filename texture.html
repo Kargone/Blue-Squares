@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1, viewport-fit=auto">
+    <meta charset="utf-8" />
+    <title>Blue Squares</title>
+    <link rel="stylesheet" href="texture.css">
+    <!-- <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
+      integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <script src="webgl-demo.js" type="module" defer></script> -->
+  </head>
+  <body id="body">
+    <canvas id="game-canvas"></canvas>
+    <div id="settings">
+        <div id="current">
+            <h2>Current:</h2>
+            <h2 id="r">r-1</h2>
+            <h2 id="g">g-1</h2>
+            <h2 id="b">b-1</h2>
+            <button id="color"></button>
+        </div>
+        <div>
+            <h2 id="last_1">Last-1: r-1 g-1 b-1</h1>
+            <button id="last_1_button"></button>
+        </div>
+        <div>
+            <h2 id="last_2">Last-2: r-1 g-1 b-1</h1>
+            <button id="last_2_button"></button>
+        </div>
+        <div>
+            <h2 id="last_3">Last-3: r-1 g-1 b-1</h1>
+            <button id="last_3_button"></button>
+        </div>
+        <div>
+            <h2 id="last_4">Last-4: r-1 g-1 b-1</h1>
+            <button id="last_4_button"></button>
+        </div>
+        <div>
+            <h2 id="last_5">Last-5: r-1 g-1 b-1</h1>
+            <button id="last_5_button"></button>
+        </div>
+        <button id="copy">Copy</button>
+    </div>
+    <script src="setup-webgl2.js"></script>
+    <script src="init-webgl2-images.js"></script>
+    <script src="init-webgl2-shapes.js"></script>
+    <script src="irregularitiesInfo.js"></script>
+    <script src="texture.js"></script>
+  </body>
+</html>

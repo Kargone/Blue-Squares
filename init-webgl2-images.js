@@ -214,8 +214,8 @@ function main() {
     mouseY = e.clientY - rect.top;
     mouseStartX_Y.x = mouseX;
     mouseStartX_Y.y = mouseY;
-    grid.distFromStartX = grid.x - mouseStartX_Y.x;
-    grid.distFromStartY = grid.y - mouseStartX_Y.y;
+    // grid.distFromStartX = grid.x - mouseStartX_Y.x;
+    // grid.distFromStartY = grid.y - mouseStartX_Y.y;
     for (const building_key of Object.keys(buildings)) {
       let building = buildings[building_key];
       building.updateDistFromStartX_Y();
@@ -240,8 +240,8 @@ function main() {
     mouseY = touch.clientY;
     mouseStartX_Y.x = mouseX;
     mouseStartX_Y.y = mouseY;
-    grid.distFromStartX = grid.x - mouseStartX_Y.x;
-    grid.distFromStartY = grid.y - mouseStartX_Y.y;
+    // grid.distFromStartX = grid.x - mouseStartX_Y.x;
+    // grid.distFromStartY = grid.y - mouseStartX_Y.y;
     for (const building_key of Object.keys(buildings)) {
       let building = buildings[building_key];
       building.updateDistFromStartX_Y();
@@ -323,47 +323,51 @@ const textureInfos = [
 let image_draw_infos = {};
 
 function dragShape() {
-  for (const building_key of Object.keys(buildings)) {
-    let building = buildings[building_key];
-    if (!building.selected) continue;
-    if (building.checkForMouseHover()) {
-      building.updateXandY();
-      building.displaySquare();
-      canDragBoard = false;
-      return true;
-    }
-  }
-  for (const building_key of Object.keys(buildings)) {
-    let building = buildings[building_key];
-    if (building.checkForMouseHover()) {
-      building.updateXandY();
-      building.displaySquare();
-      canDragBoard = false;
-      return true;
-    }
-  }
-  if ((!mouse_down) || (!canDragBoard)) return;
-  const translateX = mouseX - mouseStartX_Y.x;
-  const translateY = mouseY - mouseStartX_Y.y;
-  grid.x = mouseStartX_Y.x + translateX + grid.distFromStartX;
-  grid.y = mouseStartX_Y.y + translateY + grid.distFromStartY;
-  for (const building_key of Object.keys(buildings)) {
-    let building = buildings[building_key];
-    building.translateX_YfromStartX_Y(translateX, translateY);
-  }
   for (const shape_key of Object.keys(shapes)) {
     let shape = shapes[shape_key];
-    shape.translateX_YfromStartX_Y(translateX, translateY);
+    shape.clicked();
   }
-  for (const image_key of Object.keys(image_draw_infos)) {
-    let image = image_draw_infos[image_key];
-    image.translateX_YfromStartX_Y(translateX, translateY);
-  }
+  // for (const building_key of Object.keys(buildings)) {
+  //   let building = buildings[building_key];
+  //   if (!building.selected) continue;
+  //   if (building.checkForMouseHover()) {
+  //     building.updateXandY();
+  //     building.displaySquare();
+  //     canDragBoard = false;
+  //     return true;
+  //   }
+  // }
+  // for (const building_key of Object.keys(buildings)) {
+  //   let building = buildings[building_key];
+  //   if (building.checkForMouseHover()) {
+  //     building.updateXandY();
+  //     building.displaySquare();
+  //     canDragBoard = false;
+  //     return true;
+  //   }
+  // }
+  // if ((!mouse_down) || (!canDragBoard)) return;
+  // const translateX = mouseX - mouseStartX_Y.x;
+  // const translateY = mouseY - mouseStartX_Y.y;
+  // grid.x = mouseStartX_Y.x + translateX + grid.distFromStartX;
+  // grid.y = mouseStartX_Y.y + translateY + grid.distFromStartY;
+  // for (const building_key of Object.keys(buildings)) {
+  //   let building = buildings[building_key];
+  //   building.translateX_YfromStartX_Y(translateX, translateY);
+  // }
+  // for (const shape_key of Object.keys(shapes)) {
+  //   let shape = shapes[shape_key];
+  //   shape.translateX_YfromStartX_Y(translateX, translateY);
+  // }
+  // for (const image_key of Object.keys(image_draw_infos)) {
+  //   let image = image_draw_infos[image_key];
+  //   image.translateX_YfromStartX_Y(translateX, translateY);
+  // }
 }
 
 function updateResourceDisplays() {
-  for (const building_key of Object.keys(buildings)) {
-    let building = buildings[building_key];
-    building.updateResourceDisplay();
-  }
+  // for (const building_key of Object.keys(buildings)) {
+  //   let building = buildings[building_key];
+  //   building.updateResourceDisplay();
+  // }
 }

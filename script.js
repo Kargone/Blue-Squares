@@ -268,6 +268,7 @@ class blue_square {
             grid[`${this.coordX + 1}_${this.coordY + 1}`] = 'blue_square';
         } else this.assignCoords();
         this.level = object.level ?? 1;
+
         this.maxLevel = object.maxLevel ?? 10;
         this.color = object.color ?? 'Blue';
         this.rChangePerLevel = (colors[this.color]['r2'] - colors[this.color]['r']) / (this.maxLevel - 1);
@@ -569,19 +570,11 @@ function copy(value) {
 }
 
 renderGame();
-// const BLOCK1 = new Grass_Block(100 + 565, 100 + 85, 150, 150);
-// BLOCK1.drawInnerGrassBlock1();
-// const BLOCK2 = new Grass_Block(250 + 565, 100 + 85, 150, 150);
-// BLOCK2.drawInnerGrassBlock2();
-// const BLOCK3 = new Grass_Block(100 + 565, 250 + 85, 150, 150);
-// BLOCK3.drawInnerGrassBlock2();
-// const BLOCK4 = new Grass_Block(250 + 565, 250 + 85, 150, 150);
-// BLOCK4.drawInnerGrassBlock1();
 
 for (const color of Object.keys(colors)) {
     document.getElementById(`${color.toLowerCase()}-square-buy`).addEventListener('click', function () {
         if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`]) return;
-        new blue_square({'level': getRandomInt(10), 'coordX': getRandomInt(10), 'coordY': getRandomInt(10), 'color': color});
+        new blue_square({'color': color});
         currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_squares`];
         buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
         document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = buy_costs[`${color.toLowerCase()}_squares`];
@@ -604,6 +597,10 @@ document.getElementById("toggle-building-create").addEventListener('click', func
     } else {
         document.getElementById("building-create").className = "collapse-building-create";
     }
+});
+
+document.getElementById("settings").addEventListener('click', function () {
+    window.location.href = "texture.html";
 });
 
 const UP_RESOURCES = setInterval(() => {
