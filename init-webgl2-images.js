@@ -148,7 +148,7 @@ function main() {
   }
   setInterval(() => {
     draw();
-  }, 1000/20);
+  }, 1000/60);
 
   // Unlike images, textures do not have a width and height associated
   // with them so we'll pass in the width and height of the texture
