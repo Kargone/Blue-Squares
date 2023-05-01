@@ -148,7 +148,7 @@ function main() {
   }
   setInterval(() => {
     draw();
-  }, 1000/60);
+  }, 1000/20);
 
   // Unlike images, textures do not have a width and height associated
   // with them so we'll pass in the width and height of the texture
@@ -323,6 +323,7 @@ const textureInfos = [
 let image_draw_infos = {};
 
 function dragShape() {
+  if (!mouse_down) return;
   for (const shape_key of Object.keys(shapes)) {
     let shape = shapes[shape_key];
     shape.clicked();
