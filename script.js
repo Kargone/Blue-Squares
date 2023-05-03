@@ -186,8 +186,8 @@ class Grass_Block {
     }
     drawGrass(type = 'none') {
         if (!(type === 'none')) {
-            if (type === 'outer-right') return this.drawAGrass(textureInfos[3]);
-            if (type === 'outer-down') return this.drawAGrass(textureInfos[4]);
+            if (type === 'outer-down') return this.drawAGrass(textureInfos[3]);
+            if (type === 'outer-right') return this.drawAGrass(textureInfos[4 + getRandomInt(2)]);
         }
         if (this.x < BLOCK_WIDTH * GAME_BORDER) {
             drawOuterBlockOfGrass(this);
