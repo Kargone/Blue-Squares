@@ -317,7 +317,9 @@ function loadImageAndCreateTextureInfo(url) {
 const textureInfos = [
   loadImageAndCreateTextureInfo('Images/innerBlock1.png'),
   loadImageAndCreateTextureInfo('Images/innerBlock2.png'),
-  loadImageAndCreateTextureInfo('Images/outerBlock.png'),
+  loadImageAndCreateTextureInfo('Images/Grass/Outer-Blocks/sq5.png'),
+  loadImageAndCreateTextureInfo('Images/Grass/Outer-Blocks/outer-right.png'),
+  loadImageAndCreateTextureInfo('Images/Grass/Outer-Blocks/outer-down.png'),
 ];
 
 let image_draw_infos = {};

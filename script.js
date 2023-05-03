@@ -184,7 +184,11 @@ class Grass_Block {
         this.height = height;
         this.id = getRandomInt();
     }
-    drawGrass() {
+    drawGrass(type = 'none') {
+        if (!(type === 'none')) {
+            if (type === 'outer-right') return this.drawAGrass(textureInfos[3]);
+            if (type === 'outer-down') return this.drawAGrass(textureInfos[4]);
+        }
         if (this.x < BLOCK_WIDTH * GAME_BORDER) {
             drawOuterBlockOfGrass(this);
         } else if (this.x >= BLOCK_WIDTH * GAME_BLOCK_AMOUNT_WIDTH - BLOCK_WIDTH * GAME_BORDER) {
@@ -221,6 +225,12 @@ class Grass_Block {
         this.xScale = this.width / 299;
         this.yScale = this.height / 298;
         this.textureInfo = textureInfos[0];
+        image_draw_infos[this.id] = this;
+    }
+    drawAGrass(textureInfo) {
+        this.xScale = this.width / 300;
+        this.yScale = this.height / 300;
+        this.textureInfo = textureInfo;
         image_draw_infos[this.id] = this;
     }
     translateX_YfromStartX_Y(x, y) {
@@ -532,7 +542,17 @@ function renderGame() {
     for (let current_block_height = 0; current_block_height < GAME_BLOCK_AMOUNT_HEIGHT; current_block_height++) {
         for (let current_block_width = 0; current_block_width < GAME_BLOCK_AMOUNT_WIDTH; current_block_width++) {
             const BLOCK = new Grass_Block(current_block_width * BLOCK_WIDTH, current_block_height * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
-            BLOCK.drawGrass();
+            if ((current_block_width === 4) &&
+                (current_block_height > 3) &&
+                (current_block_height < GAME_BLOCK_AMOUNT_HEIGHT - 4)
+                ) {
+                BLOCK.drawGrass('outer-right');
+            } else if ((current_block_height === 3) &&
+                        (current_block_width > 4) &&
+                        (current_block_width < GAME_BLOCK_AMOUNT_WIDTH - 4)
+            ) {
+                BLOCK.drawGrass('outer-down');
+            } else BLOCK.drawGrass();
         }
     }
 }

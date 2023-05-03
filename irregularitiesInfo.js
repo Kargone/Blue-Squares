@@ -912,3 +912,18 @@ function random_Negative_Positive_Int(max) { // min and max included
     return Math.floor(Math.random() * max) * (Math.random() < 0.5? -1 : 1);
 }
 */
+
+/*
+grass color
+brown tree color
+tree leaves color
+
+outer color 140, 240, 140
+inner 1 ligth color - 40, 220, 40
+inner 2 dark color - 40, 190, 40
+
+8 width of leak into outer blocks
+
+grass bits color - 40, 180, 40
+
+*/
