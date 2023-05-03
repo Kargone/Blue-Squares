@@ -922,8 +922,10 @@ outer color 140, 240, 140
 inner 1 ligth color - 40, 220, 40
 inner 2 dark color - 40, 190, 40
 
-8 width of leak into outer blocks
+5 width of leak into outer blocks
 
 grass bits color - 40, 180, 40
 
+bushes - 40, 140, 40
+{"last_1":"rgb(40,190,40)","last_2":"rgb(40,180,40)","last_3":"rgb(140,240,140)","last_4":"rgb(0,0,0)","last_5":"rgb(0,0,0)"}
 */
