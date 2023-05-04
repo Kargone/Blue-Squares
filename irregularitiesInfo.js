@@ -922,12 +922,13 @@ outer color 140, 240, 140
 inner 1 ligth color - 40, 190, 40ww
 grass - 20, 160, 20
 inner 2 dark color - 40, 200, 40
-grass - 40, 110, 40
+grass - 20, 160, 20
+bush - 40, 140, 40
 
 5 width of leak into outer blocks
 
 grass bits color - 40, 180, 40
 
-bushes - 40, 140, 40
+bushes - 40, 140, 40, outer width 12, inner is redish adn 150g
 {"last_1":"rgb(40,190,40)","last_2":"rgb(40,180,40)","last_3":"rgb(140,240,140)","last_4":"rgb(0,0,0)","last_5":"rgb(0,0,0)"}
 */
