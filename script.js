@@ -23,8 +23,6 @@ const GAME_BLOCK_AMOUNT_HEIGHT = 27;
 const BLOCK_WIDTH = 30;
 const BLOCK_HEIGHT = 30;
 const GAME_BORDER = 4;
-const OUTER_GRASS_COLOR = '(20,110,16)';
-const INNER_GRASS_COLOR = '(30,227,23)';
 
 shapes = {};
 buildings = {};
@@ -399,6 +397,7 @@ class blue_square {
             let square_object = shapes[this.squareId];
             square_object.x = this.x + this.blockInline + this.borderWidth;
             square_object.y = this.y + this.blockInline + this.borderWidth;
+            notification('Invalid Movement');
         }
     }
     setCoordXandY() {

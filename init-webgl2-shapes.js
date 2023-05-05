@@ -97,8 +97,6 @@ function refreshCanvas() {
   // pixels to clipspace in the shader
   gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
 
-  // draw 50 random rectangles in random colors
-  // Put a rectangle in the position buffer
   for (let zindex of [1, 2]) {
     Object.keys(shapes).forEach(function (key) {
       let object = shapes[key];

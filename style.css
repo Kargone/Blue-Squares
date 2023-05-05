@@ -1,3 +1,7 @@
+:root {
+    --vh: 1vh;
+}
+
 /* width */
 ::-webkit-scrollbar {
     width: 5px;
