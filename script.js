@@ -289,7 +289,7 @@ class blue_square {
         document.getElementById('resource-displays').innerHTML += `
             <p id="resource-display-${this.id}" class="resource-display">+
                 <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
-                <img src="Images/resource-squares/${this.color.toLowerCase()}_square.png" class="resource-image">
+                <img src="Images/resource-squares/${this.color.toLowerCase()}-square.png" class="resource-image">
             </p>
         `;
         buildings[this.id] = this;
