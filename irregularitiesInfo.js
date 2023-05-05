@@ -919,13 +919,15 @@ brown tree color
 tree leaves color
 
 outer color 140, 240, 140
-inner 1 ligth color - 40, 190, 40ww
-grass - 20, 160, 20
-inner 2 dark color - 40, 200, 40
-grass - 20, 160, 20
+inner 1 dark color - 40, 190, 40
+grass - 20, 150, 20
+inner 2 light color - 40, 200, 40
+grass - 20, 150, 20
 bush - 40, 140, 40
 
 5 width of leak into outer blocks
+2 sparse on each side
+bush made up of 40, 140; 160; 170, 40, amd yellow ish 120, 190, 70
 
 grass bits color - 40, 180, 40
 

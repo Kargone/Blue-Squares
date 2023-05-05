@@ -186,8 +186,14 @@ class Grass_Block {
     }
     drawGrass(type = 'none') {
         if (!(type === 'none')) {
-            if (type === 'outer-down') return this.drawAGrass(textureInfos[3]);
-            if (type === 'outer-right') return this.drawAGrass(textureInfos[4 + getRandomInt(2)]);
+            if (type === 'outer-right') return this.drawAGrass(textureInfos.outer.rights.dark[getRandomInt(2)]);
+            if (type === 'outer-down') return this.drawAGrass(textureInfos.outer.downs.dark[getRandomInt(2)]);
+            if (type === 'outer-left') return this.drawAGrass(textureInfos.outer.lefts.dark[getRandomInt(2)]);
+            if (type === 'outer-up') return this.drawAGrass(textureInfos.outer.ups.dark[getRandomInt(2)]);
+            if (type === 'outer-corner-bottom_right') return this.drawAGrass(textureInfos.outer.corners['bottom-right']);
+            if (type === 'outer-corner-bottom_left') return this.drawAGrass(textureInfos.outer.corners['bottom-left']);
+            if (type === 'outer-corner-top_right') return this.drawAGrass(textureInfos.outer.corners['top-right']);
+            if (type === 'outer-corner-top_left') return this.drawAGrass(textureInfos.outer.corners['top-left']);
         }
         if (this.x < BLOCK_WIDTH * GAME_BORDER) {
             drawOuterBlockOfGrass(this);
@@ -212,19 +218,19 @@ class Grass_Block {
     drawOuterGrassBlock() {
         this.xScale = this.width / 299;
         this.yScale = this.height / 298;
-        this.textureInfo = textureInfos[2];
+        this.textureInfo = textureInfos.outer.outside[0];
         image_draw_infos[this.id] = this;
     }
     drawInnerGrassBlock1() {
         this.xScale = this.width / 299;
         this.yScale = this.height / 300;
-        this.textureInfo = textureInfos[1];
+        this.textureInfo = textureInfos.inner.dark[0];
         image_draw_infos[this.id] = this;
     }
     drawInnerGrassBlock2() {
         this.xScale = this.width / 299;
         this.yScale = this.height / 298;
-        this.textureInfo = textureInfos[0];
+        this.textureInfo = textureInfos.inner.light[0];
         image_draw_infos[this.id] = this;
     }
     drawAGrass(textureInfo) {
@@ -542,16 +548,34 @@ function renderGame() {
     for (let current_block_height = 0; current_block_height < GAME_BLOCK_AMOUNT_HEIGHT; current_block_height++) {
         for (let current_block_width = 0; current_block_width < GAME_BLOCK_AMOUNT_WIDTH; current_block_width++) {
             const BLOCK = new Grass_Block(current_block_width * BLOCK_WIDTH, current_block_height * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
-            if ((current_block_width === 4) &&
+            if ((current_block_width === 4) && (current_block_height === 3)) {
+                BLOCK.drawGrass('outer-corner-bottom_right');
+            } else if ((current_block_width === GAME_BLOCK_AMOUNT_WIDTH - 4) && (current_block_height === 3)) {
+                BLOCK.drawGrass('outer-corner-bottom_left');
+            } else if ((current_block_width === 4) && (current_block_height === GAME_BLOCK_AMOUNT_HEIGHT - 4)) {
+                BLOCK.drawGrass('outer-corner-top_right');
+            } else if ((current_block_width === GAME_BLOCK_AMOUNT_WIDTH - 4) && (current_block_height === GAME_BLOCK_AMOUNT_HEIGHT - 4)) {
+                BLOCK.drawGrass('outer-corner-top_left');
+            } else if ((current_block_width === 4) &&
                 (current_block_height > 3) &&
                 (current_block_height < GAME_BLOCK_AMOUNT_HEIGHT - 4)
                 ) {
                 BLOCK.drawGrass('outer-right');
+            } else if ((current_block_width === GAME_BLOCK_AMOUNT_WIDTH - 4) &&
+                    (current_block_height > 3) &&
+                    (current_block_height < GAME_BLOCK_AMOUNT_HEIGHT - 4)
+                ) {
+                BLOCK.drawGrass('outer-left');
             } else if ((current_block_height === 3) &&
-                        (current_block_width > 4) &&
-                        (current_block_width < GAME_BLOCK_AMOUNT_WIDTH - 4)
+                    (current_block_width > 4) &&
+                    (current_block_width < GAME_BLOCK_AMOUNT_WIDTH - 4)
             ) {
                 BLOCK.drawGrass('outer-down');
+            } else if ((current_block_height === GAME_BLOCK_AMOUNT_HEIGHT - 4) &&
+                    (current_block_width > 4) &&
+                    (current_block_width < GAME_BLOCK_AMOUNT_WIDTH - 4)
+            ) {
+                BLOCK.drawGrass('outer-up');
             } else BLOCK.drawGrass();
         }
     }
