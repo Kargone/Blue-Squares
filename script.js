@@ -1,7 +1,6 @@
 const game_canvas = document.getElementById('game-canvas');
 const body = document.getElementById('body');
 let vh = window.innerHeight * 0.01;
-let aspect_ratio = window.innerWidth / window.innerHeight;
 document.querySelector(':root').style.setProperty('--vh', `${vh}px`);
 game_canvas.style.width = window.innerWidth + 'px';
 game_canvas.style.height = window.innerHeight + 'px';
@@ -15,7 +14,6 @@ window.addEventListener('resize', () => {
     game_canvas.style.height = window.innerHeight + 'px';
     body.style.width = window.innerWidth + 'px';
     body.style.height = window.innerHeight + 'px';
-    aspect_ratio = window.innerWidth / window.innerHeight;
 });
 
 const GAME_BLOCK_AMOUNT_WIDTH = 54;
