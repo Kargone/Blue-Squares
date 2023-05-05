@@ -531,29 +531,23 @@ function notification(text) {
     `;
     newDiv.classList = 'notification';
     newDiv.setAttribute("id", `noti${x}`);
-    // document.getElementById("notifications").innerHTML += `
-    //     <div class="notification" id="noti${x}">
-    //         <p class="notificationText">${text}</p>
-    //         <p class="deleteNotification" id="delete${x}">X</p>
-    //         <div class="notificationTimeBar"></div>
-    //     </div>
-    // `;
     const currentDiv = document.getElementById("notifications");
     currentDiv.appendChild(newDiv);
     notificationRemoved[x] = false;
-    // for (notificationId of Object.keys(notificationRemoved)) {
-    //     if (notificationRemoved[notificationId]) continue;
-    //     let tempNotificationId = notificationId;
-    //     document.getElementById("delete"+tempNotificationId).addEventListener('click', function () {
-    //         document.getElementById("noti"+tempNotificationId).remove();
-    //         notificationRemoved[tempNotificationId] = true;
-    //     });
-    // }
+    document.getElementById(`delete${x}`).addEventListener('click', function () {
+        removeNotification(x);
+    });
     setTimeout(function() {
         if (notificationRemoved[x]) return;
-        document.getElementById("noti"+x).remove();
-        notificationRemoved[x] = true;
+        removeNotification(x);
     }, 3000);
+    function removeNotification(x) {
+        document.getElementById("noti"+x).classList += " deletedNotification";
+        setTimeout(function() {
+            document.getElementById("noti"+x).remove();
+            notificationRemoved[x] = true;
+        }, 500);
+    }
 }
 
 function copy(value) {

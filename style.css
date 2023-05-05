@@ -325,19 +325,22 @@
     pointer-events: auto;
     overflow: hidden;
     position: relative;
-    /* animation: ease-out flowInFromTop .5s;
-    animation-fill-mode: forwards; */
+    animation: ease-out flowInFromTop .5s;
+    animation-fill-mode: forwards;
 }
 
 @keyframes flowInFromTop {
     from {
         position: absolute;
-        top: 0%;
+        top: 0px;
         left: 50%;
+        transform: translateX(-50%);
     }
-    50% {
-        top: 50%;
+    99% {
+        position: absolute;
+        top: 99%;
         left: 50%;
+        transform: translateX(-50%);
     }
     to {
         position: relative;
@@ -359,6 +362,24 @@
 
 .notification:hover .deleteNotification{
     visibility: visible;
+}
+
+.deletedNotification {
+    animation: ease-in swipedNotification .5s;
+    animation-fill-mode: forwards;
+}
+
+.deletedNotification > .notificationTimeBar {
+    display: none;
+}
+
+@keyframes swipedNotification {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: translateX(100vw);
+    }
 }
 
 .notificationText {
