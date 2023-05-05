@@ -115,13 +115,13 @@ let buy_costs = {
 };
 
 class rect {
-    constructor(x = 0, y = 0, width, height, rgb) {
-        this.x = x;
-        this.y = y;
+    constructor(x, y, width, height, rgb) {
+        this.x = x ?? 0;
+        this.y = y ?? 0;
         this.distFromStartX = -1;
         this.distFromStartY = -1;
-        this.width = width || 10;
-        this.height = height || 10;
+        this.width = width ?? 10;
+        this.height = height ?? 10;
         if (rgb != undefined) {
             rgb = rgb.split(",");
             this.r = parseInt(rgb[0].split('(')[1]);
@@ -146,16 +146,14 @@ class rect {
         const gl = this.gl;
         const colorLocation = this.colorLocation;
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        x1, y1,
-        x2, y1,
-        x1, y2,
-        x1, y2,
-        x2, y1,
-        x2, y2,
+            x1, y1,
+            x2, y1,
+            x1, y2,
+            x1, y2,
+            x2, y1,
+            x2, y2,
         ]), gl.STATIC_DRAW);
-        // Set a random color.
         gl.uniform4f(colorLocation, this.r/255, this.g/255, this.b/255, 1);
-        // Draw the rectangle.
         var primitiveType = gl.TRIANGLES;
         var offset = 0;
         var count = 6;
@@ -174,66 +172,39 @@ class rect {
     }
 }
 
-class Grass_Block {
+class grass_block {
     constructor(x, y, width, height) {
-        this.x = x;
-        this.y = y;
+        this.x = x ?? 0;
+        this.y = y ?? 0;
         this.distFromStartX = -1;
         this.distFromStartY = -1;
-        this.width = width;
-        this.height = height;
+        this.width = width ?? BLOCK_WIDTH;
+        this.height = height ?? BLOCK_HEIGHT;
         this.id = getRandomInt();
     }
-    drawGrass(type = 'none') {
-        if (!(type === 'none')) {
-            if (type === 'outer-right') return this.drawAGrass(textureInfos.outer.rights.dark[getRandomInt(2)]);
-            if (type === 'outer-down') return this.drawAGrass(textureInfos.outer.downs.dark[getRandomInt(2)]);
-            if (type === 'outer-left') return this.drawAGrass(textureInfos.outer.lefts.dark[getRandomInt(2)]);
-            if (type === 'outer-up') return this.drawAGrass(textureInfos.outer.ups.dark[getRandomInt(2)]);
-            if (type === 'outer-corner-bottom_right') return this.drawAGrass(textureInfos.outer.corners['bottom-right']);
-            if (type === 'outer-corner-bottom_left') return this.drawAGrass(textureInfos.outer.corners['bottom-left']);
-            if (type === 'outer-corner-top_right') return this.drawAGrass(textureInfos.outer.corners['top-right']);
-            if (type === 'outer-corner-top_left') return this.drawAGrass(textureInfos.outer.corners['top-left']);
-        }
-        if (this.x < BLOCK_WIDTH * GAME_BORDER) {
-            drawOuterBlockOfGrass(this);
-        } else if (this.x >= BLOCK_WIDTH * GAME_BLOCK_AMOUNT_WIDTH - BLOCK_WIDTH * GAME_BORDER) {
-            drawOuterBlockOfGrass(this);
-        } else if (this.y < BLOCK_HEIGHT * GAME_BORDER) {
-            drawOuterBlockOfGrass(this);
-        } else if (this.y >= BLOCK_HEIGHT * GAME_BLOCK_AMOUNT_HEIGHT - BLOCK_HEIGHT * GAME_BORDER) {
-            drawOuterBlockOfGrass(this);
-        } else {
-            const DO_SHADe = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
-            const GRASS_BLOCK = new Grass_Block(this.x, this.y, this.width, this.height);
-            grid[`${this.x / BLOCK_WIDTH - GAME_BORDER + 1}_${this.y / BLOCK_HEIGHT - GAME_BORDER + 1}`] = '';
-            if (DO_SHADe === 0) GRASS_BLOCK.drawInnerGrassBlock1();
-            if (DO_SHADe === 1) GRASS_BLOCK.drawInnerGrassBlock2();
-        }
-        function drawOuterBlockOfGrass(object) {
-            const GRASS_BLOCK = new Grass_Block(object.x, object.y, object.width, object.height);
-            GRASS_BLOCK.drawOuterGrassBlock();
-        }
+    drawGrass(coordX, coordY) {
+        const outer_down = (coordY === 4) && (coordX > 3) && (coordX < GAME_BLOCK_AMOUNT_WIDTH - 3);
+        const outer_up = (coordY === GAME_BLOCK_AMOUNT_HEIGHT - 4) && (coordX > 3) && (coordX < GAME_BLOCK_AMOUNT_WIDTH - 3);
+        const outer_right = (coordX === 4) && (coordY > 3) && (coordY < GAME_BLOCK_AMOUNT_HEIGHT - 3);
+        const outer_left = (coordX === GAME_BLOCK_AMOUNT_WIDTH - 4) && (coordY > 3) && (coordY < GAME_BLOCK_AMOUNT_HEIGHT - 3);
+        if (outer_down && outer_right) return this.drawGrassImage(textureInfos.outer.corners['bottom-right']);
+        if (outer_down && outer_left) return this.drawGrassImage(textureInfos.outer.corners['bottom-left']);
+        if (outer_up && outer_right) return this.drawGrassImage(textureInfos.outer.corners['top-right']);
+        if (outer_up && outer_left) return this.drawGrassImage(textureInfos.outer.corners['top-left']);
+        if (outer_right) return this.drawGrassImage(textureInfos.outer.rights.dark[getRandomInt(2)]);
+        if (outer_down) return this.drawGrassImage(textureInfos.outer.downs.dark[getRandomInt(2)]);
+        if (outer_left) return this.drawGrassImage(textureInfos.outer.lefts.dark[getRandomInt(2)]);
+        if (outer_up) return this.drawGrassImage(textureInfos.outer.ups.dark[getRandomInt(2)]);
+        if ((this.x < BLOCK_WIDTH * GAME_BORDER) ||
+            (this.x >= BLOCK_WIDTH * GAME_BLOCK_AMOUNT_WIDTH - BLOCK_WIDTH * GAME_BORDER) ||
+            (this.y < BLOCK_HEIGHT * GAME_BORDER) ||
+            (this.y >= BLOCK_HEIGHT * GAME_BLOCK_AMOUNT_HEIGHT - BLOCK_HEIGHT * GAME_BORDER)
+            ) return this.drawGrassImage(textureInfos.outer.outside[0]);
+        const DO_SHADe = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
+        if (DO_SHADe === 0) this.drawGrassImage(textureInfos.inner.dark[0]);
+        if (DO_SHADe === 1) this.drawGrassImage(textureInfos.inner.light[0]);
     }
-    drawOuterGrassBlock() {
-        this.xScale = this.width / 299;
-        this.yScale = this.height / 298;
-        this.textureInfo = textureInfos.outer.outside[0];
-        image_draw_infos[this.id] = this;
-    }
-    drawInnerGrassBlock1() {
-        this.xScale = this.width / 299;
-        this.yScale = this.height / 300;
-        this.textureInfo = textureInfos.inner.dark[0];
-        image_draw_infos[this.id] = this;
-    }
-    drawInnerGrassBlock2() {
-        this.xScale = this.width / 299;
-        this.yScale = this.height / 298;
-        this.textureInfo = textureInfos.inner.light[0];
-        image_draw_infos[this.id] = this;
-    }
-    drawAGrass(textureInfo) {
+    drawGrassImage(textureInfo) {
         this.xScale = this.width / 300;
         this.yScale = this.height / 300;
         this.textureInfo = textureInfo;
@@ -256,8 +227,8 @@ class blue_square {
         if (object == undefined) object = {};
         const WIDTH_GAME_BLOCKS = object.gameBlockWidth ?? 2;
         const HEIGHT_GAME_BLOCKS = object.gameBlockHeight ?? 2;
-        this.width = WIDTH_GAME_BLOCKS * BLOCK_WIDTH;
-        this.height = HEIGHT_GAME_BLOCKS * BLOCK_HEIGHT;
+        this.width = object.width ?? WIDTH_GAME_BLOCKS * BLOCK_WIDTH;
+        this.height = object.height ?? HEIGHT_GAME_BLOCKS * BLOCK_HEIGHT;
         this.gl = document.querySelector("#game-canvas").getContext("webgl2");
         this.colorLocation = '';
         this.x = object.x ?? 100;
@@ -284,7 +255,6 @@ class blue_square {
             grid[`${this.coordX + 1}_${this.coordY + 1}`] = 'blue_square';
         } else this.assignCoords();
         this.level = object.level ?? 1;
-
         this.maxLevel = object.maxLevel ?? 10;
         this.color = object.color ?? 'Blue';
         this.rChangePerLevel = (colors[this.color]['r2'] - colors[this.color]['r']) / (this.maxLevel - 1);
@@ -347,8 +317,12 @@ class blue_square {
             grid[`${gridX + 1}_${gridY + 1}`] = 'blue_square';
             this.coordX = gridX;
             this.coordY = gridY;
-            break;
+            return;
         }
+        notification('Cannot be created');
+        delete buildings[THIS_SQUARE.id];
+        delete shapes[THIS_SQUARE.outelineId];
+        delete shapes[THIS_SQUARE.squareId];
     }
     checkForMouseHover() {
         if (!mouse_down) {
@@ -359,17 +333,6 @@ class blue_square {
             this.selected = false;
             return false;
         }
-        // if (this.selected) {
-            
-        // } else {
-        //     if ((this.x + this.blockInline < mouseX) && (mouseX < this.x + this.width - this.blockInline)) {
-        //         if ((this.y + this.blockInline < mouseY) && (mouseY < this.y + this.height - this.blockInline)) {
-        //             document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
-        //             this.selected = true;
-        //             return true;
-        //         }
-        //     }
-        // }
         if ((this.x - 20 < mouseX) && (mouseX < this.x + this.width + 20)) {
             if ((this.y - 20 < mouseY) && (mouseY < this.y + this.height + 20)) {
                 if (!this.selected) {
@@ -545,38 +508,11 @@ class blue_square {
 }
 
 function renderGame() {
-    for (let current_block_height = 0; current_block_height < GAME_BLOCK_AMOUNT_HEIGHT; current_block_height++) {
-        for (let current_block_width = 0; current_block_width < GAME_BLOCK_AMOUNT_WIDTH; current_block_width++) {
-            const BLOCK = new Grass_Block(current_block_width * BLOCK_WIDTH, current_block_height * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
-            if ((current_block_width === 4) && (current_block_height === 3)) {
-                BLOCK.drawGrass('outer-corner-bottom_right');
-            } else if ((current_block_width === GAME_BLOCK_AMOUNT_WIDTH - 4) && (current_block_height === 3)) {
-                BLOCK.drawGrass('outer-corner-bottom_left');
-            } else if ((current_block_width === 4) && (current_block_height === GAME_BLOCK_AMOUNT_HEIGHT - 4)) {
-                BLOCK.drawGrass('outer-corner-top_right');
-            } else if ((current_block_width === GAME_BLOCK_AMOUNT_WIDTH - 4) && (current_block_height === GAME_BLOCK_AMOUNT_HEIGHT - 4)) {
-                BLOCK.drawGrass('outer-corner-top_left');
-            } else if ((current_block_width === 4) &&
-                (current_block_height > 3) &&
-                (current_block_height < GAME_BLOCK_AMOUNT_HEIGHT - 4)
-                ) {
-                BLOCK.drawGrass('outer-right');
-            } else if ((current_block_width === GAME_BLOCK_AMOUNT_WIDTH - 4) &&
-                    (current_block_height > 3) &&
-                    (current_block_height < GAME_BLOCK_AMOUNT_HEIGHT - 4)
-                ) {
-                BLOCK.drawGrass('outer-left');
-            } else if ((current_block_height === 3) &&
-                    (current_block_width > 4) &&
-                    (current_block_width < GAME_BLOCK_AMOUNT_WIDTH - 4)
-            ) {
-                BLOCK.drawGrass('outer-down');
-            } else if ((current_block_height === GAME_BLOCK_AMOUNT_HEIGHT - 4) &&
-                    (current_block_width > 4) &&
-                    (current_block_width < GAME_BLOCK_AMOUNT_WIDTH - 4)
-            ) {
-                BLOCK.drawGrass('outer-up');
-            } else BLOCK.drawGrass();
+    for (let current_block_y = 1; current_block_y <= GAME_BLOCK_AMOUNT_HEIGHT; current_block_y++) {
+        for (let current_block_x = 1; current_block_x <= GAME_BLOCK_AMOUNT_WIDTH; current_block_x++) {
+            const BLOCK = new grass_block((current_block_x - 1) * BLOCK_WIDTH, (current_block_y - 1) * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
+            BLOCK.drawGrass(current_block_x, current_block_y);
+            grid[`${current_block_x}_${current_block_y}`] = '';
         }
     }
 }
@@ -587,21 +523,32 @@ function getRandomInt(max = 1000000000) {
 
 function notification(text) {
     let x = getRandomInt();
-    document.getElementById("notifications").innerHTML += `
-        <div class="notification" id="noti${x}">
-            <p class="notificationText">${text}</p>
-            <p class="deleteNotification" id="delete${x}">X</p>
-        </div>
+    const newDiv = document.createElement("div");
+    newDiv.innerHTML = `
+        <p class="notificationText">${text}</p>
+        <p class="deleteNotification" id="delete${x}">X</p>
+        <div class="notificationTimeBar"></div>
     `;
+    newDiv.classList = 'notification';
+    newDiv.setAttribute("id", `noti${x}`);
+    // document.getElementById("notifications").innerHTML += `
+    //     <div class="notification" id="noti${x}">
+    //         <p class="notificationText">${text}</p>
+    //         <p class="deleteNotification" id="delete${x}">X</p>
+    //         <div class="notificationTimeBar"></div>
+    //     </div>
+    // `;
+    const currentDiv = document.getElementById("notifications");
+    currentDiv.appendChild(newDiv);
     notificationRemoved[x] = false;
-    for (notificationId of Object.keys(notificationRemoved)) {
-        if (notificationRemoved[notificationId]) continue;
-        let tempNotificationId = notificationId;
-        document.getElementById("delete"+tempNotificationId).addEventListener('click', function () {
-            document.getElementById("noti"+tempNotificationId).remove();
-            notificationRemoved[tempNotificationId] = true;
-        });
-    }
+    // for (notificationId of Object.keys(notificationRemoved)) {
+    //     if (notificationRemoved[notificationId]) continue;
+    //     let tempNotificationId = notificationId;
+    //     document.getElementById("delete"+tempNotificationId).addEventListener('click', function () {
+    //         document.getElementById("noti"+tempNotificationId).remove();
+    //         notificationRemoved[tempNotificationId] = true;
+    //     });
+    // }
     setTimeout(function() {
         if (notificationRemoved[x]) return;
         document.getElementById("noti"+x).remove();
