@@ -195,10 +195,10 @@ class grass_block {
             (this.x >= BLOCK_WIDTH * GAME_BLOCK_AMOUNT_WIDTH - BLOCK_WIDTH * GAME_BORDER) ||
             (this.y < BLOCK_HEIGHT * GAME_BORDER) ||
             (this.y >= BLOCK_HEIGHT * GAME_BLOCK_AMOUNT_HEIGHT - BLOCK_HEIGHT * GAME_BORDER)
-            ) return this.drawGrassImage(textureInfos.outer.outside[0]);
+            ) return this.drawGrassImage(textureInfos.outer.outside[getRandomInt(5)]);
         const DO_SHADe = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
-        if (DO_SHADe === 0) this.drawGrassImage(textureInfos.inner.dark[0]);
-        if (DO_SHADe === 1) this.drawGrassImage(textureInfos.inner.light[0]);
+        if (DO_SHADe === 0) return this.drawGrassImage(textureInfos.inner.dark[getRandomInt(2)]);
+        if (DO_SHADe === 1) return this.drawGrassImage(textureInfos.inner.light[getRandomInt(2)]);
     }
     drawGrassImage(textureInfo) {
         this.xScale = this.width / 300;
