@@ -76,4 +76,5 @@ outer-ups-light: 3
 outer-downs-light: 3
 corners: 1 more of each
 outside: 2, tree 2
+two sideds: 3 of each
 */
