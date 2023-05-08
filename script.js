@@ -411,8 +411,8 @@ class blue_square {
         currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond;
     }
     upgrade() {
-        if (this.level >= this.maxLevel) return;
-        if (currencies[`${this.color.toLowerCase()}_squares`] < this.nextLevelUpgradeCost) return;
+        if (this.level >= this.maxLevel) return notification('Not enough resources');
+        if (currencies[`${this.color.toLowerCase()}_squares`] < this.nextLevelUpgradeCost) return notification('Reached max level');
         currencies[`${this.color.toLowerCase()}_squares`] -= this.nextLevelUpgradeCost;
         this.totalCost += this.nextLevelUpgradeCost;
         this.earningsPerSecond += 1;
@@ -454,10 +454,10 @@ class blue_square {
         document.getElementById("building-info-level").textContent = `Level: ${this.level}`;
         document.getElementById("building-info-earnings_second").textContent = `Earnings per second: ${this.earningsPerSecond}`;
         document.getElementById("building-info-earnings_hour").textContent = `Earnings per hour: ${this.earningsPerHour}`;
-        document.getElementById("building-info-upgrade-number").textContent = this.nextLevelUpgradeCost;
-        document.getElementById("building-info-delete-number").textContent = this.totalCost;
-        document.getElementById('upgrade-button-resource-image').src = `images/resource-squares/${this.color.toLowerCase()}-square.png`;
-        document.getElementById('delete-button-resource-image').src = `images/resource-squares/${this.color.toLowerCase()}-square.png`;
+        document.getElementById("building-info-upgrade-text").textContent = `Upgrade ${this.nextLevelUpgradeCost}`;
+        document.getElementById("building-info-delete-text").textContent = `Delete ${this.totalCost}`;
+        document.getElementById("building-info-upgrade-resource-icon").className = `resource-icon ${this.color.toLowerCase()}`;
+        document.getElementById("building-info-delete-resource-icon").className = `resource-icon ${this.color.toLowerCase()}`;
         if (this.maxLevel === this.level) {
             document.getElementById("building-info-upgrade").style.display = 'none';
         } else {
@@ -561,11 +561,11 @@ function copy(value) {
 function eventListners() {
     for (const color of Object.keys(colors)) {
         document.getElementById(`${color.toLowerCase()}-square-buy`).addEventListener('click', function () {
-            if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`]) return;
+            if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`]) return notification('Not enough resources');
             new blue_square({'color': color});
             currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_squares`];
             buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
-            document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = buy_costs[`${color.toLowerCase()}_squares`];
+            document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${buy_costs[`${color.toLowerCase()}_squares`]}`;
         });
     }
     

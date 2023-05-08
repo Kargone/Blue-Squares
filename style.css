@@ -1,5 +1,12 @@
 :root {
     --vh: 1vh;
+    --blue: rgba(0, 76, 255, 255);
+    --red: rgba(255, 0, 0, 255);
+    --green: rgba(0, 177, 0, 255);
+    --purple: rgba(140, 0, 164, 255);
+    --orange: rgba(255, 150, 0, 255);
+    --yellow: rgba(255, 255, 0, 255);
+    --white: rgba(255, 255, 255, 255);
 }
 
 /* width */
@@ -60,6 +67,40 @@
     overflow-y: hidden;
     margin: auto;
     padding: 8px 0px 0px 0px;
+}
+
+#buy-buttons > div {
+    display: grid;
+}
+
+#buy-buttons > div > button {
+    margin-left: 23px;
+    margin-top: 0px;
+    display: table;
+    border-spacing: 5px;
+}
+
+#buy-buttons > div > button > span {
+    display: table-cell;
+}
+
+#buy-buttons > #last-buy > button {
+    margin-right: 23px;
+}
+
+#buy-buttons > #last-buy > img {
+    margin-right: 30px;
+}
+
+#buy-buttons > div > img {
+    margin-left: 30px;
+    width: 60px;
+    height: 60px;
+    border: 2px solid black;
+}
+
+#buy-buttons > #blue-square-buy {
+    margin-left: 23px;
 }
 
 #toggle-building-create {
@@ -137,34 +178,6 @@
     }
 }
 
-#buy-buttons > div {
-    display: grid;
-}
-
-#buy-buttons > div > button {
-    margin-left: 23px;
-    margin-top: 0px;
-}
-
-#buy-buttons > #last-buy > button {
-    margin-right: 23px;
-}
-
-#buy-buttons > #last-buy > img {
-    margin-right: 30px;
-}
-
-#buy-buttons > div > img {
-    margin-left: 30px;
-    width: 60px;
-    height: 60px;
-    border: 2px solid black;
-}
-
-#buy-buttons > #blue-square-buy {
-    margin-left: 23px;
-}
-
 #building-info {
     height: 50%;
     aspect-ratio: 4 / 8;
@@ -193,6 +206,18 @@
 #building-info > #building-info-content > #building-info-level {
     margin-top: 3px;
     margin-bottom: 3px;
+}
+
+#building-info > #building-info-content > #building-info-upgrade, #building-info-delete {
+    border-spacing: 5px;
+}
+
+#building-info > #building-info-content > #building-info-upgrade > span {
+    display: table-cell;
+}
+
+#building-info > #building-info-content > #building-info-delete > span {
+    display: table-cell;
 }
 
 #toggle-building-info {
@@ -308,9 +333,15 @@
     z-index: 100;
 }
 
-#resources > p {
+#resources > div {
     margin-left: 10px;
     margin-right: 10px;
+    display: table;
+    border-spacing: 5px;
+}
+
+#resources > div > span{
+    display: table-cell;
 }
 
 .resource-display {
@@ -447,10 +478,45 @@
 
 .resource-image {
     margin-left: 10px; 
-    margin-bottom: -2px; 
     width: 10px; 
     height: 10px; 
     border: 2px solid black;
+}
+
+.resource-icon {
+    margin-left: 10px; 
+    width: 10px; 
+    height: 10px; 
+    border: 2px solid black;
+    display: table-cell;
+}
+
+.blue {
+    background-color: var(--blue);
+}
+
+.red {
+    background-color: var(--red);
+}
+
+.green {
+    background-color: var(--green);
+}
+
+.purple {
+    background-color: var(--purple);
+}
+
+.orange {
+    background-color: var(--orange);
+}
+
+.yellow {
+    background-color: var(--yellow);
+}
+
+.white {
+    background-color: var(--white);
 }
 
 #leaderboard-tab-container {
