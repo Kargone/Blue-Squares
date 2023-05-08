@@ -588,8 +588,34 @@ document.getElementById("toggle-building-create").addEventListener('click', func
     }
 });
 
+/*
 document.getElementById("settings").addEventListener('click', function () {
     window.location.href = "texture.html";
+});
+*/
+
+document.getElementById("settings").addEventListener('click', function () {
+    document.getElementById("settings-tab-container").style.display = 'block';
+});
+
+document.getElementById("close-settings").addEventListener('click', function () {
+    document.getElementById("settings-tab-container").style.display = 'none';
+});
+
+document.getElementById("settings-tab-container").addEventListener('click', function () {
+    document.getElementById("settings-tab-container").style.display = 'none';
+});
+
+document.getElementById("leaderboard").addEventListener('click', function () {
+    document.getElementById("leaderboard-tab-container").style.display = 'block';
+});
+
+document.getElementById("close-leaderboard").addEventListener('click', function () {
+    document.getElementById("leaderboard-tab-container").style.display = 'none';
+});
+
+document.getElementById("leaderboard-tab-container").addEventListener('click', function () {
+    document.getElementById("leaderboard-tab-container").style.display = 'none';
 });
 
 const UP_RESOURCES = setInterval(() => {

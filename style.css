@@ -468,6 +468,8 @@
     position: absolute;
     width: 300px;
     height: 500px;
+    max-width: 100%;
+    max-height: 100%;
     background: beige;
     left: calc(50vw - 150px);
     top: calc(50vh - 250px);
@@ -475,6 +477,15 @@
     background: #d6c289;
     border: 4px solid brown;
     border-radius: 10px;
+}
+
+#leaderboard-tab > #close-leaderboard {
+    font-family: sans-serif;
+    font-size: 25px;
+    margin: 0px;
+    position: absolute;
+    top: 18px;
+    right: 16px;
 }
 
 #leaderboard-tab > hr {
@@ -490,13 +501,15 @@
     width: 100vw;
     height: 100%;
     background: rgba(0, 0, 0, 0.7);
-    /* display: none; */
+    display: none;
 }
 
 #settings-tab {
     position: absolute;
     width: 300px;
     height: 500px;
+    max-width: 100%;
+    max-height: 100%;
     background: beige;
     left: calc(50vw - 150px);
     top: calc(50vh - 250px);
@@ -508,7 +521,11 @@
 
 #settings-tab > #close-settings {
     font-family: sans-serif;
-    font-size: 20px;
+    font-size: 25px;
+    margin: 0px;
+    position: absolute;
+    top: 18px;
+    right: 16px;
 }
 
 #settings-tab > hr {
