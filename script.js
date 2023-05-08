@@ -206,6 +206,9 @@ class grass_block {
         this.textureInfo = textureInfo;
         image_draw_infos[this.id] = this;
     }
+    setTextureInfo(textureInfo) {
+        image_draw_infos[this.id].textureInfo = textureInfo;
+    }
     translateX_YfromStartX_Y(x, y) {
         this.x = mouseStartX_Y.x + x + this.distFromStartX;
         this.y = mouseStartX_Y.y + y + this.distFromStartY;
@@ -284,12 +287,14 @@ class blue_square {
         this.earningsPerSecond = object.earningsPerSecond ?? this.level;
         this.earningsPerHour = this.earningsPerSecond * 3600;
         this.displayed = false;
+        this.health = object.health ?? 100;
+        this.maxHealth = object.maxHealth ?? 100;
         this.id = getRandomInt();
         this.totalCost = object.totalCost ?? buy_costs[`${this.color.toLowerCase()}_squares`];
         document.getElementById('resource-displays').innerHTML += `
             <p id="resource-display-${this.id}" class="resource-display">+
                 <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
-                <img src="Images/resource-squares/${this.color.toLowerCase()}-square.png" class="resource-image">
+                <img src="images/resource-squares/${this.color.toLowerCase()}-square.png" class="resource-image">
             </p>
         `;
         buildings[this.id] = this;
@@ -451,6 +456,8 @@ class blue_square {
         document.getElementById("building-info-earnings_hour").textContent = `Earnings per hour: ${this.earningsPerHour}`;
         document.getElementById("building-info-upgrade-number").textContent = this.nextLevelUpgradeCost;
         document.getElementById("building-info-delete-number").textContent = this.totalCost;
+        document.getElementById('upgrade-button-resource-image').src = `images/resource-squares/${this.color.toLowerCase()}-square.png`;
+        document.getElementById('delete-button-resource-image').src = `images/resource-squares/${this.color.toLowerCase()}-square.png`;
         if (this.maxLevel === this.level) {
             document.getElementById("building-info-upgrade").style.display = 'none';
         } else {
