@@ -558,65 +558,68 @@ function copy(value) {
     return JSON.parse(JSON.stringify(value));
 }
 
-renderGame();
-
-for (const color of Object.keys(colors)) {
-    document.getElementById(`${color.toLowerCase()}-square-buy`).addEventListener('click', function () {
-        if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`]) return;
-        new blue_square({'color': color});
-        currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_squares`];
-        buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
-        document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = buy_costs[`${color.toLowerCase()}_squares`];
+function eventListners() {
+    for (const color of Object.keys(colors)) {
+        document.getElementById(`${color.toLowerCase()}-square-buy`).addEventListener('click', function () {
+            if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`]) return;
+            new blue_square({'color': color});
+            currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_squares`];
+            buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
+            document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = buy_costs[`${color.toLowerCase()}_squares`];
+        });
+    }
+    
+    document.getElementById("toggle-building-info").addEventListener('click', function () {
+        building_info_open = !building_info_open;
+        if (building_info_open) {
+            document.getElementById("building-info").className = "collapse-building-info open-building-info";
+        } else {
+            document.getElementById("building-info").className = "collapse-building-info";
+        }
+    });
+    
+    document.getElementById("toggle-building-create").addEventListener('click', function () {
+        building_create_open = !building_create_open;
+        if (building_create_open) {
+            document.getElementById("building-create").className = "collapse-building-create open-building-create";
+        } else {
+            document.getElementById("building-create").className = "collapse-building-create";
+        }
+    });
+    
+    /*
+    document.getElementById("settings").addEventListener('click', function () {
+        window.location.href = "texture.html";
+    });
+    */
+    
+    document.getElementById("settings").addEventListener('click', function () {
+        document.getElementById("settings-tab-container").style.display = 'block';
+    });
+    
+    document.getElementById("close-settings").addEventListener('click', function () {
+        document.getElementById("settings-tab-container").style.display = 'none';
+    });
+    
+    document.getElementById("settings-tab-container").addEventListener('click', function () {
+        document.getElementById("settings-tab-container").style.display = 'none';
+    });
+    
+    document.getElementById("leaderboard").addEventListener('click', function () {
+        document.getElementById("leaderboard-tab-container").style.display = 'block';
+    });
+    
+    document.getElementById("close-leaderboard").addEventListener('click', function () {
+        document.getElementById("leaderboard-tab-container").style.display = 'none';
+    });
+    
+    document.getElementById("leaderboard-tab-container").addEventListener('click', function () {
+        document.getElementById("leaderboard-tab-container").style.display = 'none';
     });
 }
 
-document.getElementById("toggle-building-info").addEventListener('click', function () {
-    building_info_open = !building_info_open;
-    if (building_info_open) {
-        document.getElementById("building-info").className = "collapse-building-info open-building-info";
-    } else {
-        document.getElementById("building-info").className = "collapse-building-info";
-    }
-});
-
-document.getElementById("toggle-building-create").addEventListener('click', function () {
-    building_create_open = !building_create_open;
-    if (building_create_open) {
-        document.getElementById("building-create").className = "collapse-building-create open-building-create";
-    } else {
-        document.getElementById("building-create").className = "collapse-building-create";
-    }
-});
-
-/*
-document.getElementById("settings").addEventListener('click', function () {
-    window.location.href = "texture.html";
-});
-*/
-
-document.getElementById("settings").addEventListener('click', function () {
-    document.getElementById("settings-tab-container").style.display = 'block';
-});
-
-document.getElementById("close-settings").addEventListener('click', function () {
-    document.getElementById("settings-tab-container").style.display = 'none';
-});
-
-document.getElementById("settings-tab-container").addEventListener('click', function () {
-    document.getElementById("settings-tab-container").style.display = 'none';
-});
-
-document.getElementById("leaderboard").addEventListener('click', function () {
-    document.getElementById("leaderboard-tab-container").style.display = 'block';
-});
-
-document.getElementById("close-leaderboard").addEventListener('click', function () {
-    document.getElementById("leaderboard-tab-container").style.display = 'none';
-});
-
-document.getElementById("leaderboard-tab-container").addEventListener('click', function () {
-    document.getElementById("leaderboard-tab-container").style.display = 'none';
-});
+renderGame();
+eventListners();
 
 const UP_RESOURCES = setInterval(() => {
     for (const building_key of Object.keys(buildings)) {
