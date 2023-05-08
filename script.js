@@ -411,8 +411,8 @@ class blue_square {
         currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond;
     }
     upgrade() {
-        if (this.level >= this.maxLevel) return notification('Not enough resources');
-        if (currencies[`${this.color.toLowerCase()}_squares`] < this.nextLevelUpgradeCost) return notification('Reached max level');
+        if (this.level >= this.maxLevel) return notification('Reached max level');
+        if (currencies[`${this.color.toLowerCase()}_squares`] < this.nextLevelUpgradeCost) return notification('Not enough resources');
         currencies[`${this.color.toLowerCase()}_squares`] -= this.nextLevelUpgradeCost;
         this.totalCost += this.nextLevelUpgradeCost;
         this.earningsPerSecond += 1;
