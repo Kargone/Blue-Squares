@@ -340,6 +340,10 @@
     border-spacing: 5px;
 }
 
+#resources > div > div {
+    display: block;
+}
+
 #resources > div > span{
     display: table-cell;
 }
@@ -489,6 +493,8 @@
     height: 10px; 
     border: 2px solid black;
     display: table-cell;
+    min-width: 0px;
+    min-height: 0px;
 }
 
 .blue {
