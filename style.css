@@ -132,7 +132,7 @@
         transform: translateX(-50%);
     }
     to {
-        transform: translateY(calc(100% - 16px)) translateX(-50%);
+        transform: translateY(calc(100% - 15px)) translateX(-50%);
     }
 }
 
@@ -157,7 +157,7 @@
 
 @keyframes open-building-create {
     from {
-        transform: translateY(calc(100% - 16px)) translateX(-50%);
+        transform: translateY(calc(100% - 15px)) translateX(-50%);
     }
     to {
         transform: translateX(-50%);
