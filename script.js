@@ -183,10 +183,10 @@ class grass_block {
         const outer_up = (coordY === GAME_BLOCK_AMOUNT_HEIGHT - 4) && (coordX > 3) && (coordX < GAME_BLOCK_AMOUNT_WIDTH - 3);
         const outer_right = (coordX === 4) && (coordY > 3) && (coordY < GAME_BLOCK_AMOUNT_HEIGHT - 3);
         const outer_left = (coordX === GAME_BLOCK_AMOUNT_WIDTH - 4) && (coordY > 3) && (coordY < GAME_BLOCK_AMOUNT_HEIGHT - 3);
-        if (outer_down && outer_right) return this.drawGrassImage(textureInfos.outer.corners['bottom-right']);
-        if (outer_down && outer_left) return this.drawGrassImage(textureInfos.outer.corners['bottom-left']);
-        if (outer_up && outer_right) return this.drawGrassImage(textureInfos.outer.corners['top-right']);
-        if (outer_up && outer_left) return this.drawGrassImage(textureInfos.outer.corners['top-left']);
+        if (outer_down && outer_right) return this.drawGrassImage(textureInfos.outer.corners['bottom-right-dark']);
+        if (outer_down && outer_left) return this.drawGrassImage(textureInfos.outer.corners['bottom-left-dark']);
+        if (outer_up && outer_right) return this.drawGrassImage(textureInfos.outer.corners['top-right-dark']);
+        if (outer_up && outer_left) return this.drawGrassImage(textureInfos.outer.corners['top-left-dark']);
         if (outer_right) return this.drawGrassImage(textureInfos.outer.rights.dark[getRandomInt(2)]);
         if (outer_down) return this.drawGrassImage(textureInfos.outer.downs.dark[getRandomInt(2)]);
         if (outer_left) return this.drawGrassImage(textureInfos.outer.lefts.dark[getRandomInt(2)]);
