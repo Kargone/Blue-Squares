@@ -458,7 +458,7 @@
     background: lightblue;
     left: 0px;
     animation: noWidth 3s;
-    /* animation-fill-mode: forwards; */
+    animation-fill-mode: forwards;
 }
 
 @keyframes noWidth {
@@ -580,7 +580,8 @@
 #settings-tab {
     position: absolute;
     width: 300px;
-    height: 500px;
+    height: fit-content;
+    padding: 0px 0px 15px 0px;
     max-width: 100%;
     max-height: 100%;
     background: beige;
@@ -607,8 +608,78 @@
     border: 1px black solid;
 }
 
-#settings-tab > div {
+#settings-tab > .toggle, #log-out-container {
     margin-top: 10px;
+}
+
+#settings-tab > .toggle {
+    margin-left: 20px;
+    text-align: left;
+    position: relative;
+}
+
+#settings-tab > .toggle > .switch {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin-right: 20px;
+}
+
+#other-notification-contianer {
+    margin-top: 0px;
+    margin-left: 20px;
+    text-align: left;
+    overflow: hidden;
+}
+
+.collapse-selectors {
+    animation: hideSelectors 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes hideSelectors {
+    0%{
+        height: 112px;
+        opacity: 1;
+    }
+    100%{
+        height: 0px;
+        opacity: 0;
+    }
+}
+
+.other-notification-toggle {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.other-notification-toggle > .switch {
+    float: right;
+    margin-right: 20px;
+}
+
+#settings-username-input {
+    width: 180px;
+}
+
+.collapse-double-delete {
+    animation: hideDoubleDelete 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes hideDoubleDelete {
+    0%{
+        height: 18px;
+        opacity: 1;
+        margin-top: 10px;
+        display: block;
+    }
+    100%{
+        height: 0px;
+        opacity: 0;
+        margin-top: 0px;
+        display: none;
+    }
 }
 
 /* The switch - the box around the slider */

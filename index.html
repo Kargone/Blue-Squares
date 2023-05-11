@@ -86,39 +86,69 @@
         <h2>Settings</h2>
         <p id="close-settings">X</p>
         <hr>
-        <div>
+        <div class="toggle">
           <label>All notifications</label>
           <label class="switch">
               <input type="checkbox" id="all-notifications-toggle">
               <span class="slider round"></span>
           </label>
         </div>
-        <div>
+        <div id="other-notification-contianer" class="collapse-selectors">
+          <div class="other-notification-toggle" id="selector-1">
+            <label>Invalid movement</label>
+            <label class="switch">
+                <input type="checkbox" id="no-delete-toggle">
+                <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="other-notification-toggle" id="selector-2">
+            <label>Not enough for upgrade</label>
+            <label class="switch">
+                <input type="checkbox" id="no-delete-toggle">
+                <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="other-notification-toggle" id="selector-3">
+            <label>Not enough for new square</label>
+            <label class="switch">
+                <input type="checkbox" id="no-delete-toggle">
+                <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="other-notification-toggle" id="selector-4">
+            <label>Deletion</label>
+            <label class="switch">
+                <input type="checkbox" id="no-delete-toggle">
+                <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+        <div class="toggle">
           <label>No delete</label>
           <label class="switch">
               <input type="checkbox" id="no-delete-toggle">
               <span class="slider round"></span>
           </label>
         </div>
-        <div id="double-delete-container">
+        <div id="double-delete-container" class="toggle collapse-double-delete">
           <label>Double tap for delete</label>
           <label class="switch">
               <input type="checkbox" id="double-delete-toggle">
               <span class="slider round"></span>
           </label>
         </div>
-        <div>
+        <div class="toggle">
           <label>No square movement</label>
           <label class="switch">
               <input type="checkbox" id="no-square-movement-toggle">
               <span class="slider round"></span>
           </label>
         </div>
-        <div id="changeUsernameButtonDiv">
-          <label for="settingsUsernameInput">Username:</label>
-          <input value="" type="text" id="settingsUsernameInput">
+        <div class="toggle">
+          <label for="settings-username-input">Username:</label>
+          <input value="" type="text" id="settings-username-input">
         </div>
-        <div>
+        <div id="log-out-container">
           <button id="log-out">Log Out</button>
         </div>
       </div>
