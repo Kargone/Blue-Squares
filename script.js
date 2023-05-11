@@ -98,7 +98,7 @@ let currencies = {
     'purple_squares': 0,
     'orange_squares': 0,
     'yellow_squares': 0,
-    'white_squares': 0,
+    'white_squares': 0
 };
 let buy_costs = {
     'blue_squares': 0,

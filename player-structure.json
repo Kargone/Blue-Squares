@@ -1,0 +1,39 @@
+{
+    "player-id": {
+        "user-data": {
+            "ip": 123456789,
+            "name": "Kargone",
+            "email-address": "karsonrty@gmail.com",
+            "tutorial-step-num": 1,
+            "logins": {
+                "id": {
+                    "device-number": 1,
+                    "device-deminsions": "1000x1000",
+                    "time": "12:56:04 PM",
+                    "date": "5/6/2023",
+                    "collected-afk-time": "1hr 2sec",
+                    "in-game-time": "2min 34sec"
+                }
+            },
+            "devices": {
+                "device-1": {
+                    "dimensions": "1000x1000",
+                    "number-of-logins": 1,
+                }
+            },
+            "total-time-collect-afk": "2d 4hr 2sec",
+            "total-in-game-tiem": "1hr 3sec",
+            "total-time": "2d 5hr 28sec",
+            "last-time-online": "utc-code, 123123124324",
+            "currincies": {
+                "blue_squares": 0,
+                "red_squares": 0,
+                "green_squares": 0,
+                "purple_squares": 0,
+                "orange_squares": 0,
+                "yellow_squares": 0,
+                "white_squares": 0
+            }
+        }
+    }
+}
