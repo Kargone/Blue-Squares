@@ -109,6 +109,16 @@ let buy_costs = {
     'yellow_squares': 0,
     'white_squares': 0,
 };
+let user_settings = {
+    'all-notifications': true,
+    'notification-invalid-movement': true,
+    'notification-not-enough-upgrade': true,
+    'notification-not-enough-new-square': true,
+    'notification-deletion': true,
+    'no-delete': false,
+    'double-tap-delete': true,
+    'no-square-movement': false,
+}
 
 class rect {
     constructor(x, y, width, height, rgb) {
@@ -587,20 +597,58 @@ function eventListners() {
         }
     });
     
-    /*
-    document.getElementById("settings").addEventListener('click', function () {
-        window.location.href = "texture.html";
-    });
-    */
-    
     document.getElementById("settings").addEventListener('click', function () {
         document.getElementById("settings-tab-container").style.display = 'block';
+        if (user_settings['all-notifications']) {
+            document.getElementById('other-notification-contianer').className = '';
+            document.getElementById('other-notification-contianer').style.height = '112px';
+            document.getElementById('other-notification-contianer').style.opacity = '1';
+        } else {
+            document.getElementById('other-notification-contianer').className = '';
+            document.getElementById('other-notification-contianer').style.height = '0px';
+            document.getElementById('other-notification-contianer').style.opacity = '0';
+        }
+        if (!user_settings['no-delete']) {
+            document.getElementById('double-delete-container').className = 'toggle';
+            document.getElementById('double-delete-container').style.height = '18px';
+            document.getElementById('double-delete-container').style.opacity = '1';
+            document.getElementById('double-delete-container').style.display = 'block';
+        } else {
+            document.getElementById('double-delete-container').className = 'toggle';
+            document.getElementById('double-delete-container').style.height = '0px';
+            document.getElementById('double-delete-container').style.opacity = '0';
+            document.getElementById('double-delete-container').style.display = 'none';
+        }
     });
-    
+
     document.getElementById("close-settings").addEventListener('click', function () {
         document.getElementById("settings-tab-container").style.display = 'none';
     });
-    
+
+    for (const type of Object.keys(user_settings)) {
+        document.getElementById(`${type}-toggle`).addEventListener('click', function () {
+            user_settings[type] = this.checked;
+            if (type === 'all-notifications') {
+                if (user_settings[type]) {
+                    document.getElementById('other-notification-contianer').className = 'collapse-selectors uncollapse-selectors ';
+                } else {
+                    document.getElementById('other-notification-contianer').className = 'collapse-selectors';
+                }
+            } else if (type === 'no-delete') {
+                if (!user_settings[type]) {
+                    document.getElementById('double-delete-container').style.display = 'block';
+                    document.getElementById('double-delete-container').className = 'toggle collapse-double-delete uncollapse-double-delete';
+                } else {
+                    document.getElementById('double-delete-container').className = 'toggle collapse-double-delete';
+                }
+            }
+        });
+    }
+
+    for (const type of Object.keys(user_settings)) {
+        document.getElementById(`${type}-toggle`).checked = user_settings[type];
+    }
+
     // document.getElementById("settings-tab-container").addEventListener('click', function () {
     //     document.getElementById("settings-tab-container").style.display = 'none';
     // });
