@@ -220,6 +220,7 @@ class grass_block {
         image_draw_infos[this.id].textureInfo = textureInfo;
     }
     translateX_YfromStartX_Y(x, y) {
+        if (user_settings['no-square-movement']) return;
         this.x = mouseStartX_Y.x + x + this.distFromStartX;
         this.y = mouseStartX_Y.y + y + this.distFromStartY;
         image_draw_infos[this.id]['x'] = this.x;
@@ -336,6 +337,7 @@ class blue_square {
         delete shapes[THIS_SQUARE.squareId];
     }
     checkForMouseHover() {
+        if (user_settings['no-square-movement']) return;
         if (!mouse_down) {
             if (this.selected) {
                 this.checkXandY();
@@ -410,7 +412,7 @@ class blue_square {
             let square_object = shapes[this.squareId];
             square_object.x = this.x + this.blockInline + this.borderWidth;
             square_object.y = this.y + this.blockInline + this.borderWidth;
-            notification('Invalid Movement');
+            if (user_settings['notification-invalid-movement'] && user_settings['all-notifications']) notification('Invalid Movement');
         }
     }
     setCoordXandY() {
@@ -421,8 +423,12 @@ class blue_square {
         currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond;
     }
     upgrade() {
-        if (this.level >= this.maxLevel) return notification('Reached max level');
-        if (currencies[`${this.color.toLowerCase()}_squares`] < this.nextLevelUpgradeCost) return notification('Not enough resources');
+        if ((this.level >= this.maxLevel) && user_settings['all-notifications']) return notification('Reached max level');
+        if (this.level >= this.maxLevel) return;
+        if ((currencies[`${this.color.toLowerCase()}_squares`] < this.nextLevelUpgradeCost) && 
+            user_settings['notification-not-enough-upgrade'] && 
+            user_settings['all-notifications']) return notification('Not enough resources');
+        if (currencies[`${this.color.toLowerCase()}_squares`] < this.nextLevelUpgradeCost) return;
         currencies[`${this.color.toLowerCase()}_squares`] -= this.nextLevelUpgradeCost;
         this.totalCost += this.nextLevelUpgradeCost;
         this.earningsPerSecond += 1;
@@ -483,7 +489,8 @@ class blue_square {
         upgrade_button.addEventListener('click', this.upgradeButtonListner, {'once': true});
         let delete_button = document.getElementById("building-info-delete");
         this.deleteButtonListner = function tryToDeleteSquare() {
-            notification('Are you sure?');
+            let delete_button = document.getElementById("building-info-delete");
+            if (user_settings['no-delete']) return delete_button.addEventListener('click', THIS_SQUARE.deleteButtonListner, {'once': true});
             THIS_SQUARE.deleteButtonListner = function deleteSquare() {
                 delete buildings[THIS_SQUARE.id];
                 delete shapes[THIS_SQUARE.outelineId];
@@ -494,7 +501,8 @@ class blue_square {
                 document.getElementById('building-info-no-content').style.display = 'block';
                 document.getElementById('building-info-content').style.visibility = 'hidden';
             }
-            let delete_button = document.getElementById("building-info-delete");
+            if (!user_settings['double-tap-delete']) return THIS_SQUARE.deleteButtonListner();
+            if (user_settings['notification-deletion'] && user_settings['all-notifications']) notification('Are you sure?');
             delete_button.addEventListener('click', THIS_SQUARE.deleteButtonListner, {'once': true});
         }
         delete_button.addEventListener('click', this.deleteButtonListner, {'once': true});
@@ -571,7 +579,10 @@ function copy(value) {
 function eventListners() {
     for (const color of Object.keys(colors)) {
         document.getElementById(`${color.toLowerCase()}-square-buy`).addEventListener('click', function () {
-            if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`]) return notification('Not enough resources');
+            if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`] &&
+                user_settings['notification-not-enough-new-square'] &&
+                user_settings['all-notifications']) return notification('Not enough resources');
+            if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`]) return;
             new blue_square({'color': color});
             currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_squares`];
             buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
