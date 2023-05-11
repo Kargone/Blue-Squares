@@ -636,6 +636,10 @@ function eventListners() {
         document.getElementById("settings-tab-container").style.display = 'none';
     });
 
+    document.getElementById("settings-tab-close").addEventListener('click', function () {
+        document.getElementById("settings-tab-container").style.display = 'none';
+    });
+
     for (const type of Object.keys(user_settings)) {
         document.getElementById(`${type}-toggle`).addEventListener('click', function () {
             user_settings[type] = this.checked;
@@ -669,6 +673,10 @@ function eventListners() {
     });
     
     document.getElementById("close-leaderboard").addEventListener('click', function () {
+        document.getElementById("leaderboard-tab-container").style.display = 'none';
+    });
+
+    document.getElementById("leaderboard-tab-close").addEventListener('click', function () {
         document.getElementById("leaderboard-tab-container").style.display = 'none';
     });
     
