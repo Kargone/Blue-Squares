@@ -107,7 +107,7 @@ let buy_costs = {
     'purple_squares': 0,
     'orange_squares': 0,
     'yellow_squares': 0,
-    'white_squares': 0,
+    'white_squares': 0
 };
 let user_settings = {
     'all-notifications': true,
@@ -117,7 +117,7 @@ let user_settings = {
     'notification-deletion': true,
     'no-delete': false,
     'double-tap-delete': true,
-    'no-square-movement': false,
+    'no-square-movement': false
 }
 
 class rect {
