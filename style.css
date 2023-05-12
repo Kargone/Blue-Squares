@@ -33,10 +33,10 @@
 
 #building-create {
     width: 100%;
-    height: 120px;
+    height: 128px;
     background: #d6c289;
     position: fixed;
-    top: calc(100% - 124px);
+    top: calc(100% - 146px);
     left: 50%;
     max-width: 740px;
     border-radius: 10px 10px 0px 0px;
@@ -47,7 +47,13 @@
     flex-wrap: nowrap;
     white-space: nowrap;
     margin: auto;
-    padding: 8px 0px 0px 0px;
+    padding: 15px 0px 0px 0px;
+}
+
+#building-create > #building-type-selector-container {
+    position: absolute;
+    top: 2px;
+    left: 5px;
 }
 
 #buy-buttons {
@@ -73,6 +79,31 @@
     display: grid;
 }
 
+#buy-buttons > div > img {
+    margin-left: 30px;
+    width: 60px;
+    height: 60px;
+    border: 2px solid black;
+}
+
+#buy-buttons > div > div {
+    margin-left: 30px;
+    width: 60px;
+    height: 60px;
+    border: 2px solid black;
+    background-color: gray;
+    position: relative;
+}
+
+#buy-buttons > div > div > img {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    margin: 0px;
+    width: 50px;
+    height: 50px;
+}
+
 #buy-buttons > div > button {
     margin-left: 23px;
     margin-top: 0px;
@@ -84,19 +115,12 @@
     display: table-cell;
 }
 
-#buy-buttons > #last-buy > button {
+#buy-buttons > #white-square-buy-container > button {
     margin-right: 23px;
 }
 
-#buy-buttons > #last-buy > img {
+#buy-buttons > #white-square-buy-container > img {
     margin-right: 30px;
-}
-
-#buy-buttons > div > img {
-    margin-left: 30px;
-    width: 60px;
-    height: 60px;
-    border: 2px solid black;
 }
 
 #buy-buttons > #blue-square-buy {
@@ -132,7 +156,21 @@
         transform: translateX(-50%);
     }
     to {
-        transform: translateY(calc(100% - 15px)) translateX(-50%);
+        transform: translateY(calc(100% - 9px)) translateX(-50%);
+    }
+}
+
+.open-building-create {
+    animation: ease-out open-building-create 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes open-building-create {
+    from {
+        transform: translateY(calc(100% - 9px)) translateX(-50%);
+    }
+    to {
+        transform: translateX(-50%);
     }
 }
 
@@ -147,20 +185,6 @@
     }
     to {
         transform: rotate(180deg);
-    }
-}
-
-.open-building-create {
-    animation: ease-out open-building-create 1s;
-    animation-fill-mode: forwards;
-}
-
-@keyframes open-building-create {
-    from {
-        transform: translateY(calc(100% - 15px)) translateX(-50%);
-    }
-    to {
-        transform: translateX(-50%);
     }
 }
 

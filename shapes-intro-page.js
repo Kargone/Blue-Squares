@@ -231,10 +231,10 @@ for (let y = 0; y <= lines_width; y++) {
     new rect(0, y * spacing, window.innerWidth, 1, 'rgb(240,240,240)');
 }
 
-const square_count = getRandomIntMinMax(9, 13);
+const square_count = getRandomIntMinMax(12, 15);
 
 for (let square_number = 0; square_number < square_count; square_number++) {
-    const side_length = getRandomIntMinMax(30, 150);
+    const side_length = getRandomIntMinMax(30, 50);
     const square = new rect(
         getRandomIntMinMax(0, window.innerWidth - 200), 
         getRandomIntMinMax(0, window.innerWidth - 200), 
