@@ -36,7 +36,7 @@
     height: 128px;
     background: #d6c289;
     position: fixed;
-    top: calc(100% - 146px);
+    top: calc(100% - 151px);
     left: 50%;
     max-width: 740px;
     border-radius: 10px 10px 0px 0px;
@@ -47,13 +47,19 @@
     flex-wrap: nowrap;
     white-space: nowrap;
     margin: auto;
-    padding: 15px 0px 0px 0px;
+    padding: 20px 0px 0px 0px;
 }
 
 #building-create > #building-type-selector-container {
     position: absolute;
-    top: 2px;
+    top: 3px;
     left: 5px;
+}
+
+#building-create > #building-type-selector-container > #building-type-selector {
+    background: transparent;
+    border: 2px brown solid;
+    border-radius: 5px;
 }
 
 #buy-buttons {
