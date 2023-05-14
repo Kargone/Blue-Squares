@@ -120,7 +120,7 @@ function getRandomInt(max = 1000000000) {
 }
 
 function getRandomIntMinMax(min = 0, max = 1000000000) {
-    return Math.floor(Math.random() * max) + min;
+    return Math.floor(Math.random() * (max - min)) + min;
 }
 
 class rect {
@@ -227,22 +227,23 @@ for (let x = 1; x <= lines_width; x++) {
     new rect(x * spacing, 0, 1, window.innerHeight, 'rgb(240,240,240)');
 }
 
-for (let y = 0; y <= lines_width; y++) {
+for (let y = 0; y <= lines_height; y++) {
     new rect(0, y * spacing, window.innerWidth, 1, 'rgb(240,240,240)');
 }
 
-const square_count = getRandomIntMinMax(12, 15);
+const square_count = getRandomIntMinMax(10, 15);
 
 for (let square_number = 0; square_number < square_count; square_number++) {
+    console.log(square_count);
     const side_length = getRandomIntMinMax(30, 50);
     const square = new rect(
-        getRandomIntMinMax(0, window.innerWidth - 200), 
-        getRandomIntMinMax(0, window.innerWidth - 200), 
+        getRandomIntMinMax(0, window.innerWidth - side_length), 
+        getRandomIntMinMax(0, window.innerHeight - side_length), 
         side_length, 
         side_length, 
         'rgb(146, 151, 247)',
-        getRandomIntMinMax(2, 6) / 10,
-        getRandomIntMinMax(2, 6) / 10
+        [1, -1][getRandomInt(2)] * getRandomIntMinMax(2, 8) / 10,
+        [1, -1][getRandomInt(2)] * getRandomIntMinMax(2, 8) / 10
     );
     square.z = 3;
 }
