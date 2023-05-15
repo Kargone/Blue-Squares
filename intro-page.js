@@ -251,15 +251,14 @@ for (let square_number = 0; square_number < square_count; square_number++) {
 const lower = 0;
 const upper = 89;
 let percentage = 0;
-let direction_percentage = 4;
+let direction_percentage = 2;
 setInterval(() => {
     percentage += direction_percentage;
     if (percentage < lower) {
         percentage = lower;
         direction_percentage *= -1;
     } else if (percentage > upper) {
-        percentage = upper;
-        direction_percentage *= -1;
+        percentage = lower;
     }
     document.querySelector(':root').style.setProperty('--grad', `${percentage}%`);
 }, 1000/10);
