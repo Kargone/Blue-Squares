@@ -35,10 +35,10 @@ h1 {
     z-index: -100;
 }
 
-.shimmer2 {
+.shimmer {
     --inner: rgb(194, 194, 218);
     text-align: center;
     color: rgba(255,255,255,0.1);
-    background: linear-gradient(to bottom right, #000044 var(--grad), var(--inner) calc(var(--grad) + 1%), var(--inner) calc(var(--grad) + 8%), #000044 calc(var(--grad) + 9%));
+    background: linear-gradient(to bottom right, #000062 var(--grad), var(--inner) calc(var(--grad) + 1%), var(--inner) calc(var(--grad) + 8%), #000062 calc(var(--grad) + 9%));
     -webkit-background-clip: text;
 }
