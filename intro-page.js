@@ -247,3 +247,19 @@ for (let square_number = 0; square_number < square_count; square_number++) {
     );
     square.z = 3;
 }
+
+const lower = 0;
+const upper = 140;
+let percentage = 0;
+let direction_percentage = 5;
+setInterval(() => {
+    percentage += direction_percentage;
+    if (percentage < lower) {
+        percentage = lower;
+        direction_percentage *= -1;
+    } else if (percentage > upper) {
+        percentage = upper;
+        direction_percentage *= -1;
+    }
+    document.querySelector(':root').style.setProperty('--grad', `${percentage}px`);
+}, 1000/10);
