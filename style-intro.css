@@ -22,10 +22,6 @@ body {
 
 h1 {
     font-size: 80px;
-    /* color: blue;
-    background-image: linear-gradient(to bottom right, rgb(0, 17, 79), rgb(0, 17, 79), rgb(0, 17, 79), blue, blue,rgb(0, 17, 79), rgb(0, 17, 79), rgb(0, 17, 79));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent; */
 }
 
 #game-canvas {
@@ -39,61 +35,10 @@ h1 {
     z-index: -100;
 }
 
-.shimmer {
-    text-align: center;
-    color: rgba(255,255,255,0.1);
-    background: -webkit-gradient(linear, left top, right top, from(blue), to(blue), color-stop(0.5, #85b4ff));
-    background: gradient(linear, left top, right top, from(blue), to(blue), color-stop(0.5, #fff));
-    -webkit-background-size: 125px 100%;
-    -moz-background-size: 125px 100%;
-    background-size: 125px 100%;
-    -webkit-background-clip: text;
-    animation: infinite ease-in-out shimmer 4s;
-    background-repeat: no-repeat;
-    background-position: 0 0;
-    background-color: blue;
-}
-
 .shimmer2 {
+    --inner: rgb(194, 194, 218);
     text-align: center;
     color: rgba(255,255,255,0.1);
-    background: linear-gradient(to bottom right, #040475 var(--grad), #5252ff calc(var(--grad) + 5%), #5252ff calc(var(--grad) + 10%), #040475 calc(var(--grad) + 15%));
+    background: linear-gradient(to bottom right, #000044 var(--grad), var(--inner) calc(var(--grad) + 1%), var(--inner) calc(var(--grad) + 8%), #000044 calc(var(--grad) + 9%));
     -webkit-background-clip: text;
-    /* animation: infinite ease-in-out shimmer 4s; */
-}
-
-/* @-moz-keyframes shimmer {
-    0% {
-        background-position: top left;
-    }
-    100% {
-        background-position: top right;
-    }
-}
-
-@-webkit-keyframes shimmer {
-    0% {
-        background-position: top left;
-    }
-    100% {
-        background-position: top right;
-    }
-}
-
-@-o-keyframes shimmer {
-    0% {
-        background-position: top left;
-    }
-    100% {
-        background-position: top right;
-    }
-} */
-
-@keyframes shimmer {
-    0% {
-        --grad: 0%;
-    }
-    100% {
-        --grad: 95%;
-    }
 }

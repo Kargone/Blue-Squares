@@ -249,9 +249,9 @@ for (let square_number = 0; square_number < square_count; square_number++) {
 }
 
 const lower = 0;
-const upper = 85;
+const upper = 89;
 let percentage = 0;
-let direction_percentage = 3;
+let direction_percentage = 4;
 setInterval(() => {
     percentage += direction_percentage;
     if (percentage < lower) {
