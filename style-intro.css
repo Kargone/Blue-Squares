@@ -57,7 +57,7 @@ h1 {
 .shimmer2 {
     text-align: center;
     color: rgba(255,255,255,0.1);
-    background: linear-gradient(to bottom right, blue var(--grad), #757cff calc(var(--grad) + 10%), blue calc(var(--grad) + 20%));
+    background: linear-gradient(to bottom right, #040475 var(--grad), #5252ff calc(var(--grad) + 5%), #5252ff calc(var(--grad) + 10%), #040475 calc(var(--grad) + 15%));
     -webkit-background-clip: text;
     /* animation: infinite ease-in-out shimmer 4s; */
 }
