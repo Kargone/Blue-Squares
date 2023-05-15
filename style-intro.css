@@ -36,9 +36,9 @@ h1 {
 }
 
 .shimmer {
-    --inner: rgb(194, 194, 218);
+    --inner: rgb(0, 0, 239);
     text-align: center;
     color: rgba(255,255,255,0.1);
-    background: linear-gradient(to bottom right, #000062 var(--grad), var(--inner) calc(var(--grad) + 1%), var(--inner) calc(var(--grad) + 8%), #000062 calc(var(--grad) + 9%));
+    background: linear-gradient(to bottom right, #000062 var(--grad), var(--inner) calc(var(--grad) + 2%), var(--inner) calc(var(--grad) + 9%), #000062 calc(var(--grad) + 11%));
     -webkit-background-clip: text;
 }
