@@ -16,8 +16,8 @@ window.addEventListener('resize', () => {
     body.style.height = window.innerHeight + 'px';
 });
 
-const GAME_BLOCK_AMOUNT_WIDTH = 6;
-const GAME_BLOCK_AMOUNT_HEIGHT = 6;
+const GAME_BLOCK_AMOUNT_WIDTH = 16;
+const GAME_BLOCK_AMOUNT_HEIGHT = 16;
 const BLOCK_WIDTH = 30;
 const BLOCK_HEIGHT = 30;
 const GAME_BORDER = 4;
@@ -150,16 +150,41 @@ let user_settings = {
 //     ['o', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'o'],
 //     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o']
 // ];
-const grass_grid = [
-    ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o'],
-    ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
-    ['o', 'i', 'i', 'i', 'i', 'i', 'i', 'o'],
-    ['o', 'o', 'i', 'i', 'i', 'i', 'o', 'o'],
-    ['o', 'o', 'i', 'i', 'i', 'i', 'o', 'o'],
-    ['o', 'i', 'i', 'i', 'i', 'i', 'i', 'o'],
-    ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
-    ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o']
-];
+// const grass_grid = [
+//     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o'],
+//     ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
+//     ['o', 'i', 'i', 'i', 'i', 'i', 'i', 'o'],
+//     ['o', 'o', 'i', 'i', 'i', 'i', 'o', 'o'],
+//     ['o', 'o', 'i', 'i', 'i', 'i', 'o', 'o'],
+//     ['o', 'i', 'i', 'i', 'i', 'i', 'i', 'o'],
+//     ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
+//     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o']
+// ];
+let grass_grid = [];
+
+for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
+    grass_grid[grass_grid_y] = [];
+    for (let grass_grid_x = 0; grass_grid_x < GAME_BLOCK_AMOUNT_WIDTH + 2; grass_grid_x++) {
+        if ((grass_grid_y === 0) || (grass_grid_y === GAME_BLOCK_AMOUNT_HEIGHT + 1)) {
+            grass_grid[grass_grid_y][grass_grid_x] = 'o';
+            continue;
+        }
+        if ((grass_grid_x === 0) || (grass_grid_x === GAME_BLOCK_AMOUNT_HEIGHT + 1)) { 
+            grass_grid[grass_grid_y][grass_grid_x] = 'o';
+            continue;
+        }
+        grass_grid[grass_grid_y][grass_grid_x] = 'i';
+    }    
+}
+
+for (let _ = 0; _ < 20; _++) {
+    const _x = getRandomInt(GAME_BLOCK_AMOUNT_WIDTH / 2) * 2;
+    const _y = getRandomInt(GAME_BLOCK_AMOUNT_HEIGHT / 2) * 2;
+    grass_grid[_y][_x] = 'o';
+    grass_grid[_y][_x + 1] = 'o';
+    grass_grid[_y + 1][_x] = 'o';
+    grass_grid[_y + 1][_x + 1] = 'o';
+}
 
 class rect {
     constructor(x, y, width, height, rgb) {
@@ -287,8 +312,6 @@ class grass_block {
         } catch {
             // local_grass_grid[2][2] = 'o';
         }
-        console.log(coordX, coordY)
-        console.log(local_grass_grid);
         const check_types = [
             'checkTop_left_corner',
             'checkTop_right_corner',
@@ -306,7 +329,7 @@ class grass_block {
         for (const check of check_types) {
             if (this[check](local_grass_grid)) return;
         }
-        this.drawGrassImage(textureInfos.outer.outside[getRandomInt(5)]);
+        // this.drawGrassImage(textureInfos.outer.outside[getRandomInt(5)]);
     }
     checkTop_left_corner(local_grass_grid) {
         const top_left_corner = [
