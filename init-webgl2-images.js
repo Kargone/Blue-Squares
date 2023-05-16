@@ -319,13 +319,13 @@ const textureInfos = {
     'dark': [
       loadImageAndCreateTextureInfo('images/grass/inner-blocks/darks/inner-block-dark-1.png'),
       loadImageAndCreateTextureInfo('images/grass/inner-blocks/darks/inner-block-dark-2.png'),
-      loadImageAndCreateTextureInfo('images/grass/inner-blocks/darks/inner-block-dark-3.png'),
+      loadImageAndCreateTextureInfo('images/grass/inner-blocks/darks/inner-block-dark-3.png')
       // loadImageAndCreateTextureInfo('images/grass/inner-blocks/inner-block-1.png'),
     ],
     'light': [
       loadImageAndCreateTextureInfo('images/grass/inner-blocks/lights/inner-block-light-1.png'),
       loadImageAndCreateTextureInfo('images/grass/inner-blocks/lights/inner-block-light-2.png'),
-      loadImageAndCreateTextureInfo('images/grass/inner-blocks/lights/inner-block-light-3.png'),
+      loadImageAndCreateTextureInfo('images/grass/inner-blocks/lights/inner-block-light-3.png')
     ],
   },
   'outer': {
@@ -333,48 +333,48 @@ const textureInfos = {
       'dark': [
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-rights/outer-right-dark-1.png'),
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-rights/outer-right-dark-2.png'),
-        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-rights/outer-right-dark-3.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-rights/outer-right-dark-3.png')
       ],
       'light': [
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-rights/outer-right-light-1.png'),
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-rights/outer-right-light-2.png'),
-        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-rights/outer-right-light-3.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-rights/outer-right-light-3.png')
       ],
     },
     'ups': {
       'dark': [
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-ups/outer-up-dark-1.png'),
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-ups/outer-up-dark-2.png'),
-        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-ups/outer-up-dark-3.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-ups/outer-up-dark-3.png')
       ],
       'light': [
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-ups/outer-up-light-1.png'),
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-ups/outer-up-light-2.png'),
-        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-ups/outer-up-light-3.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-ups/outer-up-light-3.png')
       ],
     },
     'downs': {
       'dark': [
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-downs/outer-down-dark-1.png'),
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-downs/outer-down-dark-2.png'),
-        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-downs/outer-down-dark-3.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-downs/outer-down-dark-3.png')
       ],
       'light': [
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-downs/outer-down-light-1.png'),
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-downs/outer-down-light-2.png'),
-        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-downs/outer-down-light-3.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-downs/outer-down-light-3.png')
       ],
     },
     'lefts': {
       'dark': [
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-lefts/outer-left-dark-1.png'),
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-lefts/outer-left-dark-2.png'),
-        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-lefts/outer-left-dark-3.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-lefts/outer-left-dark-3.png')
       ],
       'light': [
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-lefts/outer-left-light-1.png'),
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-lefts/outer-left-light-2.png'),
-        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-lefts/outer-left-light-3.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-lefts/outer-left-light-3.png')
       ],
     },
     'corners': {
@@ -385,15 +385,55 @@ const textureInfos = {
       'bottom-right-light': loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/corners/outer-corner-bottom_right-light-1.png'),
       'bottom-left-light': loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/corners/outer-corner-bottom_left-light-1.png'),
       'top-right-light': loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/corners/outer-corner-top_right-light-1.png'),
-      'top-left-light': loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/corners/outer-corner-top_left-light-1.png'),
+      'top-left-light': loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/corners/outer-corner-top_left-light-1.png')
     },
     'outside': [
       loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outers/outer-block-1.png'),
       loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outers/outer-block-2.png'),
       loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outers/outer-block-3.png'),
       loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outers/outer-block-4.png'),
-      loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outers/outer-block-tree-1.png'),
+      loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outers/outer-block-tree-1.png')
     ],
+    'left-down': {
+      'dark': [
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-left-downs/outer-left-down-dark-1.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-left-downs/outer-left-down-dark-2.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-left-downs/outer-left-down-dark-3.png')
+      ],
+      'light': [
+
+      ]
+    },
+    'left-up': {
+      'dark': [
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-left-ups/outer-left-up-dark-1.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-left-ups/outer-left-up-dark-2.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-left-ups/outer-left-up-dark-3.png')
+      ],
+      'light': [
+
+      ]
+    },
+    'right-down': {
+      'dark': [
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-right-downs/outer-right-down-dark-1.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-right-downs/outer-right-down-dark-2.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-right-downs/outer-right-down-dark-3.png')
+      ],
+      'light': [
+
+      ]
+    },
+    'right-up': {
+      'dark': [
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-right-ups/outer-right-up-dark-1.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-right-ups/outer-right-up-dark-2.png'),
+        loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-right-ups/outer-right-up-dark-3.png')
+      ],
+      'light': [
+
+      ]
+    }
   },
 };
 

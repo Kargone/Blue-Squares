@@ -1,12 +1,12 @@
 :root {
     --vh: 1vh;
-    --blue: rgba(0, 76, 255, 255);
-    --red: rgba(255, 0, 0, 255);
-    --green: rgba(0, 177, 0, 255);
-    --purple: rgba(140, 0, 164, 255);
-    --orange: rgba(255, 150, 0, 255);
-    --yellow: rgba(255, 255, 0, 255);
-    --white: rgba(255, 255, 255, 255);
+    --blue: rgba(0, 76, 255, 1);
+    --red: rgba(255, 0, 0, 1);
+    --green: rgba(0, 177, 0, 1);
+    --purple: rgba(140, 0, 164, 1);
+    --orange: rgba(255, 150, 0, 1);
+    --yellow: rgba(255, 255, 0, 1);
+    --white: rgba(255, 255, 255, 1);
 }
 
 /* width */
