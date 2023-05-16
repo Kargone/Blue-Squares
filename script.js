@@ -152,11 +152,11 @@ let user_settings = {
 // ];
 const grass_grid = [
     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o'],
+    ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
     ['o', 'i', 'i', 'i', 'i', 'i', 'i', 'o'],
-    ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
-    ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
-    ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
-    ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
+    ['o', 'o', 'i', 'i', 'i', 'i', 'o', 'o'],
+    ['o', 'o', 'i', 'i', 'i', 'i', 'o', 'o'],
+    ['o', 'i', 'i', 'i', 'i', 'i', 'i', 'o'],
     ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o']
 ];
@@ -289,101 +289,179 @@ class grass_block {
         }
         console.log(coordX, coordY)
         console.log(local_grass_grid);
+        const check_types = [
+            'checkTop_left_corner',
+            'checkTop_right_corner',
+            'checkBottom_right_corner',
+            'checkBottom_left_corner',
+            'checkUp_left_sides',
+            'checkUp_right_sides',
+            'checkDown_right_sides',
+            'checkDown_left_sides',
+            'checkUp_side',
+            'checkDown_side',
+            'checkRight_side',
+            'checkLeft_side'
+        ];
+        for (const check of check_types) {
+            if (this[check](local_grass_grid)) return;
+        }
+        this.drawGrassImage(textureInfos.outer.outside[getRandomInt(5)]);
+    }
+    checkTop_left_corner(local_grass_grid) {
         const top_left_corner = [
             ['i', 'o', 'o'],
             ['o', 'o', 'o'],
             ['o', 'o', 'o']
         ];
         if (JSON.stringify(local_grass_grid) === JSON.stringify(top_left_corner)) return this.drawGrassImage(textureInfos.outer.corners["top-left-dark"]);
+        return false;
+    }
+    checkTop_right_corner(local_grass_grid) {
         const top_right_corner = [
             ['o', 'o', 'i'],
             ['o', 'o', 'o'],
             ['o', 'o', 'o']
         ];
         if (JSON.stringify(local_grass_grid) === JSON.stringify(top_right_corner)) return this.drawGrassImage(textureInfos.outer.corners["top-right-dark"]);
+        return false;
+    }
+    checkBottom_right_corner(local_grass_grid) {
         const bottom_right_corner = [
             ['o', 'o', 'o'],
             ['o', 'o', 'o'],
             ['o', 'o', 'i']
         ];
         if (JSON.stringify(local_grass_grid) === JSON.stringify(bottom_right_corner)) return this.drawGrassImage(textureInfos.outer.corners["bottom-right-dark"]);
+        return false;
+    }
+    checkBottom_left_corner(local_grass_grid) {
         const bottom_left_corner = [
             ['o', 'o', 'o'],
             ['o', 'o', 'o'],
             ['i', 'o', 'o']
         ];
         if (JSON.stringify(local_grass_grid) === JSON.stringify(bottom_left_corner)) return this.drawGrassImage(textureInfos.outer.corners["bottom-left-dark"]);
+        return false;
+    }
+    checkUp_left_sides(local_grass_grid) {
         const up_left_sides = [
-            ['i', 'i', 'i'],
-            ['i', 'o', 'o'],
-            ['i', 'o', 'o']
+            [true,                           local_grass_grid[0][1] === 'i', true],
+            [local_grass_grid[1][0] === 'i', local_grass_grid[1][1] === 'o', local_grass_grid[1][2] === 'o'],
+            [true,                           local_grass_grid[2][1] === 'o', local_grass_grid[2][2] === 'o']
         ];
-        if (JSON.stringify(local_grass_grid) === JSON.stringify(up_left_sides)) return this.drawGrassImage(textureInfos.outer["left-up"].dark[getRandomInt(2)]);
+        if (JSON.stringify(up_left_sides) === "[[true,true,true],[true,true,true],[true,true,true]]") return this.drawGrassImage(textureInfos.outer["left-up"].dark[getRandomInt(2)]);
+        return false;
+    }
+    checkUp_right_sides(local_grass_grid) {
         const up_right_sides = [
-            ['i', 'i', 'i'],
-            ['o', 'o', 'i'],
-            ['o', 'o', 'i']
+            [true,                           local_grass_grid[0][1] === 'i', true],
+            [local_grass_grid[1][0] === 'o', local_grass_grid[1][1] === 'o', local_grass_grid[1][2] === 'i'],
+            [local_grass_grid[2][0] === 'o', local_grass_grid[2][1] === 'o', true]
         ];
-        if (JSON.stringify(local_grass_grid) === JSON.stringify(up_right_sides)) return this.drawGrassImage(textureInfos.outer["right-up"].dark[getRandomInt(2)]);
+        if (JSON.stringify(up_right_sides) === "[[true,true,true],[true,true,true],[true,true,true]]") return this.drawGrassImage(textureInfos.outer["right-up"].dark[getRandomInt(2)]);
+        return false;
+    }
+    checkDown_right_sides(local_grass_grid) {
         const down_right_sides = [
-            ['o', 'o', 'i'],
-            ['o', 'o', 'i'],
-            ['i', 'i', 'i']
+            [local_grass_grid[0][0] === 'o', local_grass_grid[0][1] === 'o', true],
+            [local_grass_grid[1][0] === 'o', local_grass_grid[1][1] === 'o', local_grass_grid[1][2] === 'i'],
+            [true,                           local_grass_grid[2][1] === 'i', true]
         ];
-        if (JSON.stringify(local_grass_grid) === JSON.stringify(down_right_sides)) return this.drawGrassImage(textureInfos.outer["right-down"].dark[getRandomInt(2)]);
+        if (JSON.stringify(down_right_sides) === "[[true,true,true],[true,true,true],[true,true,true]]") return this.drawGrassImage(textureInfos.outer["right-down"].dark[getRandomInt(2)]);
+        return false;
+    }
+    checkDown_left_sides(local_grass_grid) {
         const down_left_sides = [
-            ['i', 'o', 'o'],
-            ['i', 'o', 'o'],
-            ['i', 'i', 'i']
+            [true,                           local_grass_grid[0][1] === 'o', local_grass_grid[0][2] === 'o'],
+            [local_grass_grid[1][0] === 'i', local_grass_grid[1][1] === 'o', local_grass_grid[1][2] === 'o'],
+            [true,                           local_grass_grid[2][1] === 'i', true]
         ];
-        if (JSON.stringify(local_grass_grid) === JSON.stringify(down_left_sides)) return this.drawGrassImage(textureInfos.outer["left-down"].dark[getRandomInt(2)]);
+        if (JSON.stringify(down_left_sides) === "[[true,true,true],[true,true,true],[true,true,true]]") return this.drawGrassImage(textureInfos.outer["left-down"].dark[getRandomInt(2)]);
+        return false;
+    }
+    checkUp_side(local_grass_grid) {
         const up_side = [
+            [true,                           local_grass_grid[0][1] === 'i', true],
+            [local_grass_grid[1][0] === 'o', local_grass_grid[1][1] === 'o', local_grass_grid[1][2] === 'o'],
+            [local_grass_grid[2][0] === 'o', local_grass_grid[2][1] === 'o', local_grass_grid[2][2] === 'o']
+        ];
+        const up_side_1 = [
             ['i', 'i', 'i'],
             ['o', 'o', 'o'],
             ['o', 'o', 'o']
         ];
-        if (JSON.stringify(local_grass_grid) === JSON.stringify(up_side)) return this.drawGrassImage(textureInfos.outer.ups.dark[getRandomInt(2)]);
+        const up_side_4 = [
+            ['o', 'i', 'o'],
+            ['o', 'o', 'o'],
+            ['o', 'o', 'o']
+        ];
+        if (JSON.stringify(up_side) === "[[true,true,true],[true,true,true],[true,true,true]]") return this.drawGrassImage(textureInfos.outer.ups.dark[getRandomInt(2)]);   
+        return false;
+    }
+    checkDown_side(local_grass_grid) {
         const down_side = [
+            [local_grass_grid[0][0] === 'o', local_grass_grid[0][1] === 'o', local_grass_grid[0][2] === 'o'],
+            [local_grass_grid[1][0] === 'o', local_grass_grid[1][1] === 'o', local_grass_grid[1][2] === 'o'],
+            [true,                           local_grass_grid[2][1] === 'i', true]
+        ];
+        const down_side_1 = [
             ['o', 'o', 'o'],
             ['o', 'o', 'o'],
             ['i', 'i', 'i']
         ];
-        if (JSON.stringify(local_grass_grid) === JSON.stringify(down_side)) return this.drawGrassImage(textureInfos.outer.downs.dark[getRandomInt(2)]);
+        const down_side_4 = [
+            ['o', 'o', 'o'],
+            ['o', 'o', 'o'],
+            ['o', 'i', 'o']
+        ];
+        if (JSON.stringify(down_side) === "[[true,true,true],[true,true,true],[true,true,true]]") return this.drawGrassImage(textureInfos.outer.downs.dark[getRandomInt(2)]);
+        return false;
+    }
+    checkRight_side(local_grass_grid) {
         const right_side = [
+            [local_grass_grid[0][0] === 'o', local_grass_grid[0][1] === 'o', true],
+            [local_grass_grid[1][0] === 'o', local_grass_grid[1][1] === 'o', local_grass_grid[1][2] === 'i'],
+            [local_grass_grid[2][0] === 'o', local_grass_grid[2][1] === 'o', true]
+        ];
+        const right_side_1 = [
             ['o', 'o', 'i'],
             ['o', 'o', 'i'],
             ['o', 'o', 'i']
         ];
-        if (JSON.stringify(local_grass_grid) === JSON.stringify(right_side)) return this.drawGrassImage(textureInfos.outer.rights.dark[getRandomInt(2)]);
+        const right_side_4 = [
+            ['o', 'o', 'o'],
+            ['o', 'o', 'i'],
+            ['o', 'o', 'o']
+        ];
+        if (JSON.stringify(right_side) === "[[true,true,true],[true,true,true],[true,true,true]]") return this.drawGrassImage(textureInfos.outer.rights.dark[getRandomInt(2)]);
+        return false;
+    }
+    checkLeft_side(local_grass_grid) {
         const left_side = [
+            [true,                           local_grass_grid[0][1] === 'o', local_grass_grid[0][2] === 'o'],
+            [local_grass_grid[1][0] === 'i', local_grass_grid[1][1] === 'o', local_grass_grid[1][2] === 'o'],
+            [true,                           local_grass_grid[2][1] === 'o', local_grass_grid[2][2] === 'o']
+        ];
+        const left_side_1 = [
             ['i', 'o', 'o'],
             ['i', 'o', 'o'],
             ['i', 'o', 'o']
         ];
-        if (JSON.stringify(local_grass_grid) === JSON.stringify(left_side)) return this.drawGrassImage(textureInfos.outer.lefts.dark[getRandomInt(2)]);
-        // const outer_down = (coordY === GAME_BORDER) && (coordX >= GAME_BORDER) && (coordX <= GAME_BLOCK_AMOUNT_WIDTH + GAME_BORDER);
-        // const outer_up = (coordY === GAME_BLOCK_AMOUNT_HEIGHT + GAME_BORDER) && (coordX >= GAME_BORDER) && (coordX <= GAME_BLOCK_AMOUNT_WIDTH + GAME_BORDER);
-        // const outer_right = (coordX === GAME_BORDER) && (coordY >= GAME_BORDER) && (coordY <= GAME_BLOCK_AMOUNT_HEIGHT + GAME_BORDER);
-        // const outer_left = (coordX === GAME_BLOCK_AMOUNT_WIDTH + GAME_BORDER) && (coordY >= GAME_BORDER) && (coordY <= GAME_BLOCK_AMOUNT_HEIGHT + GAME_BORDER);
-        // if (outer_down && outer_right) return this.drawGrassImage(textureInfos.outer.corners['bottom-right-dark']);
-        // if (outer_down && outer_left) return this.drawGrassImage(textureInfos.outer.corners['bottom-left-dark']);
-        // if (outer_up && outer_right) return this.drawGrassImage(textureInfos.outer.corners['top-right-dark']);
-        // if (outer_up && outer_left) return this.drawGrassImage(textureInfos.outer.corners['top-left-dark']);
-        // if (outer_right) return this.drawGrassImage(textureInfos.outer.rights.dark[getRandomInt(2)]);
-        // if (outer_down) return this.drawGrassImage(textureInfos.outer.downs.dark[getRandomInt(2)]);
-        // if (outer_left) return this.drawGrassImage(textureInfos.outer.lefts.dark[getRandomInt(2)]);
-        // if (outer_up) return this.drawGrassImage(textureInfos.outer.ups.dark[getRandomInt(2)]);
-        // if ((coordY > GAME_BORDER - 1) &&
-        //     (coordX > GAME_BORDER - 1) &&
-        //     (coordY < GAME_BLOCK_AMOUNT_HEIGHT + GAME_BORDER - 1) &&
-        //     (coordY < GAME_BLOCK_AMOUNT_WIDTH + GAME_BORDER - 1)
-        //     ) console.log(grass_grid[coordY - (GAME_BORDER - 1)][coordX - (GAME_BORDER - 1)] === 'i');
+        const left_side_4 = [
+            ['o', 'o', 'o'],
+            ['i', 'o', 'o'],
+            ['o', 'o', 'o']
+        ];
+        if (JSON.stringify(left_side) === "[[true,true,true],[true,true,true],[true,true,true]]") return this.drawGrassImage(textureInfos.outer.lefts.dark[getRandomInt(2)]);
+        return false;
     }
     drawGrassImage(textureInfo) {
         this.xScale = this.width / 300;
         this.yScale = this.height / 300;
         this.textureInfo = textureInfo;
         image_draw_infos[this.id] = this;
+        return true;
     }
     setTextureInfo(textureInfo) {
         image_draw_infos[this.id].textureInfo = textureInfo;
