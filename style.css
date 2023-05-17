@@ -229,7 +229,7 @@
     visibility: hidden;
 }
 
-#building-info > #building-info-content > #refund-text, #created-text {
+#building-info > #building-info-content > #refund-text, #building-info-created {
     font-size: 10px;
 }
 
@@ -385,11 +385,13 @@
 .resource-display {
     position: fixed;
     font-size: 15px;
-    animation: up 1s infinite;
+    display: table;
+    border-spacing: 5px;
+    animation: up 2s infinite;
 }
 
-#resource-displays > p > img {
-    margin-left: 0px;
+#resource-displays > div > div {
+    display: inline-block;
 }
 
 @keyframes up {

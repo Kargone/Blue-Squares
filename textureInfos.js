@@ -146,4 +146,5 @@ outside: 2, tree 2
 right-down-light: 3
 down-left-light: 3
 left-up-light: 3
+edge bushes: 1
 */

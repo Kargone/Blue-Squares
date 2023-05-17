@@ -581,11 +581,12 @@ class blue_square {
         this.id = getRandomInt();
         this.totalCost = object.totalCost ?? buy_costs[`${this.color.toLowerCase()}_squares`];
         document.getElementById('resource-displays').innerHTML += `
-            <p id="resource-display-${this.id}" class="resource-display">+
+            <div id="resource-display-${this.id}" class="resource-display">+
                 <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
-                <img src="images/resource-squares/${this.color.toLowerCase()}-square.png" class="resource-image">
-            </p>
+                <div id="building-info-delete-resource-icon" class="resource-icon ${this.color.toLowerCase()}">
+            </div>
         `;
+        this.createdOn = object.timeCreated ?? getTime();
         buildings[this.id] = this;
     }
     assignCoords() {
@@ -746,6 +747,7 @@ class blue_square {
         this.displayed = true;
         document.getElementById("building-info-square_type").textContent = `${this.color} Square`;
         document.getElementById("building-info-level").textContent = `Level: ${this.level}`;
+        document.getElementById("building-info-created").textContent = `Created on: ${this.createdOn}`;
         document.getElementById("building-info-earnings_second").textContent = `Earnings per second: ${this.earningsPerSecond}`;
         document.getElementById("building-info-earnings_hour").textContent = `Earnings per hour: ${this.earningsPerHour}`;
         document.getElementById("building-info-upgrade-text").textContent = `Upgrade ${this.nextLevelUpgradeCost}`;
@@ -794,8 +796,8 @@ class blue_square {
         delete_button.removeEventListener('click', this.deleteButtonListner);
     }
     updateResourceDisplay() {
-        document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 2) + 'px';
-        document.getElementById(`resource-display-${this.id}`).style.left = (this.x + 10)+ 'px';
+        document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 5) + 'px';
+        document.getElementById(`resource-display-${this.id}`).style.left = (this.x + 2)+ 'px';
     }
     translateX_YfromStartX_Y(x, y) {
         this.x = mouseStartX_Y.x + x + this.distFromStartX;
