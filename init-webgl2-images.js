@@ -257,6 +257,8 @@ function main() {
   });
   gl.canvas.addEventListener('mouseup', (e) => {
     mouseEnd();
+    console.log('X ', mouseX);
+    console.log('Y ', mouseY);
   });
   gl.canvas.addEventListener('touchend', (e) => {
     mouseEnd();
@@ -459,7 +461,7 @@ function dragShape() {
       return true;
     }
   }
-  if ((!mouse_down) || (!canDragBoard)) return;
+  if ((!mouse_down) || (!canDragBoard) || (user_settings['no-square-movement'])) return;
   const translateX = mouseX - mouseStartX_Y.x;
   const translateY = mouseY - mouseStartX_Y.y;
   grid.x = mouseStartX_Y.x + translateX + grid.distFromStartX;

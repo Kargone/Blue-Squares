@@ -262,6 +262,7 @@ class grass_block {
             ) return this.drawGrassImage(textureInfos.outer.outside[getRandomInt(5)]);
         if (grass_grid[coordY - GAME_BORDER][coordX - GAME_BORDER] != 'o') {
             const DO_SHADE = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
+            grid[`${coordX - GAME_BORDER}_${coordY - GAME_BORDER}`] = '';
             if (DO_SHADE === 0) return this.drawGrassImage(textureInfos.inner.dark[getRandomInt(2)]);
             if (DO_SHADE === 1) return this.drawGrassImage(textureInfos.inner.light[getRandomInt(2)]);
         }
@@ -661,8 +662,8 @@ class blue_square {
             (grid[`${this.coordX}_${this.coordY + 1}`] === '') &&
             (grid[`${this.coordX + 1}_${this.coordY + 1}`] === '')
         ) {
-            this.originalX = this.x;
-            this.originalY = this.y;
+            this.originalX = copy(this.x);
+            this.originalY = copy(this.y);
             this.setCoordXandY();
             grid[`${this.coordX}_${this.coordY}`] = 'blue_square';
             grid[`${this.coordX + 1}_${this.coordY}`] = 'blue_square';
@@ -792,6 +793,8 @@ class blue_square {
     translateX_YfromStartX_Y(x, y) {
         this.x = mouseStartX_Y.x + x + this.distFromStartX;
         this.y = mouseStartX_Y.y + y + this.distFromStartY;
+        this.originalX = copy(this.x);
+        this.originalY = copy(this.y);
     }
     updateDistFromStartX_Y() {
         this.distFromStartX = this.x - mouseStartX_Y.x;
@@ -804,7 +807,6 @@ function renderGame() {
         for (let current_block_x = 1; current_block_x <= GAME_BLOCK_AMOUNT_WIDTH + GAME_BORDER * 2; current_block_x++) {
             const BLOCK = new grass_block((current_block_x - 1) * BLOCK_WIDTH, (current_block_y - 1) * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
             BLOCK.drawGrass(current_block_x, current_block_y);
-            grid[`${current_block_x}_${current_block_y}`] = '';
         }
     }
 }
