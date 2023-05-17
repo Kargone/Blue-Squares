@@ -150,16 +150,6 @@ let user_settings = {
 //     ['o', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i', 'o'],
 //     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o']
 // ];
-// const grass_grid = [
-//     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o'],
-//     ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
-//     ['o', 'i', 'i', 'i', 'i', 'i', 'i', 'o'],
-//     ['o', 'o', 'i', 'i', 'i', 'i', 'o', 'o'],
-//     ['o', 'o', 'i', 'i', 'i', 'i', 'o', 'o'],
-//     ['o', 'i', 'i', 'i', 'i', 'i', 'i', 'o'],
-//     ['o', 'i', 'i', 'o', 'o', 'i', 'i', 'o'],
-//     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o']
-// ];
 let grass_grid = [];
 
 for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
@@ -186,8 +176,21 @@ for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_gr
 //     grass_grid[_y + 1][_x + 1] = 'o';
 // }
 
+window.addEventListener('wheel', function(event) {
+    if (event.deltaY < 0) {
+        console.log('scrolling up');
+        const multiplier = 1.1;
+        // setScales(multiplier);
+    } else if (event.deltaY > 0) {
+        console.log('scrolling down');
+        const multiplier = 0.9;
+        // setScales(multiplier);
+    }
+});
+
 class rect {
     constructor(x, y, width, height, rgb) {
+        this.scale = 1;
         this.x = x ?? 0;
         this.y = y ?? 0;
         this.distFromStartX = -1;
@@ -246,6 +249,7 @@ class rect {
 
 class grass_block {
     constructor(x, y, width, height) {
+        this.scale = 1;
         this.x = x ?? 0;
         this.y = y ?? 0;
         this.distFromStartX = -1;
@@ -330,7 +334,7 @@ class grass_block {
         for (const check of check_types) {
             if (this[check](local_grass_grid)) return;
         }
-        // this.drawGrassImage(textureInfos.outer.outside[getRandomInt(5)]);
+        this.drawGrassImage(textureInfos.outer.outside[getRandomInt(5)]);
     }
     checkTop_left_corner(local_grass_grid) {
         const top_left_corner = [
@@ -484,6 +488,8 @@ class grass_block {
         this.xScale = this.width / 300;
         this.yScale = this.height / 300;
         this.textureInfo = textureInfo;
+        this.fogColor = [0, 0, 0, 1];
+        this.fogAmount = 0;
         image_draw_infos[this.id] = this;
         return true;
     }
@@ -508,6 +514,7 @@ class blue_square {
         if (object == undefined) object = {};
         const WIDTH_GAME_BLOCKS = object.gameBlockWidth ?? 2;
         const HEIGHT_GAME_BLOCKS = object.gameBlockHeight ?? 2;
+        this.scale = 1;
         this.width = object.width ?? WIDTH_GAME_BLOCKS * BLOCK_WIDTH;
         this.height = object.height ?? HEIGHT_GAME_BLOCKS * BLOCK_HEIGHT;
         this.gl = document.querySelector("#game-canvas").getContext("webgl2");
@@ -800,6 +807,15 @@ class blue_square {
         this.distFromStartX = this.x - mouseStartX_Y.x;
         this.distFromStartY = this.y - mouseStartX_Y.y;
     }
+    setScale(multiplier) {
+        this.scale *= multiplier;
+        // this.x = ;
+        // this.y = ;
+        // this.width = ;
+        // this.height = ;
+        this.originalX = copy(this.x);
+        this.originalY = copy(this.y);
+    }
 }
 
 function renderGame() {
@@ -996,6 +1012,21 @@ function afkTime(since) {
     seconds = seconds > 0? `${seconds} ${seconds === 1? 'second' : 'seconds'} ` : '';
     const timeSince = `${days}${hours}${minutes}${seconds}`;
     return timeSince;
+}
+
+function setScales(multiplier) {
+    for (const building_key of Object.keys(buildings)) {
+        let building = buildings[building_key];
+        building.setScale(multiplier);
+    }
+    for (const shape_key of Object.keys(shapes)) {
+        let shape = shapes[shape_key];
+        shape.setScale(multiplier);
+    }
+    for (const image_key of Object.keys(image_draw_infos)) {
+        let image = image_draw_infos[image_key];
+        image.setScale(multiplier);
+    }
 }
 
 renderGame();

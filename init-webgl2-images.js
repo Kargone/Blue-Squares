@@ -22,10 +22,14 @@ in vec2 v_texcoord;
 
 uniform sampler2D u_texture;
 
+uniform vec4 u_fogColor;
+uniform float u_fogAmount;
+
 out vec4 outColor;
 
 void main() {
-   outColor = texture(u_texture, v_texcoord);
+  vec4 color = texture(u_texture, v_texcoord);
+  outColor = mix(color, u_fogColor, u_fogAmount);  
 }
 `;
 
@@ -58,6 +62,8 @@ function main() {
   // lookup uniforms
   var matrixLocation = gl.getUniformLocation(program, "u_matrix");
   var textureLocation = gl.getUniformLocation(program, "u_texture");
+  var fogColorLocation = gl.getUniformLocation(program, "u_fogColor");
+  var fogAmountLocation = gl.getUniformLocation(program, "u_fogAmount");
 
   // Create a vertex array object (attribute state)
   var vao = gl.createVertexArray();
@@ -135,12 +141,14 @@ function main() {
       var dstY      = drawInfo.y;
       var dstWidth  = drawInfo.textureInfo.width  * drawInfo.xScale;
       var dstHeight = drawInfo.textureInfo.height * drawInfo.yScale;
-
+      var fogColor  = drawInfo.fogColor;
+      var fogAmount = drawInfo.fogAmount;
       drawImage(
         drawInfo.textureInfo.texture,
         drawInfo.textureInfo.width,
         drawInfo.textureInfo.height,
-        dstX, dstY, dstWidth, dstHeight);
+        dstX, dstY, fogColor, fogAmount, 
+        dstWidth, dstHeight);
     });
     dragShape();
     updateResourceDisplays();
@@ -152,7 +160,7 @@ function main() {
 
   // Unlike images, textures do not have a width and height associated
   // with them so we'll pass in the width and height of the texture
-  function drawImage(tex, texWidth, texHeight, dstX, dstY, dstWidth, dstHeight) {
+  function drawImage(tex, texWidth, texHeight, dstX, dstY, fogColor, fogAmount, dstWidth, dstHeight) {
     if (dstWidth === undefined) {
       dstWidth = texWidth;
     }
@@ -169,6 +177,10 @@ function main() {
     var textureUnit = 0;
     // The the shader we're putting the texture on texture unit 0
     gl.uniform1i(textureLocation, textureUnit);
+
+    // set the fog color and amount
+    gl.uniform4fv(fogColorLocation, fogColor);
+    gl.uniform1f(fogAmountLocation, fogAmount);
 
     // Bind the texture to texture unit 0
     gl.activeTexture(gl.TEXTURE0 + textureUnit);
