@@ -177,14 +177,14 @@ for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_gr
     }    
 }
 
-for (let _ = 0; _ < 20; _++) {
-    const _x = getRandomInt(GAME_BLOCK_AMOUNT_WIDTH / 2) * 2;
-    const _y = getRandomInt(GAME_BLOCK_AMOUNT_HEIGHT / 2) * 2;
-    grass_grid[_y][_x] = 'o';
-    grass_grid[_y][_x + 1] = 'o';
-    grass_grid[_y + 1][_x] = 'o';
-    grass_grid[_y + 1][_x + 1] = 'o';
-}
+// for (let _ = 0; _ < 20; _++) {
+//     const _x = getRandomInt(GAME_BLOCK_AMOUNT_WIDTH / 2) * 2;
+//     const _y = getRandomInt(GAME_BLOCK_AMOUNT_HEIGHT / 2) * 2;
+//     grass_grid[_y][_x] = 'o';
+//     grass_grid[_y][_x + 1] = 'o';
+//     grass_grid[_y + 1][_x] = 'o';
+//     grass_grid[_y + 1][_x + 1] = 'o';
+// }
 
 class rect {
     constructor(x, y, width, height, rgb) {
