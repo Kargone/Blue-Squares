@@ -118,7 +118,8 @@ let user_settings = {
     'notification-deletion': true,
     'no-delete': false,
     'double-tap-delete': true,
-    'no-square-movement': false
+    'no-square-movement': false,
+    'open-square-after-move': true
 }
 // const grass_grid = [
 //     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o',''],
@@ -952,14 +953,13 @@ function eventListners() {
         }
         if (!user_settings['no-delete']) {
             document.getElementById('double-delete-container').className = 'toggle';
-            document.getElementById('double-delete-container').style.height = '18px';
-            document.getElementById('double-delete-container').style.opacity = '1';
-            document.getElementById('double-delete-container').style.display = 'block';
         } else {
-            document.getElementById('double-delete-container').className = 'toggle';
-            document.getElementById('double-delete-container').style.height = '0px';
-            document.getElementById('double-delete-container').style.opacity = '0';
-            document.getElementById('double-delete-container').style.display = 'none';
+            document.getElementById('double-delete-container').className = 'toggle collasped-selector';
+        }
+        if (!user_settings['no-square-movement']) {
+            document.getElementById('open-square-after-move-container').className = 'toggle';
+        } else {
+            document.getElementById('open-square-after-move-container').className = 'toggle collasped-selector';
         }
     });
 
@@ -982,10 +982,15 @@ function eventListners() {
                 }
             } else if (type === 'no-delete') {
                 if (!user_settings[type]) {
-                    document.getElementById('double-delete-container').style.display = 'block';
-                    document.getElementById('double-delete-container').className = 'toggle collapse-double-delete uncollapse-double-delete';
+                    document.getElementById('double-delete-container').className = 'toggle collapse-selector uncollapse-selector';
                 } else {
-                    document.getElementById('double-delete-container').className = 'toggle collapse-double-delete';
+                    document.getElementById('double-delete-container').className = 'toggle collapse-selector';
+                }
+            } else if (type === 'no-square-movement') {
+                if (!user_settings[type]) {
+                    document.getElementById('open-square-after-move-container').className = 'toggle collapse-selector uncollapse-selector';
+                } else {
+                    document.getElementById('open-square-after-move-container').className = 'toggle collapse-selector';
                 }
             }
         });

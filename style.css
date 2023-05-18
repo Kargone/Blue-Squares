@@ -725,12 +725,18 @@
     width: 180px;
 }
 
-.collapse-double-delete {
-    animation: hideDoubleDelete 1s;
+.collasped-selector {
+    height: 0px;
+    opacity: 0;
+    display: none;
+}
+
+.collapse-selector {
+    animation: hideSelector 1s;
     animation-fill-mode: forwards;
 }
 
-@keyframes hideDoubleDelete {
+@keyframes hideSelector {
     0%{
         height: 18px;
         opacity: 1;
@@ -745,12 +751,12 @@
     }
 }
 
-.uncollapse-double-delete {
-    animation: showDoubleDelete 1s;
+.uncollapse-selector {
+    animation: showSelector 1s;
     animation-fill-mode: forwards;
 }
 
-@keyframes showDoubleDelete {
+@keyframes showSelector {
     0%{
         height: 0px;
         opacity: 0;

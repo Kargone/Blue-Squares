@@ -288,7 +288,7 @@ function main() {
       if (building.checkForMouseHover()) {
         building.displaySquare();
         building_info_open = true;
-        document.getElementById("building-info").className = "collapse-building-info open-building-info";
+        if (user_settings['open-square-after-move']) document.getElementById("building-info").className = "collapse-building-info open-building-info";
         break;
       }
     }
