@@ -16,15 +16,15 @@ window.addEventListener('resize', () => {
     body.style.height = window.innerHeight + 'px';
 });
 
-const GAME_BLOCK_AMOUNT_WIDTH = 16;
-const GAME_BLOCK_AMOUNT_HEIGHT = 16;
+const GAME_BLOCK_AMOUNT_WIDTH = 4;
+const GAME_BLOCK_AMOUNT_HEIGHT = 3;
 const BLOCK_WIDTH = 30;
 const BLOCK_HEIGHT = 30;
 const GAME_BORDER = 4;
 
 shapes = {};
 buildings = {};
-let global_scale = 0.5;
+let global_scale = 5;
 grid = {
     'x': (GAME_BORDER) * BLOCK_WIDTH * global_scale, 
     'y': (GAME_BORDER) * BLOCK_HEIGHT * global_scale,
@@ -528,7 +528,7 @@ class grass_block {
     }
 }
 
-class blue_square {
+class square {
     constructor(object) {
         if (object == undefined) object = {};
         const WIDTH_GAME_BLOCKS = object.gameBlockWidth ?? 2;
@@ -560,7 +560,9 @@ class blue_square {
             grid[`${this.coordX + 1}_${this.coordY}`] = 'blue_square';
             grid[`${this.coordX}_${this.coordY + 1}`] = 'blue_square';
             grid[`${this.coordX + 1}_${this.coordY + 1}`] = 'blue_square';
-        } else this.assignCoords();
+        } else {
+            if (!this.assignCoords()) return this.removed = true;
+        }
         this.level = object.level ?? 1;
         this.maxLevel = object.maxLevel ?? 10;
         this.color = object.color ?? 'Blue';
@@ -607,6 +609,7 @@ class blue_square {
         `;
         this.createdOn = object.timeCreated ?? getTime();
         buildings[this.id] = this;
+        return this.removed = false;
     }
     assignCoords() {
         for (let x_y of Object.keys(grid)) {
@@ -627,12 +630,10 @@ class blue_square {
             grid[`${gridX + 1}_${gridY + 1}`] = 'blue_square';
             this.coordX = gridX;
             this.coordY = gridY;
-            return;
+            return true;
         }
         notification('Cannot be created');
-        delete buildings[THIS_SQUARE.id];
-        delete shapes[THIS_SQUARE.outelineId];
-        delete shapes[THIS_SQUARE.squareId];
+        return false;
     }
     checkForMouseHover() {
         if (user_settings['no-square-movement']) return;
@@ -793,14 +794,7 @@ class blue_square {
             let delete_button = document.getElementById("building-info-delete");
             if (user_settings['no-delete']) return delete_button.addEventListener('click', THIS_SQUARE.deleteButtonListner, {'once': true});
             THIS_SQUARE.deleteButtonListner = function deleteSquare() {
-                delete buildings[THIS_SQUARE.id];
-                delete shapes[THIS_SQUARE.outelineId];
-                delete shapes[THIS_SQUARE.squareId];
-                currencies[`${THIS_SQUARE.color.toLowerCase()}_squares`] += THIS_SQUARE.totalCost;
-                document.getElementById(`resource-display-${THIS_SQUARE.id}`).remove();
-                THIS_SQUARE.removeUpgradeListener();
-                document.getElementById('building-info-no-content').style.display = 'block';
-                document.getElementById('building-info-content').style.visibility = 'hidden';
+                THIS_SQUARE.remove();
             }
             if (!user_settings['double-tap-delete']) return THIS_SQUARE.deleteButtonListner();
             if (user_settings['notification-deletion'] && user_settings['all-notifications']) notification('Are you sure?');
@@ -815,6 +809,20 @@ class blue_square {
     removeDeleteListener() {
         let delete_button = document.getElementById("building-info-delete");
         delete_button.removeEventListener('click', this.deleteButtonListner);
+    }
+    remove() {
+        delete buildings[this.id];
+        delete shapes[this.outelineId];
+        delete shapes[this.squareId];
+        currencies[`${this.color.toLowerCase()}_squares`] += this.totalCost;
+        document.getElementById(`resource-display-${this.id}`).remove();
+        this.removeUpgradeListener();
+        document.getElementById('building-info-no-content').style.display = 'block';
+        document.getElementById('building-info-content').style.visibility = 'hidden';
+        grid[`${this.coordX}_${this.coordY}`] = '';
+        grid[`${this.coordX + 1}_${this.coordY}`] = '';
+        grid[`${this.coordX}_${this.coordY + 1}`] = '';
+        grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
     }
     updateResourceDisplay() {
         document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 2.5 * 2 * global_scale) + 'px';
@@ -905,7 +913,8 @@ function eventListners() {
                 user_settings['notification-not-enough-new-square'] &&
                 user_settings['all-notifications']) return notification('Not enough resources');
             if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`]) return;
-            new blue_square({'color': color});
+            const new_square = new square({'color': color});
+            if  (new_square.removed) return;
             currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_squares`];
             buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
             document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${buy_costs[`${color.toLowerCase()}_squares`]}`;
@@ -985,10 +994,6 @@ function eventListners() {
     for (const type of Object.keys(user_settings)) {
         document.getElementById(`${type}-toggle`).checked = user_settings[type];
     }
-
-    // document.getElementById("settings-tab-container").addEventListener('click', function () {
-    //     document.getElementById("settings-tab-container").style.display = 'none';
-    // });
     
     document.getElementById("leaderboard").addEventListener('click', function () {
         document.getElementById("leaderboard-tab-container").style.display = 'block';
@@ -1001,10 +1006,6 @@ function eventListners() {
     document.getElementById("leaderboard-tab-close").addEventListener('click', function () {
         document.getElementById("leaderboard-tab-container").style.display = 'none';
     });
-    
-    // document.getElementById("leaderboard-tab-container").addEventListener('click', function () {
-    //     document.getElementById("leaderboard-tab-container").style.display = 'none';
-    // });
 }
 
 function getTime() {
