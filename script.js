@@ -24,9 +24,10 @@ const GAME_BORDER = 4;
 
 shapes = {};
 buildings = {};
+let global_scale = 0.5;
 grid = {
-    'x': (GAME_BORDER) * BLOCK_WIDTH, 
-    'y': (GAME_BORDER) * BLOCK_HEIGHT,
+    'x': (GAME_BORDER) * BLOCK_WIDTH * global_scale, 
+    'y': (GAME_BORDER) * BLOCK_HEIGHT * global_scale,
     'distFromStartX': -1,
     'distFromStartY': -1,
 };
@@ -151,7 +152,6 @@ let user_settings = {
 //     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o']
 // ];
 let grass_grid = [];
-let global_scale = 1;
 
 for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
     grass_grid[grass_grid_y] = [];
@@ -263,8 +263,8 @@ class grass_block {
         this.y = y ?? 0;
         this.distFromStartX = -1;
         this.distFromStartY = -1;
-        this.width = width ?? BLOCK_WIDTH;
-        this.height = height ?? BLOCK_HEIGHT;
+        this.width = width ?? BLOCK_WIDTH * global_scale;
+        this.height = height ?? BLOCK_HEIGHT * global_scale;
         this.id = getRandomInt();
     }
     drawGrass(coordX, coordY) {
@@ -276,7 +276,7 @@ class grass_block {
         this.gridX = coordX - GAME_BORDER - 1;
         this.gridY = coordY - GAME_BORDER - 1;
         if (grass_grid[coordY - GAME_BORDER][coordX - GAME_BORDER] != 'o') {
-            const DO_SHADE = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
+            const DO_SHADE = ((this.x / (BLOCK_WIDTH * global_scale)) + (this.y / (BLOCK_HEIGHT * global_scale))) % 2;
             grid[`${coordX - GAME_BORDER}_${coordY - GAME_BORDER}`] = '';
             if (DO_SHADE === 0) return this.drawGrassImage(textureInfos.inner.dark[getRandomInt(2)]);
             if (DO_SHADE === 1) return this.drawGrassImage(textureInfos.inner.light[getRandomInt(2)]);
@@ -602,7 +602,7 @@ class blue_square {
         document.getElementById('resource-displays').innerHTML += `
             <div id="resource-display-${this.id}" class="resource-display">+
                 <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
-                <div id="building-info-delete-resource-icon" class="resource-icon ${this.color.toLowerCase()}">
+                <div id="resource-display-resource-icon-${this.id}" class="resource-icon ${this.color.toLowerCase()}">
             </div>
         `;
         this.createdOn = object.timeCreated ?? getTime();
@@ -644,8 +644,8 @@ class blue_square {
             this.selected = false;
             return false;
         }
-        if ((this.x - (20 * global_scale) < mouseX) && (mouseX < this.x + this.width + (20 * global_scale))) {
-            if ((this.y - (20 * global_scale) < mouseY) && (mouseY < this.y + this.height + (20 * global_scale))) {
+        if ((this.x < mouseX) && (mouseX < this.x + this.width)) {
+            if ((this.y < mouseY) && (mouseY < this.y + this.height)) {
                 if ((mouseX > grid.x) && (mouseY > grid.y) && (mouseX < grid.x + BLOCK_WIDTH * global_scale * GAME_BLOCK_AMOUNT_WIDTH) && (mouseY < grid.y + BLOCK_HEIGHT * global_scale * GAME_BLOCK_AMOUNT_HEIGHT)) {
                     if (!this.selected) {
                         grid[`${this.coordX}_${this.coordY}`] = '';
@@ -817,8 +817,12 @@ class blue_square {
         delete_button.removeEventListener('click', this.deleteButtonListner);
     }
     updateResourceDisplay() {
-        document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 5 * global_scale) + 'px';
-        document.getElementById(`resource-display-${this.id}`).style.left = (this.x + 2 * global_scale)+ 'px';
+        document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 2.5 * 2 * global_scale) + 'px';
+        document.getElementById(`resource-display-${this.id}`).style.left = (this.x + 1 * 2 * global_scale) + 'px';
+        document.getElementById(`resource-display-${this.id}`).style.fontSize = (20 * global_scale) + 'px';
+        document.getElementById(`resource-display-resource-icon-${this.id}`).style.height = (10 * global_scale) + 'px';
+        document.getElementById(`resource-display-resource-icon-${this.id}`).style.width = (10 * global_scale) + 'px';
+        document.getElementById(`resource-display-resource-icon-${this.id}`).style.borderWidth = (2 * global_scale) + 'px';
     }
     translateX_YfromStartX_Y(x, y) {
         this.x = mouseStartX_Y.x + x + this.distFromStartX;
@@ -846,7 +850,12 @@ class blue_square {
 function renderGame() {
     for (let current_block_y = 1; current_block_y <= GAME_BLOCK_AMOUNT_HEIGHT + GAME_BORDER * 2; current_block_y++) {
         for (let current_block_x = 1; current_block_x <= GAME_BLOCK_AMOUNT_WIDTH + GAME_BORDER * 2; current_block_x++) {
-            const BLOCK = new grass_block((current_block_x - 1) * BLOCK_WIDTH, (current_block_y - 1) * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
+            const BLOCK = new grass_block(
+                (current_block_x - 1) * BLOCK_WIDTH * global_scale, 
+                (current_block_y - 1) * BLOCK_HEIGHT * global_scale, 
+                BLOCK_WIDTH * global_scale, 
+                BLOCK_HEIGHT * global_scale
+            );
             BLOCK.drawGrass(current_block_x, current_block_y);
         }
     }
