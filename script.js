@@ -178,6 +178,7 @@ for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_gr
 // }
 
 window.addEventListener('wheel', function(event) {
+    if (mouse_down) return;
     if (event.deltaY < 0) {
         // console.log('scrolling up');
         const multiplier = 1.1;
@@ -272,6 +273,8 @@ class grass_block {
             (coordY < GAME_BORDER) ||
             (coordY > GAME_BLOCK_AMOUNT_HEIGHT + (GAME_BORDER + 1))
             ) return this.drawGrassImage(textureInfos.outer.outside[getRandomInt(5)]);
+        this.gridX = coordX - GAME_BORDER - 1;
+        this.gridY = coordY - GAME_BORDER - 1;
         if (grass_grid[coordY - GAME_BORDER][coordX - GAME_BORDER] != 'o') {
             const DO_SHADE = ((this.x / BLOCK_WIDTH) + (this.y / BLOCK_HEIGHT)) % 2;
             grid[`${coordX - GAME_BORDER}_${coordY - GAME_BORDER}`] = '';
@@ -501,8 +504,8 @@ class grass_block {
         image_draw_infos[this.id] = this;
         return true;
     }
-    setTextureInfo(textureInfo) {
-        image_draw_infos[this.id].textureInfo = textureInfo;
+    updateInfo() {
+        image_draw_infos[this.id] = this;
     }
     translateX_YfromStartX_Y(x, y) {
         if (user_settings['no-square-movement']) return;

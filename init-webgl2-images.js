@@ -275,6 +275,12 @@ function main() {
   gl.canvas.addEventListener('touchend', (e) => {
     mouseEnd();
   });
+  document.addEventListener('mouseup', function () {
+    mouseEnd();
+  });
+  document.addEventListener('touchend', function () {
+    mouseEnd();
+  });
   function mouseEnd() {
     if (!mouse_down) return;
     for (let building_key of Object.keys(buildings)) {
