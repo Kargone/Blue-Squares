@@ -16,8 +16,8 @@ window.addEventListener('resize', () => {
     body.style.height = window.innerHeight + 'px';
 });
 
-const GAME_BLOCK_AMOUNT_WIDTH = 4;
-const GAME_BLOCK_AMOUNT_HEIGHT = 3;
+const GAME_BLOCK_AMOUNT_WIDTH = 3;
+const GAME_BLOCK_AMOUNT_HEIGHT = 4;
 const BLOCK_WIDTH = 30;
 const BLOCK_HEIGHT = 30;
 const GAME_BORDER = 4;
@@ -160,7 +160,7 @@ for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_gr
             grass_grid[grass_grid_y][grass_grid_x] = 'o';
             continue;
         }
-        if ((grass_grid_x === 0) || (grass_grid_x === GAME_BLOCK_AMOUNT_HEIGHT + 1)) { 
+        if ((grass_grid_x === 0) || (grass_grid_x === GAME_BLOCK_AMOUNT_WIDTH + 1)) { 
             grass_grid[grass_grid_y][grass_grid_x] = 'o';
             continue;
         }
