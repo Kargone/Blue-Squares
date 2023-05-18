@@ -24,7 +24,7 @@ const GAME_BORDER = 4;
 
 shapes = {};
 buildings = {};
-let global_scale = 5;
+let global_scale = 3;
 grid = {
     'x': (GAME_BORDER) * BLOCK_WIDTH * global_scale, 
     'y': (GAME_BORDER) * BLOCK_HEIGHT * global_scale,
@@ -643,6 +643,7 @@ class square {
                 this.checkXandY();
             }
             document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
+            this.removeHighlightUnder();
             this.selected = false;
             return false;
         }
@@ -656,6 +657,7 @@ class square {
                         grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
                     }
                     document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
+                    this.highlightGreenUnder();
                     this.selected = true;
                     return true;
                 }
@@ -665,15 +667,34 @@ class square {
             this.checkXandY();
         }
         document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
+        this.removeHighlightUnder();
         this.selected = false;
         return false;
     }
+    highlightGreenUnder() {
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].fogAmount = 0.5;
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].fogColor = [0, 1, 0, 1];
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].fogAmount = 0.5;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].fogColor = [0, 1, 0, 1];
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].fogAmount = 0.5;
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].fogColor = [0, 1, 0, 1];
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].fogAmount = 0.5;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].fogColor = [0, 1, 0, 1];
+    }
+    removeHighlightUnder() {
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].fogAmount = 0;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].fogAmount = 0;
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].fogAmount = 0;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].fogAmount = 0;
+    }
     updateXandY() {
+        this.removeHighlightUnder();
         this.x = Math.round((mouseX - this.width / 2) / (BLOCK_WIDTH * global_scale)) * BLOCK_WIDTH * global_scale;
         this.y = Math.round((mouseY - this.height / 2) / (BLOCK_HEIGHT * global_scale)) * BLOCK_HEIGHT * global_scale;
         this.setCoordXandY();
         this.x = (this.coordX - 1) * BLOCK_WIDTH * global_scale + grid.x;
         this.y = (this.coordY - 1) * BLOCK_HEIGHT * global_scale + grid.y;
+        if (this.selected) this.highlightGreenUnder();
         let outline_object = shapes[this.outelineId];
         outline_object.x = this.x + this.blockInline;
         outline_object.y = this.y + this.blockInline;
@@ -1070,6 +1091,13 @@ function setScales(multiplier) {
     grid.x = multiplier * (grid.x - mouseX) + mouseX;
     grid.y = multiplier * (grid.y - mouseY) + mouseY;
     global_scale *= multiplier;
+}
+
+function getGrassBlockId(gridX, gridY) {
+    for (const image_key of Object.keys(image_draw_infos)) {
+        let image = image_draw_infos[image_key];
+        if ((image.gridX === gridX) && (image.gridY === gridY)) return image.id;
+    }
 }
 
 renderGame();
