@@ -151,6 +151,7 @@ let user_settings = {
 //     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o']
 // ];
 let grass_grid = [];
+let global_scale = 1;
 
 for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
     grass_grid[grass_grid_y] = [];
@@ -178,13 +179,13 @@ for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_gr
 
 window.addEventListener('wheel', function(event) {
     if (event.deltaY < 0) {
-        console.log('scrolling up');
+        // console.log('scrolling up');
         const multiplier = 1.1;
-        // setScales(multiplier);
+        setScales(multiplier);
     } else if (event.deltaY > 0) {
-        console.log('scrolling down');
+        // console.log('scrolling down');
         const multiplier = 0.9;
-        // setScales(multiplier);
+        setScales(multiplier);
     }
 });
 
@@ -244,6 +245,13 @@ class rect {
     updateDistFromStartX_Y() {
         this.distFromStartX = this.x - mouseStartX_Y.x;
         this.distFromStartY = this.y - mouseStartX_Y.y;
+    }
+    setScale(multiplier) {
+        this.scale *= multiplier;
+        this.width = this.width * multiplier;
+        this.height = this.height * multiplier;
+        this.x = multiplier * (this.x - mouseX) + mouseX;
+        this.y = multiplier * (this.y - mouseY) + mouseY;
     }
 }
 
@@ -500,12 +508,20 @@ class grass_block {
         if (user_settings['no-square-movement']) return;
         this.x = mouseStartX_Y.x + x + this.distFromStartX;
         this.y = mouseStartX_Y.y + y + this.distFromStartY;
-        image_draw_infos[this.id]['x'] = this.x;
-        image_draw_infos[this.id]['y'] = this.y;
     }
     updateDistFromStartX_Y() {
         this.distFromStartX = this.x - mouseStartX_Y.x;
         this.distFromStartY = this.y - mouseStartX_Y.y;
+    }
+    setScale(multiplier) {
+        this.scale = multiplier;
+        this.width *= multiplier;
+        this.height *= multiplier;
+        this.xScale = this.width / 300;
+        this.yScale = this.height / 300;
+        this.x = multiplier * (this.x - mouseX) + mouseX;
+        this.y = multiplier * (this.y - mouseY) + mouseY;
+
     }
 }
 
@@ -514,9 +530,9 @@ class blue_square {
         if (object == undefined) object = {};
         const WIDTH_GAME_BLOCKS = object.gameBlockWidth ?? 2;
         const HEIGHT_GAME_BLOCKS = object.gameBlockHeight ?? 2;
-        this.scale = 1;
-        this.width = object.width ?? WIDTH_GAME_BLOCKS * BLOCK_WIDTH;
-        this.height = object.height ?? HEIGHT_GAME_BLOCKS * BLOCK_HEIGHT;
+        this.scale = global_scale;
+        this.width = object.width ?? WIDTH_GAME_BLOCKS * BLOCK_WIDTH * global_scale;
+        this.height = object.height ?? HEIGHT_GAME_BLOCKS * BLOCK_HEIGHT * global_scale;
         this.gl = document.querySelector("#game-canvas").getContext("webgl2");
         this.colorLocation = '';
         this.x = object.x ?? 100;
@@ -533,8 +549,8 @@ class blue_square {
                 (grid[`${this.coordX}_${this.coordY + 1}`] != '') ||
                 (grid[`${this.coordX + 1}_${this.coordY + 1}`] != '')
                 ) this.assignCoords();
-            this.x = (this.coordX - 1) * BLOCK_WIDTH + grid.x;
-            this.y = (this.coordY - 1) * BLOCK_HEIGHT + grid.y;
+            this.x = (this.coordX - 1) * BLOCK_WIDTH * global_scale + grid.x;
+            this.y = (this.coordY - 1) * BLOCK_HEIGHT * global_scale + grid.y;
             this.originalX = copy(this.x);
             this.originalY = copy(this.y);
             grid[`${this.coordX}_${this.coordY}`] = 'blue_square';
@@ -551,8 +567,8 @@ class blue_square {
         this.r = object.r ?? colors[this.color]['r'] + (this.level - 1) * this.rChangePerLevel;
         this.g = object.g ?? colors[this.color]['g'] + (this.level - 1) * this.gChangePerLevel;
         this.b = object.b ?? colors[this.color]['b'] + (this.level - 1) * this.bChangePerLevel;
-        const BLOCK_INLINE = 24 - this.level * 2;
-        const BORDER_WIDTH = 2;
+        const BLOCK_INLINE = (24 - this.level * 2) * global_scale;
+        const BORDER_WIDTH = 2 * global_scale;
         this.blockInline = BLOCK_INLINE;
         this.borderWidth = BORDER_WIDTH;
         const OUTLINE = new rect(
@@ -598,8 +614,8 @@ class blue_square {
             if (grid[`${gridX + 1}_${gridY}`] != '') continue;
             if (grid[`${gridX}_${gridY + 1}`] != '') continue;
             if (grid[`${gridX + 1}_${gridY + 1}`] != '') continue;
-            this.x = (gridX - 1) * BLOCK_WIDTH + grid.x;
-            this.y = (gridY - 1) * BLOCK_HEIGHT + grid.y;
+            this.x = (gridX - 1) * BLOCK_WIDTH * global_scale + grid.x;
+            this.y = (gridY - 1) * BLOCK_HEIGHT * global_scale + grid.y;
             this.originalX = copy(this.x);
             this.originalY = copy(this.y);
             grid[`${gridX}_${gridY}`] = 'blue_square';
@@ -625,17 +641,19 @@ class blue_square {
             this.selected = false;
             return false;
         }
-        if ((this.x - 20 < mouseX) && (mouseX < this.x + this.width + 20)) {
-            if ((this.y - 20 < mouseY) && (mouseY < this.y + this.height + 20)) {
-                if (!this.selected) {
-                    grid[`${this.coordX}_${this.coordY}`] = '';
-                    grid[`${this.coordX + 1}_${this.coordY}`] = '';
-                    grid[`${this.coordX}_${this.coordY + 1}`] = '';
-                    grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
+        if ((this.x - (20 * global_scale) < mouseX) && (mouseX < this.x + this.width + (20 * global_scale))) {
+            if ((this.y - (20 * global_scale) < mouseY) && (mouseY < this.y + this.height + (20 * global_scale))) {
+                if ((mouseX > grid.x) && (mouseY > grid.y) && (mouseX < grid.x + BLOCK_WIDTH * global_scale * GAME_BLOCK_AMOUNT_WIDTH) && (mouseY < grid.y + BLOCK_HEIGHT * global_scale * GAME_BLOCK_AMOUNT_HEIGHT)) {
+                    if (!this.selected) {
+                        grid[`${this.coordX}_${this.coordY}`] = '';
+                        grid[`${this.coordX + 1}_${this.coordY}`] = '';
+                        grid[`${this.coordX}_${this.coordY + 1}`] = '';
+                        grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
+                    }
+                    document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
+                    this.selected = true;
+                    return true;
                 }
-                document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
-                this.selected = true;
-                return true;
             }
         }
         if (this.selected) {
@@ -646,11 +664,11 @@ class blue_square {
         return false;
     }
     updateXandY() {
-        this.x = Math.round((mouseX - this.width / 2) / BLOCK_WIDTH) * BLOCK_WIDTH;
-        this.y = Math.round((mouseY - this.height / 2) / BLOCK_HEIGHT) * BLOCK_HEIGHT;
+        this.x = Math.round((mouseX - this.width / 2) / (BLOCK_WIDTH * global_scale)) * BLOCK_WIDTH * global_scale;
+        this.y = Math.round((mouseY - this.height / 2) / (BLOCK_HEIGHT * global_scale)) * BLOCK_HEIGHT * global_scale;
         this.setCoordXandY();
-        this.x = (this.coordX - 1) * BLOCK_WIDTH + grid.x;
-        this.y = (this.coordY - 1) * BLOCK_HEIGHT + grid.y;
+        this.x = (this.coordX - 1) * BLOCK_WIDTH * global_scale + grid.x;
+        this.y = (this.coordY - 1) * BLOCK_HEIGHT * global_scale + grid.y;
         let outline_object = shapes[this.outelineId];
         outline_object.x = this.x + this.blockInline;
         outline_object.y = this.y + this.blockInline;
@@ -695,8 +713,8 @@ class blue_square {
         }
     }
     setCoordXandY() {
-        this.coordX = Math.round((this.x - grid.x) / BLOCK_WIDTH) + 1;
-        this.coordY = Math.round((this.y - grid.y) / BLOCK_WIDTH) + 1;
+        this.coordX = Math.round((this.x - grid.x) / (BLOCK_WIDTH * global_scale)) + 1;
+        this.coordY = Math.round((this.y - grid.y) / (BLOCK_WIDTH * global_scale)) + 1;
     }
     upResource() {
         currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond;
@@ -714,7 +732,7 @@ class blue_square {
         this.earningsPerHour = this.earningsPerSecond * 3600;
         this.nextLevelUpgradeCost += 1;
         this.level += 1;
-        this.blockInline -= 2;
+        this.blockInline -= 2 * global_scale;
         this.r += this.rChangePerLevel;
         this.g += this.gChangePerLevel;
         this.b += this.bChangePerLevel;
@@ -796,8 +814,8 @@ class blue_square {
         delete_button.removeEventListener('click', this.deleteButtonListner);
     }
     updateResourceDisplay() {
-        document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 5) + 'px';
-        document.getElementById(`resource-display-${this.id}`).style.left = (this.x + 2)+ 'px';
+        document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 5 * global_scale) + 'px';
+        document.getElementById(`resource-display-${this.id}`).style.left = (this.x + 2 * global_scale)+ 'px';
     }
     translateX_YfromStartX_Y(x, y) {
         this.x = mouseStartX_Y.x + x + this.distFromStartX;
@@ -811,12 +829,14 @@ class blue_square {
     }
     setScale(multiplier) {
         this.scale *= multiplier;
-        // this.x = ;
-        // this.y = ;
-        // this.width = ;
-        // this.height = ;
+        this.width = this.width * multiplier;
+        this.height = this.height * multiplier;
+        this.x = multiplier * (this.x - mouseX) + mouseX;
+        this.y = multiplier * (this.y - mouseY) + mouseY;
         this.originalX = copy(this.x);
         this.originalY = copy(this.y);
+        this.blockInline *= multiplier;
+        this.borderWidth *= multiplier;
     }
 }
 
@@ -1029,6 +1049,9 @@ function setScales(multiplier) {
         let image = image_draw_infos[image_key];
         image.setScale(multiplier);
     }
+    grid.x = multiplier * (grid.x - mouseX) + mouseX;
+    grid.y = multiplier * (grid.y - mouseY) + mouseY;
+    global_scale *= multiplier;
 }
 
 renderGame();
