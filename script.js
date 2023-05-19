@@ -279,8 +279,8 @@ class grass_block {
         if (grass_grid[coordY - GAME_BORDER][coordX - GAME_BORDER] != 'o') {
             const DO_SHADE = ((this.x / (BLOCK_WIDTH * global_scale)) + (this.y / (BLOCK_HEIGHT * global_scale))) % 2;
             grid[`${coordX - GAME_BORDER}_${coordY - GAME_BORDER}`] = '';
-            if (DO_SHADE === 0) return this.drawGrassImage(textureInfos.inner.dark[getRandomInt(2)]);
-            if (DO_SHADE === 1) return this.drawGrassImage(textureInfos.inner.light[getRandomInt(2)]);
+            if (Math.floor(DO_SHADE) === 0) return this.drawGrassImage(textureInfos.inner.dark[getRandomInt(2)]);
+            if (Math.floor(DO_SHADE) === 1) return this.drawGrassImage(textureInfos.inner.light[getRandomInt(2)]);
         }
         coordX -= GAME_BORDER;
         coordY -= GAME_BORDER;
@@ -527,6 +527,13 @@ class grass_block {
         this.y = multiplier * (this.y - mouseY) + mouseY;
 
     }
+    highlight(fogColor, fogAmount = 0.3) {
+        this.fogColor = fogColor;
+        this.fogAmount = fogAmount;
+    }
+    removeHighlight() {
+        this.fogAmount = 0;
+    }
 }
 
 class square {
@@ -643,12 +650,12 @@ class square {
                 this.checkXandY();
             }
             document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
-            this.removeHighlightUnder();
+            this.removeHighlights();
             this.selected = false;
             return false;
         }
-        if ((this.x < mouseX) && (mouseX < this.x + this.width)) {
-            if ((this.y < mouseY) && (mouseY < this.y + this.height)) {
+        if ((this.x - 10 < mouseX) && (mouseX < this.x + this.width + 10)) {
+            if ((this.y - 10 < mouseY) && (mouseY < this.y + this.height + 10)) {
                 if ((mouseX > grid.x) && (mouseY > grid.y) && (mouseX < grid.x + BLOCK_WIDTH * global_scale * GAME_BLOCK_AMOUNT_WIDTH) && (mouseY < grid.y + BLOCK_HEIGHT * global_scale * GAME_BLOCK_AMOUNT_HEIGHT)) {
                     if (!this.selected) {
                         grid[`${this.coordX}_${this.coordY}`] = '';
@@ -657,7 +664,7 @@ class square {
                         grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
                     }
                     document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
-                    this.highlightGreenUnder();
+                    this.addHighlights();
                     this.selected = true;
                     return true;
                 }
@@ -667,34 +674,47 @@ class square {
             this.checkXandY();
         }
         document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
-        this.removeHighlightUnder();
+        this.removeHighlights();
         this.selected = false;
         return false;
     }
-    highlightGreenUnder() {
-        image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].fogAmount = 0.5;
-        image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].fogColor = [0, 1, 0, 1];
-        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].fogAmount = 0.5;
-        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].fogColor = [0, 1, 0, 1];
-        image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].fogAmount = 0.5;
-        image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].fogColor = [0, 1, 0, 1];
-        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].fogAmount = 0.5;
-        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].fogColor = [0, 1, 0, 1];
+    addHighlights() {
+        for (let x_y of Object.keys(grid)) {
+            x_y = x_y.split('_');
+            const gridX = parseInt(x_y[0]);
+            const gridY = parseInt(x_y[1]);
+            if (grid[`${gridX}_${gridY}`] === '') image_draw_infos[getGrassBlockId(gridX - 1, gridY - 1)].highlight([1, 1, 1, 1]);
+        }
+        this.highlightUnder();
     }
-    removeHighlightUnder() {
-        image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].fogAmount = 0;
-        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].fogAmount = 0;
-        image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].fogAmount = 0;
-        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].fogAmount = 0;
+    highlightUnder() {
+        const top_left_good = grid[`${this.coordX + 1}_${this.coordY + 1}`] === ''; 
+        const top_right_good = grid[`${this.coordX}_${this.coordY + 1}`] === ''; 
+        const bottom_left_good = grid[`${this.coordX + 1}_${this.coordY}`] === ''; 
+        const bottom_right_good = grid[`${this.coordX}_${this.coordY}`] === '';
+        if (top_left_good) image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].highlight([0, 1, 0, 1]);
+            else image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].highlight([1, 0, 0, 1]);
+        if (top_right_good) image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].highlight([0, 1, 0, 1]);
+            else image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].highlight([1, 0, 0, 1]);
+        if (bottom_left_good) image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].highlight([0, 1, 0, 1]);
+            else image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].highlight([1, 0, 0, 1]);
+        if (bottom_right_good) image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].highlight([0, 1, 0, 1]);
+            else image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].highlight([1, 0, 0, 1]);
+    }
+    removeHighlights() {
+        for (const image_key of Object.keys(image_draw_infos)) {
+            let image = image_draw_infos[image_key];
+            image.fogAmount = 0;
+        }
     }
     updateXandY() {
-        this.removeHighlightUnder();
+        this.removeHighlights();
         this.x = Math.round((mouseX - this.width / 2) / (BLOCK_WIDTH * global_scale)) * BLOCK_WIDTH * global_scale;
         this.y = Math.round((mouseY - this.height / 2) / (BLOCK_HEIGHT * global_scale)) * BLOCK_HEIGHT * global_scale;
         this.setCoordXandY();
         this.x = (this.coordX - 1) * BLOCK_WIDTH * global_scale + grid.x;
         this.y = (this.coordY - 1) * BLOCK_HEIGHT * global_scale + grid.y;
-        if (this.selected) this.highlightGreenUnder();
+        if (this.selected) this.addHighlights();
         let outline_object = shapes[this.outelineId];
         outline_object.x = this.x + this.blockInline;
         outline_object.y = this.y + this.blockInline;
@@ -714,6 +734,7 @@ class square {
             (grid[`${this.coordX}_${this.coordY + 1}`] === '') &&
             (grid[`${this.coordX + 1}_${this.coordY + 1}`] === '')
         ) {
+            this.removeHighlights();
             this.originalX = copy(this.x);
             this.originalY = copy(this.y);
             this.setCoordXandY();
@@ -722,6 +743,7 @@ class square {
             grid[`${this.coordX}_${this.coordY + 1}`] = 'blue_square';
             grid[`${this.coordX + 1}_${this.coordY + 1}`] = 'blue_square';
         } else {
+            this.removeHighlights();
             this.x = copy(this.originalX);
             this.y = copy(this.originalY);
             this.setCoordXandY();
