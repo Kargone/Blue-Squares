@@ -936,4 +936,10 @@ bushes - 40, 140, 40, outer width 12, inner is redish adn 150g
 tree - up and down of brown 150, 75, 0 and green 40, 190, 40
 
 {"last_1":"rgb(40,190,40)","last_2":"rgb(40,180,40)","last_3":"rgb(140,240,140)","last_4":"rgb(0,0,0)","last_5":"rgb(0,0,0)"}
+
+"background":"rgb(140,240,140)",
+"bush":"rgb(40,140,40)",
+"grass bits":"rgb(40,180,40)",
+"inner light":"rgb(40,200,40)",
+"bush yellow":"rgb(120,190,70)"
 */

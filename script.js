@@ -24,7 +24,7 @@ const GAME_BORDER = 4;
 
 shapes = {};
 buildings = {};
-let global_scale = 3;
+let global_scale = 2.077719706942689;
 grid = {
     'x': (GAME_BORDER) * BLOCK_WIDTH * global_scale, 
     'y': (GAME_BORDER) * BLOCK_HEIGHT * global_scale,
