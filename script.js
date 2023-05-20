@@ -169,14 +169,14 @@ for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_gr
     }    
 }
 
-// for (let _ = 0; _ < 8; _++) {
-//     const _x = getRandomInt(GAME_BLOCK_AMOUNT_WIDTH / 2) * 2;
-//     const _y = getRandomInt(GAME_BLOCK_AMOUNT_HEIGHT / 2) * 2;
-//     grass_grid[_y][_x] = 'o';
-//     grass_grid[_y][_x + 1] = 'o';
-//     grass_grid[_y + 1][_x] = 'o';
-//     grass_grid[_y + 1][_x + 1] = 'o';
-// }
+for (let _ = 0; _ < 40; _++) {
+    const _x = getRandomInt(GAME_BLOCK_AMOUNT_WIDTH / 2) * 2;
+    const _y = getRandomInt(GAME_BLOCK_AMOUNT_HEIGHT / 2) * 2;
+    grass_grid[_y][_x] = 'o';
+    grass_grid[_y][_x + 1] = 'o';
+    grass_grid[_y + 1][_x] = 'o';
+    grass_grid[_y + 1][_x + 1] = 'o';
+}
 
 window.addEventListener('wheel', function(event) {
     if (mouse_down) return;
@@ -273,14 +273,19 @@ class grass_block {
             (coordX > GAME_BLOCK_AMOUNT_WIDTH + (GAME_BORDER + 1)) ||
             (coordY < GAME_BORDER) ||
             (coordY > GAME_BLOCK_AMOUNT_HEIGHT + (GAME_BORDER + 1))
-            ) return this.drawGrassImage(textureInfos.outer.outside[getRandomInt(5)]);
+            ) return this.drawGrassImage(textureInfos.outer["edge-bush"]);
         this.gridX = coordX - GAME_BORDER - 1;
         this.gridY = coordY - GAME_BORDER - 1;
         if (grass_grid[coordY - GAME_BORDER][coordX - GAME_BORDER] != 'o') {
             const DO_SHADE = ((this.x / (BLOCK_WIDTH * global_scale)) + (this.y / (BLOCK_HEIGHT * global_scale))) % 2;
             grid[`${coordX - GAME_BORDER}_${coordY - GAME_BORDER}`] = '';
-            if ((Math.round(DO_SHADE) === 0) || (Math.round(DO_SHADE) === 2)) return this.drawGrassImage(textureInfos.inner.dark[getRandomInt(4)]);
-            if (Math.round(DO_SHADE) === 1) return this.drawGrassImage(textureInfos.inner.light[getRandomInt(4)]);
+            if (getRandomInt(7) === 1) {
+                if ((Math.round(DO_SHADE) === 0) || (Math.round(DO_SHADE) === 2)) return this.drawGrassImage(textureInfos.inner.bush.dark[getRandomInt(2)]);
+                if (Math.round(DO_SHADE) === 1) return this.drawGrassImage(textureInfos.inner.bush.light[getRandomInt(2)]);
+            } else {
+                if ((Math.round(DO_SHADE) === 0) || (Math.round(DO_SHADE) === 2)) return this.drawGrassImage(textureInfos.inner.block.dark[getRandomInt(5)]);
+                if (Math.round(DO_SHADE) === 1) return this.drawGrassImage(textureInfos.inner.block.light[getRandomInt(5)]);
+            }
             return;
         }
         coordX -= GAME_BORDER;
@@ -347,7 +352,11 @@ class grass_block {
         for (const check of check_types) {
             if (this[check](local_grass_grid, coordX, coordY)) return;
         }
-        this.drawGrassImage(textureInfos.outer.outside[getRandomInt(5)]);
+        if (getRandomInt(7) === 1) {
+            this.drawGrassImage(textureInfos.outer.outside.tree[getRandomInt(3)]);
+        } else {
+            this.drawGrassImage(textureInfos.outer.outside.block[getRandomInt(6)]);
+        }
     }
     checkTop_left_corner(local_grass_grid, coordX, coordY) {
         const top_left_corner = [
@@ -413,8 +422,8 @@ class grass_block {
         ];
         if (JSON.stringify(up_left_sides) === "[[true,true,true],[true,true,true],[true,true,true]]") {
             const DO_SHADE = (coordX + coordY + 1) % 2;
-            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer["left-up"].dark[getRandomInt(2)]);
-            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer["left-up"].light[getRandomInt(2)]);
+            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer["left-up"].dark[getRandomInt(3)]);
+            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer["left-up"].light[getRandomInt(3)]);
             return true;
         }
         return false;
@@ -427,8 +436,8 @@ class grass_block {
         ];
         if (JSON.stringify(up_right_sides) === "[[true,true,true],[true,true,true],[true,true,true]]") {
             const DO_SHADE = (coordX + coordY + 1) % 2;
-            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer["right-up"].dark[getRandomInt(2)]);
-            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer["right-up"].light[getRandomInt(2)]);
+            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer["right-up"].dark[getRandomInt(3)]);
+            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer["right-up"].light[getRandomInt(3)]);
             return true;
         }
         return false;
@@ -441,8 +450,8 @@ class grass_block {
         ];
         if (JSON.stringify(down_right_sides) === "[[true,true,true],[true,true,true],[true,true,true]]") {
             const DO_SHADE = (coordX + coordY + 1) % 2;
-            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer["right-down"].dark[getRandomInt(2)]);
-            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer["right-down"].light[getRandomInt(2)]);
+            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer["right-down"].dark[getRandomInt(3)]);
+            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer["right-down"].light[getRandomInt(3)]);
             return true;
         }
         return false;
@@ -455,8 +464,8 @@ class grass_block {
         ];
         if (JSON.stringify(down_left_sides) === "[[true,true,true],[true,true,true],[true,true,true]]") {
             const DO_SHADE = (coordX + coordY + 1) % 2;
-            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer["left-down"].dark[getRandomInt(2)]);
-            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer["left-down"].light[getRandomInt(2)]);
+            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer["left-down"].dark[getRandomInt(3)]);
+            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer["left-down"].light[getRandomInt(3)]);
             return true;
         }
         return false;
@@ -469,8 +478,8 @@ class grass_block {
         ];
         if (JSON.stringify(up_side) === "[[true,true,true],[true,true,true],[true,true,true]]") {
             const DO_SHADE = (coordX + coordY + 1) % 2;
-            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer.ups.dark[getRandomInt(2)]);
-            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer.ups.light[getRandomInt(2)]);
+            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer.ups.dark[getRandomInt(3)]);
+            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer.ups.light[getRandomInt(3)]);
             return true;   
         }
         return false;
@@ -483,8 +492,8 @@ class grass_block {
         ];
         if (JSON.stringify(down_side) === "[[true,true,true],[true,true,true],[true,true,true]]") {
             const DO_SHADE = (coordX + coordY + 1) % 2;
-            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer.downs.dark[getRandomInt(2)]);
-            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer.downs.light[getRandomInt(2)]);
+            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer.downs.dark[getRandomInt(3)]);
+            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer.downs.light[getRandomInt(3)]);
             return true;
         }
         return false;
@@ -497,8 +506,8 @@ class grass_block {
         ];
         if (JSON.stringify(right_side) === "[[true,true,true],[true,true,true],[true,true,true]]") {
             const DO_SHADE = (coordX + coordY + 1) % 2;
-            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer.rights.dark[getRandomInt(2)]);
-            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer.rights.light[getRandomInt(2)]);
+            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer.rights.dark[getRandomInt(3)]);
+            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer.rights.light[getRandomInt(3)]);
             return true;
         }
         return false;
@@ -511,8 +520,8 @@ class grass_block {
         ];
         if (JSON.stringify(left_side) === "[[true,true,true],[true,true,true],[true,true,true]]") {
             const DO_SHADE = (coordX + coordY + 1) % 2;
-            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer.lefts.dark[getRandomInt(2)]);
-            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer.lefts.light[getRandomInt(2)]);
+            if (Math.round(DO_SHADE) === 0) this.drawGrassImage(textureInfos.outer.lefts.dark[getRandomInt(3)]);
+            if (Math.round(DO_SHADE) === 1) this.drawGrassImage(textureInfos.outer.lefts.light[getRandomInt(3)]);
             return true;
         }
         return false;
