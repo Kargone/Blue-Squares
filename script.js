@@ -16,8 +16,8 @@ window.addEventListener('resize', () => {
     body.style.height = window.innerHeight + 'px';
 });
 
-const GAME_BLOCK_AMOUNT_WIDTH = 10;
-const GAME_BLOCK_AMOUNT_HEIGHT = 10;
+const GAME_BLOCK_AMOUNT_WIDTH = 50;
+const GAME_BLOCK_AMOUNT_HEIGHT = 30;
 const BLOCK_WIDTH = 30;
 const BLOCK_HEIGHT = 30;
 const GAME_BORDER = 4;
@@ -93,13 +93,13 @@ let building_info_open = true;
 let building_create_open = true;
 let notificationRemoved = {'id': 'removed or not'};
 let currencies = {
-    'blue_squares': 0,
-    'red_squares': 0,
-    'green_squares': 0,
-    'purple_squares': 0,
-    'orange_squares': 0,
-    'yellow_squares': 0,
-    'white_squares': 0
+    'blue_squares': 10000000000,
+    'red_squares': 10000000000,
+    'green_squares': 10000000000,
+    'purple_squares': 10000000000,
+    'orange_squares': 10000000000,
+    'yellow_squares': 10000000000,
+    'white_squares': 10000000000
 };
 let buy_costs = {
     'blue_squares': 0,
@@ -153,6 +153,8 @@ let user_settings = {
 //     ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o']
 // ];
 let grass_grid = [];
+let building_selected_id = '';
+let addHighlight = false;
 
 for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
     grass_grid[grass_grid_y] = [];
@@ -169,7 +171,7 @@ for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_gr
     }    
 }
 
-for (let _ = 0; _ < 40; _++) {
+for (let _ = 0; _ < 100; _++) {
     const _x = getRandomInt(GAME_BLOCK_AMOUNT_WIDTH / 2) * 2;
     const _y = getRandomInt(GAME_BLOCK_AMOUNT_HEIGHT / 2) * 2;
     grass_grid[_y][_x] = 'o';
@@ -266,6 +268,7 @@ class grass_block {
         this.distFromStartY = -1;
         this.width = width ?? BLOCK_WIDTH * global_scale;
         this.height = height ?? BLOCK_HEIGHT * global_scale;
+        this.highlightable = false;
         this.id = getRandomInt();
     }
     drawGrass(coordX, coordY) {
@@ -279,6 +282,7 @@ class grass_block {
         if (grass_grid[coordY - GAME_BORDER][coordX - GAME_BORDER] != 'o') {
             const DO_SHADE = ((this.x / (BLOCK_WIDTH * global_scale)) + (this.y / (BLOCK_HEIGHT * global_scale))) % 2;
             grid[`${coordX - GAME_BORDER}_${coordY - GAME_BORDER}`] = '';
+            this.highlightable = true;
             if (getRandomInt(7) === 1) {
                 if ((Math.round(DO_SHADE) === 0) || (Math.round(DO_SHADE) === 2)) return this.drawGrassImage(textureInfos.inner.bush.dark[getRandomInt(2)]);
                 if (Math.round(DO_SHADE) === 1) return this.drawGrassImage(textureInfos.inner.bush.light[getRandomInt(2)]);
@@ -646,6 +650,10 @@ class square {
             </div>
         `;
         this.createdOn = object.timeCreated ?? getTime();
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].highlightable = false;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].highlightable = false;
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].highlightable = false;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].highlightable = false;
         buildings[this.id] = this;
         return this.removed = false;
     }
@@ -678,9 +686,10 @@ class square {
         if (!mouse_down) {
             if (this.selected) {
                 this.checkXandY();
+                building_selected_id = '';
+                this.removeHighlights();
             }
             document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
-            this.removeHighlights();
             this.selected = false;
             return false;
         }
@@ -696,25 +705,22 @@ class square {
                     document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
                     this.addHighlights();
                     this.selected = true;
+                    building_selected_id = copy(this.id);
                     return true;
                 }
             }
         }
         if (this.selected) {
             this.checkXandY();
+            building_selected_id = '';
+            this.removeHighlights();
         }
         document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
-        this.removeHighlights();
         this.selected = false;
         return false;
     }
     addHighlights() {
-        for (let x_y of Object.keys(grid)) {
-            x_y = x_y.split('_');
-            const gridX = parseInt(x_y[0]);
-            const gridY = parseInt(x_y[1]);
-            if (grid[`${gridX}_${gridY}`] === '') image_draw_infos[getGrassBlockId(gridX - 1, gridY - 1)].highlight([1, 1, 1, 1]);
-        }
+        addHighlight = true;
         this.highlightUnder();
     }
     highlightUnder() {
@@ -732,10 +738,23 @@ class square {
             else image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].highlight([1, 0, 0, 1]);
     }
     removeHighlights() {
-        for (const image_key of Object.keys(image_draw_infos)) {
-            let image = image_draw_infos[image_key];
-            image.fogAmount = 0;
-        }
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].fogColor = [1, 1, 1, 1];
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].fogColor = [1, 1, 1, 1];
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].fogColor = [1, 1, 1, 1];
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].fogColor = [1, 1, 1, 1];
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].highlightable = false;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].highlightable = false;
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].highlightable = false;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].highlightable = false;
+        const top_left_good = grid[`${this.coordX + 1}_${this.coordY + 1}`] === ''; 
+        const top_right_good = grid[`${this.coordX}_${this.coordY + 1}`] === ''; 
+        const bottom_left_good = grid[`${this.coordX + 1}_${this.coordY}`] === ''; 
+        const bottom_right_good = grid[`${this.coordX}_${this.coordY}`] === '';
+        if (!top_left_good) image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].fogAmount = 0;
+        if (!top_right_good) image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].fogAmount = 0;
+        if (!bottom_left_good) image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].fogAmount = 0;
+        if (!bottom_right_good) image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].fogAmount = 0;
+        addHighlight = false;
     }
     updateXandY() {
         this.removeHighlights();

@@ -41,6 +41,7 @@ let mouse_down = false;
 let mouseStartX_Y = {'x': -1, 'y': -1};
 let canDragBoard = true;
 let grid;
+let d = false;
 
 function main() {
   // Get A WebGL context
@@ -135,6 +136,7 @@ function main() {
     // Clear the canvas
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    let time = Date.now();
     Object.keys(image_draw_infos).forEach(function(drawInfoKey) {
       let drawInfo = image_draw_infos[drawInfoKey];
       var dstX      = drawInfo.x;
@@ -143,6 +145,12 @@ function main() {
       var dstHeight = drawInfo.textureInfo.height * drawInfo.yScale;
       var fogColor  = drawInfo.fogColor;
       var fogAmount = drawInfo.fogAmount;
+      if ((fogAmount === 0) && drawInfo.highlightable && addHighlight) {
+        fogAmount = 0.3;
+        fogColor = [1, 1, 1, 1];
+      } else if (!addHighlight) {
+        fogAmount = 0;
+      }
       drawImage(
         drawInfo.textureInfo.texture,
         drawInfo.textureInfo.width,
@@ -150,9 +158,19 @@ function main() {
         dstX, dstY, fogColor, fogAmount, 
         dstWidth, dstHeight);
     });
+    if (d) console.log('Image drawing: ', Date.now() - time);
+    time = Date.now();
     dragShape();
+    if (d) console.log('Drag shape: ', Date.now() - time);
+    time = Date.now();
     updateResourceDisplays();
+    if (d) console.log('Resource disps: ', Date.now() - time);
+    time = Date.now();
     refreshCanvas();
+    if (d) console.log('Draw shapes: ', Date.now() - time);
+    time = Date.now();
+    d = false;
+    if (getRandomInt(60) === 1) d = true;
   }
   setInterval(() => {
     draw();
@@ -492,16 +510,17 @@ const textureInfos = {
 let image_draw_infos = {};
 
 function dragShape() {
-  for (const building_key of Object.keys(buildings)) {
-    let building = buildings[building_key];
-    if (!building.selected) continue;
-    if (building.checkForMouseHover()) {
-      building.updateXandY();
-      building.displaySquare();
+  if (building_selected_id != '') {
+    let building_selected = buildings[building_selected_id];
+    if (building_selected.checkForMouseHover()) {
+      building_selected.updateXandY();
+      building_selected.displaySquare();
       canDragBoard = false;
+      console.log('h')
       return true;
     }
   }
+  if (!mouse_down) return;
   for (const building_key of Object.keys(buildings)) {
     let building = buildings[building_key];
     if (building.checkForMouseHover()) {
