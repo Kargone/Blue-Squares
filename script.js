@@ -223,6 +223,10 @@ class rect {
         let x2 = this.x + this.width;
         let y1 = this.y;
         let y2 = this.y + this.height;
+        if ((x1 > window.innerWidth) && (y1 > window.innerHeight)) return;
+        if ((x1 > window.innerWidth) && (y2 < 0)) return;
+        if ((x2 < 0) && (y1 > window.innerHeight)) return;
+        if ((x2 < 0) && (y2 < 0)) return;
         const gl = this.gl;
         const colorLocation = this.colorLocation;
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([

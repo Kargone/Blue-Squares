@@ -145,6 +145,14 @@ function main() {
       var dstHeight = drawInfo.textureInfo.height * drawInfo.yScale;
       var fogColor  = drawInfo.fogColor;
       var fogAmount = drawInfo.fogAmount;
+      let x1 = dstX;
+      let y1 = dstY;
+      let x2 = dstY + dstWidth;
+      let y2 = dstY + dstHeight;
+      if ((x1 > window.innerWidth) && (y1 > window.innerHeight)) return;
+      if ((x1 > window.innerWidth) && (y2 < 0)) return;
+      if ((x2 < 0) && (y1 > window.innerHeight)) return;
+      if ((x2 < 0) && (y2 < 0)) return;
       if ((fogAmount === 0) && drawInfo.highlightable && addHighlight) {
         fogAmount = 0.3;
         fogColor = [1, 1, 1, 1];
