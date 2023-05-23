@@ -39,31 +39,31 @@ void main() {
 }
 `;
 
+// Get A WebGL context
+var canvas = document.querySelector("#game-canvas");
+var gl = canvas.getContext("webgl2");
+// if (!gl) {
+//   return;
+// }
+
+// Use our boilerplate utils to compile the shaders and link into a program
+var program = webglUtils.createProgramFromSources(gl,
+    [vertexShaderSource, fragmentShaderSource]);
+
+// look up where the vertex data needs to go.
+var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+
+// look up uniform locations
+var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
+var colorLocation = gl.getUniformLocation(program, "u_color");
+
+// Create a buffer
+var positionBuffer = gl.createBuffer();
+
+// Create a vertex array object (attribute state)
+var vao = gl.createVertexArray();
+
 function refreshCanvas() {
-  // Get A WebGL context
-  var canvas = document.querySelector("#game-canvas");
-  var gl = canvas.getContext("webgl2");
-  if (!gl) {
-    return;
-  }
-
-  // Use our boilerplate utils to compile the shaders and link into a program
-  var program = webglUtils.createProgramFromSources(gl,
-      [vertexShaderSource, fragmentShaderSource]);
-
-  // look up where the vertex data needs to go.
-  var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
-
-  // look up uniform locations
-  var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
-  var colorLocation = gl.getUniformLocation(program, "u_color");
-
-  // Create a buffer
-  var positionBuffer = gl.createBuffer();
-
-  // Create a vertex array object (attribute state)
-  var vao = gl.createVertexArray();
-
   // and make it the one we're currently working with
   gl.bindVertexArray(vao);
 
@@ -96,14 +96,34 @@ function refreshCanvas() {
   // Pass in the canvas resolution so we can convert from
   // pixels to clipspace in the shader
   gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
-
-  for (let zindex of [1, 2]) {
-    Object.keys(shapes).forEach(function (key) {
-      let object = shapes[key];
-      if (object.z != zindex) return;
-      object.colorLocation = colorLocation;
-      object.draw();
-    });
+  const zs = Object.keys(shapes);
+  for (const z of zs) {
+    const shape_keys = Object.keys(shapes[z]);
+    for (const shape_key of shape_keys) {
+      let object = shapes[z][shape_key];
+      let x1 = object.x;
+      let x2 = object.x + object.width;
+      let y1 = object.y;
+      let y2 = object.y + object.height;
+      if ((x1 > window.innerWidth) && (y1 > window.innerHeight)) continue;
+      if ((x1 > window.innerWidth) && (y2 < 0)) continue;
+      if ((x2 < 0) && (y1 > window.innerHeight)) continue;
+      if ((x2 < 0) && (y2 < 0)) continue;
+      const gl = object.gl;
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+          x1, y1,
+          x2, y1,
+          x1, y2,
+          x1, y2,
+          x2, y1,
+          x2, y2,
+      ]), gl.STATIC_DRAW);
+      gl.uniform4f(colorLocation, object.r/255, object.g/255, object.b/255, 1);
+      var primitiveType = gl.TRIANGLES;
+      var offset = 0;
+      var count = 6;
+      gl.drawArrays(primitiveType, offset, count);
+    }
   }
   return 'Success';
 }

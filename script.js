@@ -22,7 +22,10 @@ const BLOCK_WIDTH = 30;
 const BLOCK_HEIGHT = 30;
 const GAME_BORDER = 4;
 
-shapes = {};
+shapes = {
+    'z1': {}, 
+    'z2': {}
+};
 buildings = {};
 let global_scale = 1.5;
 grid = {
@@ -194,7 +197,7 @@ window.addEventListener('wheel', function(event) {
 });
 
 class rect {
-    constructor(x, y, width, height, rgb) {
+    constructor(x, y, width, height, rgb, z) {
         this.scale = 1;
         this.x = x ?? 0;
         this.y = y ?? 0;
@@ -215,8 +218,8 @@ class rect {
         this.gl = document.querySelector("#game-canvas").getContext("webgl2");
         this.colorLocation = '';
         this.id = getRandomInt();
-        this.z = 1;
-        shapes[this.id] = this;
+        this.z = z ?? 1;
+        shapes[`z${this.z}`][this.id] = this;
     }
     draw() {
         let x1 = this.x;
@@ -634,9 +637,8 @@ class square {
             this.y + BLOCK_INLINE + BORDER_WIDTH,
             this.width - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
             this.height - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
-            `(${this.r},${this.g},${this.b})`
+            `(${this.r},${this.g},${this.b})`, 2
         );
-        SQUARE.z = 2;
         this.squareId = SQUARE.getId();
         this.selected = false;
         this.nextLevelUpgradeCost = object.nextLevelCost ?? this.level;
@@ -768,10 +770,10 @@ class square {
         this.x = (this.coordX - 1) * BLOCK_WIDTH * global_scale + grid.x;
         this.y = (this.coordY - 1) * BLOCK_HEIGHT * global_scale + grid.y;
         if (this.selected) this.addHighlights();
-        let outline_object = shapes[this.outelineId];
+        let outline_object = shapes['z1'][this.outelineId];
         outline_object.x = this.x + this.blockInline;
         outline_object.y = this.y + this.blockInline;
-        let square_object = shapes[this.squareId];
+        let square_object = shapes['z2'][this.squareId];
         square_object.x = this.x + this.blockInline + this.borderWidth;
         square_object.y = this.y + this.blockInline + this.borderWidth;
     }
@@ -804,10 +806,10 @@ class square {
             grid[`${this.coordX + 1}_${this.coordY}`] = `${this.color}_square`;
             grid[`${this.coordX}_${this.coordY + 1}`] = `${this.color}_square`;
             grid[`${this.coordX + 1}_${this.coordY + 1}`] = `${this.color}_square`;
-            let outline_object = shapes[this.outelineId];
+            let outline_object = shapes['z1'][this.outelineId];
             outline_object.x = this.x + this.blockInline;
             outline_object.y = this.y + this.blockInline;
-            let square_object = shapes[this.squareId];
+            let square_object = shapes['z2'][this.squareId];
             square_object.x = this.x + this.blockInline + this.borderWidth;
             square_object.y = this.y + this.blockInline + this.borderWidth;
             if (user_settings['notification-invalid-movement'] && user_settings['all-notifications']) notification('Invalid Movement');
@@ -837,12 +839,12 @@ class square {
         this.r += this.rChangePerLevel;
         this.g += this.gChangePerLevel;
         this.b += this.bChangePerLevel;
-        let outline_object = shapes[this.outelineId];
+        let outline_object = shapes['z1'][this.outelineId];
         outline_object.x = this.x + this.blockInline;
         outline_object.y = this.y + this.blockInline;
         outline_object.width = this.width - (2 * this.blockInline);
         outline_object.height = this.height - (2 * this.blockInline);
-        let square_object = shapes[this.squareId];
+        let square_object = shapes['z2'][this.squareId];
         square_object.x = this.x + this.blockInline + this.borderWidth;
         square_object.y = this.y + this.blockInline + this.borderWidth;
         square_object.width = this.width - (2 * this.blockInline) - (2 * this.borderWidth);
@@ -909,8 +911,8 @@ class square {
     }
     remove() {
         delete buildings[this.id];
-        delete shapes[this.outelineId];
-        delete shapes[this.squareId];
+        delete shapes['z1'][this.outelineId];
+        delete shapes['z2'][this.squareId];
         currencies[`${this.color.toLowerCase()}_squares`] += this.totalCost;
         document.getElementById(`resource-display-${this.id}`).remove();
         this.removeUpgradeListener();
@@ -1155,9 +1157,11 @@ function setScales(multiplier) {
         let building = buildings[building_key];
         building.setScale(multiplier);
     }
-    for (const shape_key of Object.keys(shapes)) {
-        let shape = shapes[shape_key];
-        shape.setScale(multiplier);
+    for (const z of Object.keys(shapes)) {
+        for (const shape_key of Object.keys(shapes[z])) {
+            let shape = shapes[z][shape_key];
+            shape.setScale(multiplier);
+        }
     }
     for (const image_key of Object.keys(image_draw_infos)) {
         let image = image_draw_infos[image_key];

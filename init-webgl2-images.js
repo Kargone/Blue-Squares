@@ -39,9 +39,11 @@ let mouseX = -1;
 let mouseY = -1;
 let mouse_down = false;
 let mouseStartX_Y = {'x': -1, 'y': -1};
-let canDragBoard = true;
+let canDragBoard = false;
+let checkedDragBoard = false;
 let grid;
 let d = false;
+let counter = 0;
 
 function main() {
   // Get A WebGL context
@@ -136,36 +138,9 @@ function main() {
     // Clear the canvas
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    let begin = Date.now();
     let time = Date.now();
-    Object.keys(image_draw_infos).forEach(function(drawInfoKey) {
-      let drawInfo = image_draw_infos[drawInfoKey];
-      var dstX      = drawInfo.x;
-      var dstY      = drawInfo.y;
-      var dstWidth  = drawInfo.textureInfo.width  * drawInfo.xScale;
-      var dstHeight = drawInfo.textureInfo.height * drawInfo.yScale;
-      var fogColor  = drawInfo.fogColor;
-      var fogAmount = drawInfo.fogAmount;
-      let x1 = dstX;
-      let y1 = dstY;
-      let x2 = dstY + dstWidth;
-      let y2 = dstY + dstHeight;
-      if ((x1 > window.innerWidth) && (y1 > window.innerHeight)) return;
-      if ((x1 > window.innerWidth) && (y2 < 0)) return;
-      if ((x2 < 0) && (y1 > window.innerHeight)) return;
-      if ((x2 < 0) && (y2 < 0)) return;
-      if ((fogAmount === 0) && drawInfo.highlightable && addHighlight) {
-        fogAmount = 0.3;
-        fogColor = [1, 1, 1, 1];
-      } else if (!addHighlight) {
-        fogAmount = 0;
-      }
-      drawImage(
-        drawInfo.textureInfo.texture,
-        drawInfo.textureInfo.width,
-        drawInfo.textureInfo.height,
-        dstX, dstY, fogColor, fogAmount, 
-        dstWidth, dstHeight);
-    });
+    drawImages();
     if (d) console.log('Image drawing: ', Date.now() - time);
     time = Date.now();
     dragShape();
@@ -179,6 +154,9 @@ function main() {
     time = Date.now();
     d = false;
     if (getRandomInt(60) === 1) d = true;
+    const fps = 1000 / (Date.now() - begin);
+    if (counter % 5 === 0) document.getElementById('fps').textContent = Math.floor(fps);
+    counter++;
   }
   setInterval(() => {
     draw();
@@ -231,6 +209,82 @@ function main() {
     var count = 6;
     gl.drawArrays(gl.TRIANGLES, offset, count);
   }
+  function drawImages() {
+    const image_keys = Object.keys(image_draw_infos);
+    for (const drawInfoKey of image_keys) {
+      let drawInfo = image_draw_infos[drawInfoKey];
+      var dstX      = drawInfo.x;
+      var dstY      = drawInfo.y;
+      var dstWidth  = drawInfo.textureInfo.width  * drawInfo.xScale;
+      var dstHeight = drawInfo.textureInfo.height * drawInfo.yScale;
+      var fogColor  = drawInfo.fogColor;
+      var fogAmount = drawInfo.fogAmount;
+      let x1 = dstX;
+      let y1 = dstY;
+      let x2 = dstY + dstWidth;
+      let y2 = dstY + dstHeight;
+      if ((x1 > window.innerWidth) && (y1 > window.innerHeight)) continue;
+      if ((x1 > window.innerWidth) && (y2 < 0)) continue;
+      if ((x2 < 0) && (y1 > window.innerHeight)) continue;
+      if ((x2 < 0) && (y2 < 0)) continue;
+      if ((fogAmount === 0) && drawInfo.highlightable && addHighlight) {
+        fogAmount = 0.3;
+        fogColor = [1, 1, 1, 1];
+      } else if (!addHighlight) {
+        fogAmount = 0;
+      }
+      // drawImage(
+      //   drawInfo.textureInfo.texture,
+      //   drawInfo.textureInfo.width,
+      //   drawInfo.textureInfo.height,
+      //   dstX, dstY, fogColor, fogAmount, 
+      //   dstWidth, dstHeight);
+      if (dstWidth === undefined) {
+        dstWidth = drawInfo.textureInfo.width;
+      }
+  
+      if (dstHeight === undefined) {
+        dstHeight = drawInfo.textureInfo.height;
+      }
+  
+      gl.useProgram(program);
+  
+      // Setup the attributes for the quad
+      gl.bindVertexArray(vao);
+  
+      var textureUnit = 0;
+      // The the shader we're putting the texture on texture unit 0
+      gl.uniform1i(textureLocation, textureUnit);
+  
+      // set the fog color and amount
+      gl.uniform4fv(fogColorLocation, fogColor);
+      gl.uniform1f(fogAmountLocation, fogAmount);
+  
+      // Bind the texture to texture unit 0
+      gl.activeTexture(gl.TEXTURE0 + textureUnit);
+      gl.bindTexture(gl.TEXTURE_2D, drawInfo.textureInfo.texture);
+  
+      // this matrix will convert from pixels to clip space
+      var matrix = m4.orthographic(
+          0, gl.canvas.clientWidth, gl.canvas.clientHeight, 0, -1, 1);
+  
+      // translate our quad to dstX, dstY
+      matrix = m4.translate(matrix, dstX, dstY, 0);
+  
+      // scale our 1 unit quad
+      // from 1 unit to dstWidth, dstHeight units
+      matrix = m4.scale(matrix, dstWidth, dstHeight, 1);
+  
+      // Set the matrix.
+      gl.uniformMatrix4fv(matrixLocation, false, matrix);
+  
+      // draw the quad (2 triangles, 6 vertices)
+      var offset = 0;
+      var count = 6;
+      gl.drawArrays(gl.TRIANGLES, offset, count);
+    }
+  }
+
   gl.canvas.addEventListener('mousemove', (e) => {
     const rect = canvas.getBoundingClientRect();
     mouseX = e.clientX - rect.left;
@@ -258,9 +312,11 @@ function main() {
       let building = buildings[building_key];
       building.updateDistFromStartX_Y();
     }
-    for (const shape_key of Object.keys(shapes)) {
-      let shape = shapes[shape_key];
-      shape.updateDistFromStartX_Y();
+    for (const z of Object.keys(shapes)) {
+      for (const shape_key of Object.keys(shapes[z])) {
+        let shape = shapes[z][shape_key];
+        shape.updateDistFromStartX_Y();
+      }
     }
     for (const image_key of Object.keys(image_draw_infos)) {
       let image = image_draw_infos[image_key];
@@ -284,9 +340,11 @@ function main() {
       let building = buildings[building_key];
       building.updateDistFromStartX_Y();
     }
-    for (const shape_key of Object.keys(shapes)) {
-      let shape = shapes[shape_key];
-      shape.updateDistFromStartX_Y();
+    for (const z of Object.keys(shapes)) {
+      for (const shape_key of Object.keys(shapes[z])) {
+        let shape = shapes[z][shape_key];
+        shape.updateDistFromStartX_Y();
+      }
     }
     for (const image_key of Object.keys(image_draw_infos)) {
       let image = image_draw_infos[image_key];
@@ -318,8 +376,9 @@ function main() {
         break;
       }
     }
-    canDragBoard = true;
+    canDragBoard = false;
     mouse_down = false;
+    checkedDragBoard = false;
   }
 }
 
@@ -518,27 +577,37 @@ const textureInfos = {
 let image_draw_infos = {};
 
 function dragShape() {
+  let time = Date.now();
   if (building_selected_id != '') {
     let building_selected = buildings[building_selected_id];
     if (building_selected.checkForMouseHover()) {
       building_selected.updateXandY();
       building_selected.displaySquare();
       canDragBoard = false;
+      checkedDragBoard = true;
       console.log('h')
       return true;
     }
   }
+  if (d) console.log('1: ', Date.now() - time);
+  time = Date.now();
   if (!mouse_down) return;
-  for (const building_key of Object.keys(buildings)) {
-    let building = buildings[building_key];
-    if (building.checkForMouseHover()) {
-      building.updateXandY();
-      building.displaySquare();
-      canDragBoard = false;
-      return true;
+  if (!canDragBoard && (!user_settings['no-square-movement'])) {
+    for (const building_key of Object.keys(buildings)) {
+      let building = buildings[building_key];
+      if (building.checkForMouseHover()) {
+        checkedDragBoard = true;
+        canDragBoard = false;
+        building.updateXandY();
+        building.displaySquare();
+        return true;
+      }
     }
   }
-  if ((!mouse_down) || (!canDragBoard) || (user_settings['no-square-movement'])) return;
+  if (d) console.log('2: ', Date.now() - time);
+  time = Date.now();
+  if ((!mouse_down) || (checkedDragBoard)) return;
+  canDragBoard = true;
   const translateX = mouseX - mouseStartX_Y.x;
   const translateY = mouseY - mouseStartX_Y.y;
   grid.x = mouseStartX_Y.x + translateX + grid.distFromStartX;
@@ -547,9 +616,11 @@ function dragShape() {
     let building = buildings[building_key];
     building.translateX_YfromStartX_Y(translateX, translateY);
   }
-  for (const shape_key of Object.keys(shapes)) {
-    let shape = shapes[shape_key];
-    shape.translateX_YfromStartX_Y(translateX, translateY);
+  for (const z of Object.keys(shapes)) {
+    for (const shape_key of Object.keys(shapes[z])) {
+      let shape = shapes[z][shape_key];
+      shape.translateX_YfromStartX_Y(translateX, translateY);
+    }
   }
   for (const image_key of Object.keys(image_draw_infos)) {
     let image = image_draw_infos[image_key];

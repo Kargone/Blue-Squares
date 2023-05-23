@@ -869,3 +869,10 @@ body {
     touch-action: manipulation;
     overscroll-behavior-y: contain;
 }
+
+#fps {
+    top: 20px;
+    left: 310px;
+    position: absolute;
+    font-size: 46px;
+}
