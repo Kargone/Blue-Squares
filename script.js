@@ -668,20 +668,40 @@ class square {
             this.selected = false;
             return false;
         }
-        if ((this.x - 10 < mouseX) && (mouseX < this.x + this.width + 10)) {
-            if ((this.y - 10 < mouseY) && (mouseY < this.y + this.height + 10)) {
-                if ((mouseX > grid.x) && (mouseY > grid.y) && (mouseX < grid.x + BLOCK_WIDTH * global_scale * GAME_BLOCK_AMOUNT_WIDTH) && (mouseY < grid.y + BLOCK_HEIGHT * global_scale * GAME_BLOCK_AMOUNT_HEIGHT)) {
-                    if (!this.selected) {
-                        grid[`${this.coordX}_${this.coordY}`] = '';
-                        grid[`${this.coordX + 1}_${this.coordY}`] = '';
-                        grid[`${this.coordX}_${this.coordY + 1}`] = '';
-                        grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
+        if (this.selected) {
+            if ((this.x - 10 < mouseX) && (mouseX < this.x + this.width + 10)) {
+                if ((this.y - 10 < mouseY) && (mouseY < this.y + this.height + 10)) {
+                    if ((mouseX > grid.x) && (mouseY > grid.y) && (mouseX < grid.x + BLOCK_WIDTH * global_scale * GAME_BLOCK_AMOUNT_WIDTH) && (mouseY < grid.y + BLOCK_HEIGHT * global_scale * GAME_BLOCK_AMOUNT_HEIGHT)) {
+                        if (!this.selected) {
+                            grid[`${this.coordX}_${this.coordY}`] = '';
+                            grid[`${this.coordX + 1}_${this.coordY}`] = '';
+                            grid[`${this.coordX}_${this.coordY + 1}`] = '';
+                            grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
+                        }
+                        document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
+                        this.addHighlights();
+                        this.selected = true;
+                        building_selected_id = copy(this.id);
+                        return true;
                     }
-                    document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
-                    this.addHighlights();
-                    this.selected = true;
-                    building_selected_id = copy(this.id);
-                    return true;
+                }
+            }
+        } else {
+            if ((this.x + this.blockInline < mouseX) && (mouseX < this.x + this.width - this.blockInline)) {
+                if ((this.y + this.blockInline < mouseY) && (mouseY < this.y + this.height - this.blockInline)) {
+                    if ((mouseX > grid.x) && (mouseY > grid.y) && (mouseX < grid.x + BLOCK_WIDTH * global_scale * GAME_BLOCK_AMOUNT_WIDTH) && (mouseY < grid.y + BLOCK_HEIGHT * global_scale * GAME_BLOCK_AMOUNT_HEIGHT)) {
+                        if (!this.selected) {
+                            grid[`${this.coordX}_${this.coordY}`] = '';
+                            grid[`${this.coordX + 1}_${this.coordY}`] = '';
+                            grid[`${this.coordX}_${this.coordY + 1}`] = '';
+                            grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
+                        }
+                        document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
+                        this.addHighlights();
+                        this.selected = true;
+                        building_selected_id = copy(this.id);
+                        return true;
+                    }
                 }
             }
         }
@@ -912,8 +932,8 @@ class square {
     }
     setScale(multiplier) {
         this.scale *= multiplier;
-        this.width = this.width * multiplier;
-        this.height = this.height * multiplier;
+        this.width *= multiplier;
+        this.height *= multiplier;
         this.x = multiplier * (this.x - mouseX) + mouseX;
         this.y = multiplier * (this.y - mouseY) + mouseY;
         this.originalX = copy(this.x);
@@ -923,7 +943,7 @@ class square {
     }
 }
 
-function renderGame() {
+function createGrass() {
     for (let current_block_y = 1; current_block_y <= GAME_BLOCK_AMOUNT_HEIGHT + GAME_BORDER * 2; current_block_y++) {
         for (let current_block_x = 1; current_block_x <= GAME_BLOCK_AMOUNT_WIDTH + GAME_BORDER * 2; current_block_x++) {
             const BLOCK = new grass_block(
@@ -1148,8 +1168,15 @@ function getGrassBlockId(gridX, gridY) {
     }
 }
 
-renderGame();
+function createIntialSquares(count) {
+    for (let i = 0; i < count; i++) {
+        new square({'color': 'Blue'});
+    }
+}
+
+createGrass();
 eventListners();
+createIntialSquares(5);
 
 const UP_RESOURCES = setInterval(() => {
     for (const building_key of Object.keys(buildings)) {

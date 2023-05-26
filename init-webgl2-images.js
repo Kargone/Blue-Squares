@@ -82,7 +82,7 @@ let mouseStartX_Y = {'x': -1, 'y': -1};
 let canDragBoard = false;
 let checkedDragBoard = false;
 let grid = {};
-let d = false;
+let d = true;
 let counter = 0;
 let building_selected_id = '';
 
