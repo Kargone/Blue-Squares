@@ -5,6 +5,7 @@ var vertexShaderSource = `#version 300 es
 in vec4 a_position;
 in vec2 a_texcoord;
 
+// Used to pass in the resolution of the canvas
 uniform mat4 u_matrix;
 
 out vec2 v_texcoord;
@@ -33,17 +34,57 @@ void main() {
 }
 `;
 
-let shapes;
-let buildings;
+var vertexShaderSourceShapes = `#version 300 es
+
+// an attribute is an input (in) to a vertex shader.
+// It will receive data from a buffer
+in vec2 a_position;
+
+// Used to pass in the resolution of the canvas
+uniform vec2 u_resolution;
+
+// all shaders have a main function
+void main() {
+
+  // convert the position from pixels to 0.0 to 1.0
+  vec2 zeroToOne = a_position / u_resolution;
+
+  // convert from 0->1 to 0->2
+  vec2 zeroToTwo = zeroToOne * 2.0;
+
+  // convert from 0->2 to -1->+1 (clipspace)
+  vec2 clipSpace = zeroToTwo - 1.0;
+
+  gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+}
+`;
+
+var fragmentShaderSourceShapes = `#version 300 es
+
+precision highp float;
+
+uniform vec4 u_color;
+
+// we need to declare an output for the fragment shader
+out vec4 outColor;
+
+void main() {
+  outColor = u_color;
+}
+`;
+
+let shapes = {};
+let buildings = {};
 let mouseX = -1;
 let mouseY = -1;
 let mouse_down = false;
 let mouseStartX_Y = {'x': -1, 'y': -1};
 let canDragBoard = false;
 let checkedDragBoard = false;
-let grid;
+let grid = {};
 let d = false;
 let counter = 0;
+let building_selected_id = '';
 
 function main() {
   // Get A WebGL context
@@ -57,16 +98,21 @@ function main() {
   // Use our boilerplate utils to compile the shaders and link into a program
   var program = webglUtils.createProgramFromSources(gl,
       [vertexShaderSource, fragmentShaderSource]);
+  var programShapes = webglUtils.createProgramFromSources(gl,
+      [vertexShaderSourceShapes, fragmentShaderSourceShapes]);
 
   // look up where the vertex data needs to go.
   var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
   var texcoordAttributeLocation = gl.getAttribLocation(program, "a_texcoord");
+  var positionAttributeLocationShapes = gl.getAttribLocation(programShapes, "a_position");
 
   // lookup uniforms
   var matrixLocation = gl.getUniformLocation(program, "u_matrix");
   var textureLocation = gl.getUniformLocation(program, "u_texture");
   var fogColorLocation = gl.getUniformLocation(program, "u_fogColor");
   var fogAmountLocation = gl.getUniformLocation(program, "u_fogAmount");
+  var resolutionUniformLocationShapes = gl.getUniformLocation(programShapes, "u_resolution");
+  var colorLocationShapes = gl.getUniformLocation(programShapes, "u_color");
 
   // Create a vertex array object (attribute state)
   var vao = gl.createVertexArray();
@@ -88,6 +134,10 @@ function main() {
     1, 1,
   ];
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+  var positionBufferShapes = gl.createBuffer();
+
+  // Create a vertex array object (attribute state)
+  var vaoShapes = gl.createVertexArray();
 
   // Turn on the attribute
   gl.enableVertexAttribArray(positionAttributeLocation);
@@ -157,10 +207,12 @@ function main() {
     const fps = 1000 / (Date.now() - begin);
     if (counter % 5 === 0) document.getElementById('fps').textContent = Math.floor(fps);
     counter++;
+    requestAnimationFrame(draw);
   }
-  setInterval(() => {
-    draw();
-  }, 1000/60);
+  // setInterval(() => {
+  //   draw();
+  // }, 1000/60);
+  requestAnimationFrame(draw);
 
   // Unlike images, textures do not have a width and height associated
   // with them so we'll pass in the width and height of the texture
@@ -233,12 +285,6 @@ function main() {
       } else if (!addHighlight) {
         fogAmount = 0;
       }
-      // drawImage(
-      //   drawInfo.textureInfo.texture,
-      //   drawInfo.textureInfo.width,
-      //   drawInfo.textureInfo.height,
-      //   dstX, dstY, fogColor, fogAmount, 
-      //   dstWidth, dstHeight);
       if (dstWidth === undefined) {
         dstWidth = drawInfo.textureInfo.width;
       }
@@ -284,7 +330,73 @@ function main() {
       gl.drawArrays(gl.TRIANGLES, offset, count);
     }
   }
+  function refreshCanvas() {
+  // and make it the one we're currently working with
+  gl.bindVertexArray(vaoShapes);
 
+  // Turn on the attribute
+  gl.enableVertexAttribArray(positionAttributeLocationShapes);
+
+  // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferShapes);
+
+  // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+  var size = 2;          // 2 components per iteration
+  var type = gl.FLOAT;   // the data is 32bit floats
+  var normalize = false; // don't normalize the data
+  var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+  var offset = 0;        // start at the beginning of the buffer
+  gl.vertexAttribPointer(
+      positionAttributeLocationShapes, size, type, normalize, stride, offset);
+
+  webglUtils.resizeCanvasToDisplaySize(gl.canvas);
+
+  // Tell WebGL how to convert from clip space to pixels
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+  // Tell it to use our program (pair of shaders)
+  gl.useProgram(programShapes);
+
+  // Bind the attribute/buffer set we want.
+  gl.bindVertexArray(vaoShapes);
+
+  // Pass in the canvas resolution so we can convert from
+  // pixels to clipspace in the shader
+  gl.uniform2f(resolutionUniformLocationShapes, gl.canvas.width, gl.canvas.height);
+  const zs = Object.keys(shapes);
+  for (const z of zs) {
+    const shape_keys = Object.keys(shapes[z]);
+    for (const shape_key of shape_keys) {
+      let object = shapes[z][shape_key];
+      let x1 = object.x;
+      let x2 = object.x + object.width;
+      let y1 = object.y;
+      let y2 = object.y + object.height;
+      if ((x1 > window.innerWidth) && (y1 > window.innerHeight)) continue;
+      if ((x1 > window.innerWidth) && (y2 < 0)) continue;
+      if ((x2 < 0) && (y1 > window.innerHeight)) continue;
+      if ((x2 < 0) && (y2 < 0)) continue;
+      const gl = object.gl;
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+          x1, y1,
+          x2, y1,
+          x1, y2,
+          x1, y2,
+          x2, y1,
+          x2, y2,
+      ]), gl.STATIC_DRAW);
+      gl.uniform4f(colorLocationShapes, object.r/255, object.g/255, object.b/255, 1);
+      var primitiveType = gl.TRIANGLES;
+      var offset = 0;
+      var count = 6;
+      gl.drawArrays(primitiveType, offset, count);
+    }
+  }
+  return 'Success';
+  }
+  function getRandomInt(max = 1000000000) {
+    return Math.floor(Math.random() * max);
+  }
   gl.canvas.addEventListener('mousemove', (e) => {
     const rect = canvas.getBoundingClientRect();
     mouseX = e.clientX - rect.left;
