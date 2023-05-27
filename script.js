@@ -225,11 +225,11 @@ window.addEventListener('touchmove', (e) => {
     const current_touch_distance = getDistance(touch_1.clientX, touch_1.clientY, touch_2.clientX, touch_2.clientY);
     if (current_touch_distance > last_touch_distance) {
         // console.log('scrolling up');
-        const multiplier = 1.1;
+        const multiplier = 1.05;
         if (global_scale * multiplier <= MAX_GLOBAL_SCALE) setScales(multiplier);
     } else {
         // console.log('scrolling down');
-        const multiplier = 0.9;
+        const multiplier = 0.95;
         if (global_scale * multiplier >= MIN_GLOBAL_SCALE) setScales(multiplier);
     }
     last_touch_distance = copy(current_touch_distance);
@@ -1327,7 +1327,7 @@ createGrass();
 eventListners();
 createIntialSquares(1);
 centerBoard();
-notification('hi3');
+notification('hi4');
 
 const UP_RESOURCES = setInterval(() => {
     for (const building_key of Object.keys(buildings)) {
