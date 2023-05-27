@@ -416,6 +416,7 @@ function main() {
     mouseY = touch.clientY;
   });
   gl.canvas.addEventListener('mousedown', (e) => {
+    notification('l');
     mouse_down = true;
     const rect = canvas.getBoundingClientRect();
     mouseX = e.clientX - rect.left;
@@ -440,6 +441,7 @@ function main() {
     }
   });
   gl.canvas.addEventListener('touchstart', (e) => {
+    notification('j');
     mouse_down = true;
     const touch = e.targetTouches[0];
     if (e.targetTouches.length > 1) return mouseEnd();

@@ -1328,7 +1328,7 @@ createGrass();
 eventListners();
 createIntialSquares(1);
 centerBoard();
-notification('hi1');
+notification('hi2');
 
 const UP_RESOURCES = setInterval(() => {
     for (const building_key of Object.keys(buildings)) {
