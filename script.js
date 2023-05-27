@@ -208,7 +208,6 @@ window.addEventListener('wheel', function(event) {
 });
 
 window.addEventListener('touchstart', (e) => {
-    if (Date.now() % 20 != 0) return;
     last_touch_distance = 1;
     console.log(e.targetTouches[0]);
     if (e.targetTouches.length != 2) return;
