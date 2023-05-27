@@ -218,6 +218,7 @@ window.addEventListener('touchstart', (e) => {
 });
 
 window.addEventListener('touchMove', (e) => {
+    notification('i');
     if (e.targetTouches.length != 2) return last_touch_distance = 0;
     notification('h');
     const touch_1 = e.targetTouches[0];
@@ -1327,7 +1328,7 @@ createGrass();
 eventListners();
 createIntialSquares(1);
 centerBoard();
-notification('hi');
+notification('hi1');
 
 const UP_RESOURCES = setInterval(() => {
     for (const building_key of Object.keys(buildings)) {
