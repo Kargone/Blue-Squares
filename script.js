@@ -32,7 +32,7 @@ const MAX_GLOBAL_SCALE = Math.min(
     window.innerWidth / 5 / BLOCK_WIDTH, 
     window.innerHeight / 5 / BLOCK_WIDTH
 );
-const MIN_GLOBAL_SCALE = Math.min(
+const MIN_GLOBAL_SCALE = Math.max(
     window.innerWidth / 25 / BLOCK_WIDTH, 
     window.innerHeight / 25 / BLOCK_WIDTH
 );
