@@ -210,7 +210,7 @@ window.addEventListener('wheel', function(event) {
 
 window.addEventListener('touchstart', (e) => {
     // notification('j');
-    last_touch_distance = 0;
+    last_touch_distance = 1;
     console.log(e.targetTouches[0]);
     if (e.targetTouches.length != 2) return;
     const touch_1 = e.targetTouches[0];
@@ -223,20 +223,15 @@ window.addEventListener('touchmove', (e) => {
     const touch_1 = e.targetTouches[0];
     const touch_2 = e.targetTouches[1];
     const current_touch_distance = getDistance(touch_1.clientX, touch_1.clientY, touch_2.clientX, touch_2.clientY);
-    if (current_touch_distance > last_touch_distance) {
-        // console.log('scrolling up');
-        const multiplier = 1.05;
-        if (global_scale * multiplier <= MAX_GLOBAL_SCALE) setScales(multiplier);
-    } else {
-        // console.log('scrolling down');
-        const multiplier = 0.95;
-        if (global_scale * multiplier >= MIN_GLOBAL_SCALE) setScales(multiplier);
-    }
+    const multiplier = current_touch_distance / last_touch_distance;
+    if ((global_scale * multiplier <= MAX_GLOBAL_SCALE) &&
+        (global_scale * multiplier >= MIN_GLOBAL_SCALE)
+        ) setScales(multiplier);
     last_touch_distance = copy(current_touch_distance);
 });
 
 window.addEventListener('touchend', (e) => {
-    last_touch_distance = 0;
+    last_touch_distance = 1;
 });
 
 class rect {
