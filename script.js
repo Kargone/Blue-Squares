@@ -32,7 +32,8 @@ const MAX_GLOBAL_SCALE = Math.min(
     window.innerWidth / 5 / BLOCK_WIDTH, 
     window.innerHeight / 5 / BLOCK_WIDTH
 );
-const MIN_GLOBAL_SCALE = Math.min(
+const MIN_GLOBAL_SCALE = 0;
+Math.min(
     window.innerWidth / 25 / BLOCK_WIDTH, 
     window.innerHeight / 25 / BLOCK_WIDTH
 );
@@ -133,32 +134,65 @@ let user_settings = {
     'no-square-movement': false,
     'open-square-after-move': true
 }
-let grass_grid = [];
+let grass_grid = [
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"], //15
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"], //15
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"]
+];
 let addHighlight = false;
 
-for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
-    grass_grid[grass_grid_y] = [];
-    for (let grass_grid_x = 0; grass_grid_x < GAME_BLOCK_AMOUNT_WIDTH + 2; grass_grid_x++) {
-        if ((grass_grid_y === 0) || (grass_grid_y === GAME_BLOCK_AMOUNT_HEIGHT + 1)) {
-            grass_grid[grass_grid_y][grass_grid_x] = 'o';
-            continue;
-        }
-        if ((grass_grid_x === 0) || (grass_grid_x === GAME_BLOCK_AMOUNT_WIDTH + 1)) { 
-            grass_grid[grass_grid_y][grass_grid_x] = 'o';
-            continue;
-        }
-        grass_grid[grass_grid_y][grass_grid_x] = 'i';
-    }    
-}
+// for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
+//     grass_grid[grass_grid_y] = [];
+//     for (let grass_grid_x = 0; grass_grid_x < GAME_BLOCK_AMOUNT_WIDTH + 2; grass_grid_x++) {
+//         if ((grass_grid_y === 0) || (grass_grid_y === GAME_BLOCK_AMOUNT_HEIGHT + 1)) {
+//             grass_grid[grass_grid_y][grass_grid_x] = 'o';
+//             continue;
+//         }
+//         if ((grass_grid_x === 0) || (grass_grid_x === GAME_BLOCK_AMOUNT_WIDTH + 1)) { 
+//             grass_grid[grass_grid_y][grass_grid_x] = 'o';
+//             continue;
+//         }
+//         grass_grid[grass_grid_y][grass_grid_x] = 'i';
+//     }    
+// }
 
-for (let _ = 0; _ < 100; _++) {
-    const _x = getRandomInt(GAME_BLOCK_AMOUNT_WIDTH / 2) * 2;
-    const _y = getRandomInt(GAME_BLOCK_AMOUNT_HEIGHT / 2) * 2;
-    grass_grid[_y][_x] = 'o';
-    grass_grid[_y][_x + 1] = 'o';
-    grass_grid[_y + 1][_x] = 'o';
-    grass_grid[_y + 1][_x + 1] = 'o';
-}
+// for (let _ = 0; _ < 100; _++) {
+//     const _x = getRandomInt(GAME_BLOCK_AMOUNT_WIDTH / 2) * 2;
+//     const _y = getRandomInt(GAME_BLOCK_AMOUNT_HEIGHT / 2) * 2;
+//     grass_grid[_y][_x] = 'o';
+//     grass_grid[_y][_x + 1] = 'o';
+//     grass_grid[_y + 1][_x] = 'o';
+//     grass_grid[_y + 1][_x + 1] = 'o';
+// }
 
 window.addEventListener('wheel', function(event) {
     if (mouse_down) return;
@@ -1228,9 +1262,33 @@ function createIntialSquares(count) {
     }
 }
 
+function centerBoard() {
+    const orginal_grid_x = grid.x;
+    grid.x = window.innerWidth / 2 - (GAME_BLOCK_AMOUNT_WIDTH / 2) * BLOCK_WIDTH * global_scale - BLOCK_WIDTH * global_scale;
+    translateX = grid.x - orginal_grid_x;
+    const orginal_grid_y = grid.y;
+    grid.y = window.innerHeight / 2 - (GAME_BLOCK_AMOUNT_HEIGHT / 2) * BLOCK_HEIGHT * global_scale - BLOCK_HEIGHT * global_scale;
+    translateY = grid.y - orginal_grid_y;
+    for (const building_key of Object.keys(buildings)) {
+        let building = buildings[building_key];
+        building.translate(translateX, translateY);
+    }
+    for (const z of Object.keys(shapes)) {
+        for (const shape_key of Object.keys(shapes[z])) {
+        let shape = shapes[z][shape_key];
+        shape.translate(translateX, translateY);
+        }
+    }
+    for (const image_key of Object.keys(image_draw_infos)) {
+        let image = image_draw_infos[image_key];
+        image.translate(translateX, translateY);
+    }
+}
+
 createGrass();
 eventListners();
-createIntialSquares(10);
+createIntialSquares(1);
+centerBoard();
 
 const UP_RESOURCES = setInterval(() => {
     for (const building_key of Object.keys(buildings)) {
