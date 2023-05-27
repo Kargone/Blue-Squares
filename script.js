@@ -219,6 +219,7 @@ window.addEventListener('touchstart', (e) => {
 
 window.addEventListener('touchMove', (e) => {
     if (e.targetTouches.length != 2) return last_touch_distance = 0;
+    notification('h');
     const touch_1 = e.targetTouches[0];
     const touch_2 = e.targetTouches[1];
     const current_touch_distance = getDistance(touch_1.clientX, touch_1.clientY, touch_2.clientX, touch_2.clientY);
