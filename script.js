@@ -208,7 +208,7 @@ window.addEventListener('wheel', function(event) {
 });
 
 window.addEventListener('touchstart', (e) => {
-    // notification('j');
+    if (Date.now() % 20 != 0) return;
     last_touch_distance = 1;
     console.log(e.targetTouches[0]);
     if (e.targetTouches.length != 2) return;
@@ -1321,8 +1321,7 @@ createGrass();
 eventListners();
 createIntialSquares(1);
 centerBoard();
-notification(MAX_GLOBAL_SCALE);
-notification(MIN_GLOBAL_SCALE);
+notification('hi');
 
 const UP_RESOURCES = setInterval(() => {
     for (const building_key of Object.keys(buildings)) {
