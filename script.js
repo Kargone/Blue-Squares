@@ -150,8 +150,8 @@ let grass_grid = [
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"], //15
-    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"], //15
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
@@ -169,6 +169,7 @@ let grass_grid = [
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"]
 ];
 let addHighlight = false;
+let last_touch_distance = 0;
 
 // for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
 //     grass_grid[grass_grid_y] = [];
@@ -205,6 +206,36 @@ window.addEventListener('wheel', function(event) {
         const multiplier = 0.9;
         if (global_scale * multiplier >= MIN_GLOBAL_SCALE) setScales(multiplier);
     }
+});
+
+window.addEventListener('touchstart', (e) => {
+    last_touch_distance = 0;
+    console.log(e.targetTouches[0]);
+    if (e.targetTouches.length != 2) return;
+    const touch_1 = e.targetTouches[0];
+    const touch_2 = e.targetTouches[1];
+    last_touch_distance = getDistance(touch_1.clientX, touch_1.clientY, touch_2.clientX, touch_2.clientY);
+});
+
+window.addEventListener('touchMove', (e) => {
+    if (e.targetTouches.length != 2) return last_touch_distance = 0;
+    const touch_1 = e.targetTouches[0];
+    const touch_2 = e.targetTouches[1];
+    const current_touch_distance = getDistance(touch_1.clientX, touch_1.clientY, touch_2.clientX, touch_2.clientY);
+    if (current_touch_distance < last_touch_distance) {
+        // console.log('scrolling up');
+        const multiplier = 1.1;
+        if (global_scale * multiplier <= MAX_GLOBAL_SCALE) setScales(multiplier);
+    } else {
+        // console.log('scrolling down');
+        const multiplier = 0.9;
+        if (global_scale * multiplier >= MIN_GLOBAL_SCALE) setScales(multiplier);
+    }
+    last_touch_distance = copy(current_touch_distance);
+});
+
+window.addEventListener('touchEnd', (e) => {
+    last_touch_distance = 0;
 });
 
 class rect {
@@ -1283,6 +1314,12 @@ function centerBoard() {
         let image = image_draw_infos[image_key];
         image.translate(translateX, translateY);
     }
+}
+
+function getDistance(x1, y1, x2, y2){
+    let y = x2 - x1;
+    let x = y2 - y1;
+    return Math.sqrt(x * x + y * y);
 }
 
 createGrass();

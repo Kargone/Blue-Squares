@@ -442,10 +442,7 @@ function main() {
   gl.canvas.addEventListener('touchstart', (e) => {
     mouse_down = true;
     const touch = e.targetTouches[0];
-    if (e.targetTouches.length > 1) {
-      mouse_down = false;
-      return;
-    }
+    if (e.targetTouches.length > 1) return mouseEnd();
     mouseX = touch.clientX;
     mouseY = touch.clientY;
     mouseStartX_Y.x = mouseX;
