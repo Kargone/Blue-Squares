@@ -28,6 +28,14 @@ shapes = {
 };
 buildings = {};
 let global_scale = 1.5;
+const MAX_GLOBAL_SCALE = Math.min(
+    window.innerWidth / 5 / BLOCK_WIDTH, 
+    window.innerHeight / 5 / BLOCK_WIDTH
+);
+const MIN_GLOBAL_SCALE = Math.min(
+    window.innerWidth / 25 / BLOCK_WIDTH, 
+    window.innerHeight / 25 / BLOCK_WIDTH
+);
 grid = {
     'x': (GAME_BORDER) * BLOCK_WIDTH * global_scale, 
     'y': (GAME_BORDER) * BLOCK_HEIGHT * global_scale,
@@ -157,11 +165,11 @@ window.addEventListener('wheel', function(event) {
     if (event.deltaY < 0) {
         // console.log('scrolling up');
         const multiplier = 1.1;
-        setScales(multiplier);
+        if (global_scale * multiplier <= MAX_GLOBAL_SCALE) setScales(multiplier);
     } else if (event.deltaY > 0) {
         // console.log('scrolling down');
         const multiplier = 0.9;
-        setScales(multiplier);
+        if (global_scale * multiplier >= MIN_GLOBAL_SCALE) setScales(multiplier);
     }
 });
 
@@ -221,6 +229,10 @@ class rect {
     translateX_YfromStartX_Y(x, y) {
         this.x = mouseStartX_Y.x + x + this.distFromStartX;
         this.y = mouseStartX_Y.y + y + this.distFromStartY;
+    }
+    translate(x, y) {
+        this.x += x;
+        this.y += y;
     }
     updateDistFromStartX_Y() {
         this.distFromStartX = this.x - mouseStartX_Y.x;
@@ -522,6 +534,10 @@ class grass_block {
         if (user_settings['no-square-movement']) return;
         this.x = mouseStartX_Y.x + x + this.distFromStartX;
         this.y = mouseStartX_Y.y + y + this.distFromStartY;
+    }
+    translate(x, y) {
+        this.x += x;
+        this.y += y;
     }
     updateDistFromStartX_Y() {
         this.distFromStartX = this.x - mouseStartX_Y.x;
@@ -926,6 +942,12 @@ class square {
         this.originalX = copy(this.x);
         this.originalY = copy(this.y);
     }
+    translate(x, y) {
+        this.x += x;
+        this.y += y;
+        this.originalX = copy(this.x);
+        this.originalY = copy(this.y);
+    }
     updateDistFromStartX_Y() {
         this.distFromStartX = this.x - mouseStartX_Y.x;
         this.distFromStartY = this.y - mouseStartX_Y.y;
@@ -1159,6 +1181,38 @@ function setScales(multiplier) {
     grid.x = multiplier * (grid.x - mouseX) + mouseX;
     grid.y = multiplier * (grid.y - mouseY) + mouseY;
     global_scale *= multiplier;
+    let translateX = 0;
+    let translateY = 0;
+    const orginal_grid_x = grid.x;
+    const orginal_grid_y = grid.y;
+    if (grid.x > GAME_BORDER * BLOCK_WIDTH * global_scale) {
+        grid.x = GAME_BORDER * BLOCK_WIDTH * global_scale;
+        translateX = grid.x - orginal_grid_x;
+    } else if (grid.x + (GAME_BORDER + GAME_BLOCK_AMOUNT_WIDTH) * BLOCK_WIDTH * global_scale < window.innerWidth) {
+        grid.x = window.innerWidth - (GAME_BORDER + GAME_BLOCK_AMOUNT_WIDTH) * BLOCK_WIDTH * global_scale;
+        translateX = grid.x - orginal_grid_x;
+    }
+    if (grid.y > GAME_BORDER * BLOCK_HEIGHT * global_scale) {
+        grid.y = GAME_BORDER * BLOCK_HEIGHT * global_scale;
+        translateY = grid.y - orginal_grid_y;
+    } else if (grid.y + (GAME_BORDER + GAME_BLOCK_AMOUNT_HEIGHT) * BLOCK_HEIGHT * global_scale < window.innerHeight) {
+        grid.y = window.innerHeight - (GAME_BORDER + GAME_BLOCK_AMOUNT_HEIGHT) * BLOCK_HEIGHT * global_scale;
+        translateY = grid.y - orginal_grid_y;
+    }
+    for (const building_key of Object.keys(buildings)) {
+        let building = buildings[building_key];
+        building.translate(translateX, translateY);
+    }
+    for (const z of Object.keys(shapes)) {
+        for (const shape_key of Object.keys(shapes[z])) {
+        let shape = shapes[z][shape_key];
+        shape.translate(translateX, translateY);
+        }
+    }
+    for (const image_key of Object.keys(image_draw_infos)) {
+        let image = image_draw_infos[image_key];
+        image.translate(translateX, translateY);
+    }
 }
 
 function getGrassBlockId(gridX, gridY) {
@@ -1176,7 +1230,7 @@ function createIntialSquares(count) {
 
 createGrass();
 eventListners();
-createIntialSquares(5);
+createIntialSquares(10);
 
 const UP_RESOURCES = setInterval(() => {
     for (const building_key of Object.keys(buildings)) {

@@ -83,6 +83,10 @@ let canDragBoard = false;
 let checkedDragBoard = false;
 let grid = {};
 let d = true;
+let Image_drawing = 0;
+let Drag_shape = 0;
+let Resource_disps = 0;
+let Draw_shapes = 0;
 let counter = 0;
 let building_selected_id = '';
 
@@ -191,19 +195,19 @@ function main() {
     let begin = Date.now();
     let time = Date.now();
     drawImages();
-    if (d) console.log('Image drawing: ', Date.now() - time);
+    if (d) Image_drawing = Date.now() - time;
     time = Date.now();
     dragShape();
-    if (d) console.log('Drag shape: ', Date.now() - time);
+    if (d) Drag_shape = Date.now() - time;
     time = Date.now();
     updateResourceDisplays();
-    if (d) console.log('Resource disps: ', Date.now() - time);
+    if (d) Resource_disps = Date.now() - time;
     time = Date.now();
     refreshCanvas();
-    if (d) console.log('Draw shapes: ', Date.now() - time);
+    if (d) Draw_shapes = Date.now() - time;
     time = Date.now();
     d = false;
-    if (getRandomInt(60) === 1) d = true;
+    if (getRandomInt(30) === 1) d = true;
     const fps = 1000 / (Date.now() - begin);
     if (counter % 5 === 0) document.getElementById('fps').textContent = Math.floor(fps);
     counter++;
@@ -689,7 +693,6 @@ const textureInfos = {
 let image_draw_infos = {};
 
 function dragShape() {
-  let time = Date.now();
   if (building_selected_id != '') {
     let building_selected = buildings[building_selected_id];
     if (building_selected.checkForMouseHover()) {
@@ -701,8 +704,6 @@ function dragShape() {
       return true;
     }
   }
-  if (d) console.log('1: ', Date.now() - time);
-  time = Date.now();
   if (!mouse_down) return;
   if (!canDragBoard && (!user_settings['no-square-movement'])) {
     for (const building_key of Object.keys(buildings)) {
@@ -716,14 +717,30 @@ function dragShape() {
       }
     }
   }
-  if (d) console.log('2: ', Date.now() - time);
-  time = Date.now();
   if ((!mouse_down) || (checkedDragBoard)) return;
   canDragBoard = true;
-  const translateX = mouseX - mouseStartX_Y.x;
-  const translateY = mouseY - mouseStartX_Y.y;
+  let translateX = mouseX - mouseStartX_Y.x;
+  let translateY = mouseY - mouseStartX_Y.y;
+  translateBoardFromStart(translateX, translateY);
+}
+
+function translateBoardFromStart(translateX, translateY) {
   grid.x = mouseStartX_Y.x + translateX + grid.distFromStartX;
+  if (grid.x > GAME_BORDER * BLOCK_WIDTH * global_scale) {
+    grid.x = GAME_BORDER * BLOCK_WIDTH * global_scale;
+    translateX = grid.x - mouseStartX_Y.x - grid.distFromStartX;
+  } else if (grid.x + (GAME_BORDER + GAME_BLOCK_AMOUNT_WIDTH) * BLOCK_WIDTH * global_scale < window.innerWidth) {
+    grid.x = window.innerWidth - (GAME_BORDER + GAME_BLOCK_AMOUNT_WIDTH) * BLOCK_WIDTH * global_scale;
+    translateX = grid.x - mouseStartX_Y.x - grid.distFromStartX;
+  }
   grid.y = mouseStartX_Y.y + translateY + grid.distFromStartY;
+  if (grid.y > GAME_BORDER * BLOCK_HEIGHT * global_scale) {
+    grid.y = GAME_BORDER * BLOCK_HEIGHT * global_scale;
+    translateY = grid.y - mouseStartX_Y.y - grid.distFromStartY;
+  } else if (grid.y + (GAME_BORDER + GAME_BLOCK_AMOUNT_HEIGHT) * BLOCK_HEIGHT * global_scale < window.innerHeight) {
+    grid.y = window.innerHeight - (GAME_BORDER + GAME_BLOCK_AMOUNT_HEIGHT) * BLOCK_HEIGHT * global_scale;
+    translateY = grid.y - mouseStartX_Y.y - grid.distFromStartY;
+  }
   for (const building_key of Object.keys(buildings)) {
     let building = buildings[building_key];
     building.translateX_YfromStartX_Y(translateX, translateY);
