@@ -218,7 +218,7 @@ window.addEventListener('touchstart', (e) => {
     last_touch_distance = getDistance(touch_1.clientX, touch_1.clientY, touch_2.clientX, touch_2.clientY);
 });
 
-window.addEventListener('touchMove', (e) => {
+window.addEventListener('touchmove', (e) => {
     notification('i');
     if (e.targetTouches.length != 2) return last_touch_distance = 0;
     notification('h');
@@ -237,7 +237,7 @@ window.addEventListener('touchMove', (e) => {
     last_touch_distance = copy(current_touch_distance);
 });
 
-window.addEventListener('touchEnd', (e) => {
+window.addEventListener('touchend', (e) => {
     last_touch_distance = 0;
 });
 
