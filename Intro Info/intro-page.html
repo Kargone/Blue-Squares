@@ -20,7 +20,7 @@
     <script>
       let notificationRemoved = {'id': 'removed or not'};
       function notification(text) {
-          let x = getRandomInt();
+          let x = Math.floor(Math.random() * 1000000000);
           const newDiv = document.createElement("div");
           newDiv.innerHTML = `
               <p class="notificationText">${text}</p>
@@ -82,7 +82,7 @@
       const auth = getAuth();
       if (localStorage.getItem('user') != null) document.getElementById("google-sign-in").textContent = "Sign Out";
       document.getElementById("play").addEventListener('click', async function () {
-        if (localStorage.getItem('user') != null) return notification('Already signed into google');;
+        if (localStorage.getItem('user') != null) return window.location.href = "../index.html";
         signInAnonymously(auth).then(() => {
           // Signed in..
           notification('Sign in anonymously success');

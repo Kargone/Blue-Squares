@@ -40,7 +40,7 @@ grid = {
     'x': (GAME_BORDER) * BLOCK_WIDTH * global_scale, 
     'y': (GAME_BORDER) * BLOCK_HEIGHT * global_scale,
     'distFromStartX': -1,
-    'distFromStartY': -1,
+    'distFromStartY': -1
 };
 building_selected_id = '';
 const colors = {
@@ -104,13 +104,13 @@ const colors = {
 let building_info_open = true;
 let building_create_open = true;
 let currencies = {
-    'blue_squares': 10000000000,
-    'red_squares': 10000000000,
-    'green_squares': 10000000000,
-    'purple_squares': 10000000000,
-    'orange_squares': 10000000000,
-    'yellow_squares': 10000000000,
-    'white_squares': 10000000000
+    'blue_squares': 0,
+    'red_squares': 0,
+    'green_squares': 0,
+    'purple_squares': 0,
+    'orange_squares': 0,
+    'yellow_squares': 0,
+    'white_squares': 0
 };
 let buy_costs = {
     'blue_squares': 0,
@@ -329,7 +329,7 @@ class grass_block {
             const DO_SHADE = ((this.x / (BLOCK_WIDTH * global_scale)) + (this.y / (BLOCK_HEIGHT * global_scale))) % 2;
             grid[`${coordX - GAME_BORDER}_${coordY - GAME_BORDER}`] = '';
             this.highlightable = true;
-            if (getRandomInt(7) === 1) {
+            if (getRandomInt(10) === 1) {
                 if ((Math.round(DO_SHADE) === 0) || (Math.round(DO_SHADE) === 2)) return this.drawGrassImage(textureInfos.inner.bush.dark[getRandomInt(2)]);
                 if (Math.round(DO_SHADE) === 1) return this.drawGrassImage(textureInfos.inner.bush.light[getRandomInt(2)]);
             } else {
@@ -690,7 +690,7 @@ class square {
         this.displayed = false;
         this.health = object.health ?? 100;
         this.maxHealth = object.maxHealth ?? 100;
-        this.id = getRandomInt();
+        this.id = object.id ?? getRandomInt();
         this.totalCost = object.totalCost ?? buy_costs[`${this.color.toLowerCase()}_squares`];
         document.getElementById('resource-displays').innerHTML += `
             <div id="resource-display-${this.id}" class="resource-display">+
@@ -698,7 +698,8 @@ class square {
                 <div id="resource-display-resource-icon-${this.id}" class="resource-icon ${this.color.toLowerCase()}">
             </div>
         `;
-        this.createdOn = object.timeCreated ?? getTime();
+        this.createdAt = object.createdAt ?? Date.now();
+        this.timeCreated = object.timeCreated ?? getFormatedTime(this.createdAt);
         image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].highlightable = false;
         image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].highlightable = false;
         image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].highlightable = false;
@@ -931,7 +932,7 @@ class square {
         this.displayed = true;
         document.getElementById("building-info-square_type").textContent = `${this.color} Square`;
         document.getElementById("building-info-level").textContent = `Level: ${this.level}`;
-        document.getElementById("building-info-created").textContent = `Created on: ${this.createdOn}`;
+        document.getElementById("building-info-created").textContent = `Created on: ${this.timeCreated}`;
         document.getElementById("building-info-earnings_second").textContent = `Earnings per second: ${this.earningsPerSecond}`;
         document.getElementById("building-info-earnings_hour").textContent = `Earnings per hour: ${this.earningsPerHour}`;
         document.getElementById("building-info-upgrade-text").textContent = `Upgrade ${this.nextLevelUpgradeCost}`;
@@ -1020,6 +1021,18 @@ class square {
         this.originalY = copy(this.y);
         this.blockInline *= multiplier;
         this.borderWidth *= multiplier;
+    }
+    collectAfktime(milliseconds) {
+        currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond * Math.floor(milliseconds / 1000);
+    }
+    export() {
+        return {
+            'id': this.id,
+            'level': this.level,
+            'type': `${this.color}_square`,
+            'created-at': this.createdAt,
+            'total-cost': this.totalCost
+        };
     }
 }
 
@@ -1151,15 +1164,15 @@ function eventListners() {
     });
 }
 
-function getTime() {
-    const today = new Date();
-    const month = today.getMonth();
-    const day = today.getDate();
-    const year = today.getFullYear();
-    const date = `${month + 1}-${day}-${year}`;
-    let hours = today.getHours();
-    const mintues = today.getMinutes();
-    const seconds = today.getSeconds();
+function getFormatedTime(utc_code = Date.now()) {
+    const now = new Date(utc_code);
+    const month = now.getMonth();
+    const day_of_week = now.getDay();
+    const day = now.getDate();
+    const year = now.getFullYear();
+    let hours = now.getHours();
+    const mintues = now.getMinutes();
+    const seconds = now.getSeconds();
     let meridiem;
     if (hours < 12) {
         meridiem = 'AM';
@@ -1169,6 +1182,9 @@ function getTime() {
         meridiem = 'PM';
         hours -= 12;
     }
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thurs", "Fri", "Sat"];
+    const date = `${days[day_of_week]}, ${day} ${months[month]} ${year}`;
     const time = `${hours < 10 ? '0' + hours : hours}:${mintues < 10 ? '0' + mintues : mintues}:${seconds < 10 ? '0' + seconds : seconds} ${meridiem}`;
     const dateTime = time+'  '+date;
     return dateTime;
@@ -1291,7 +1307,6 @@ eventListners();
 createIntialSquares(1);
 centerBoard();
 notification('hi');
-console.log(googleUserCred);
 
 const UP_RESOURCES = setInterval(() => {
     for (const building_key of Object.keys(buildings)) {
