@@ -35,7 +35,7 @@
                 "no-square-movement": false,
                 "open-square-after-move": true
             },
-            "currincies": {
+            "currencies": {
                 "blue_squares": 0,
                 "red_squares": 0,
                 "green_squares": 0,
@@ -59,7 +59,9 @@
                     "level": 1,
                     "type": "color_buildingType",
                     "created-at": "11232342345, utc",
-                    "total-cost": 10
+                    "total-cost": 10,
+                    "coordX": 26,
+                    "coordY": 15
                 }
             }
         }

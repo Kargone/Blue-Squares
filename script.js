@@ -146,12 +146,12 @@ let grass_grid = [
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
@@ -168,6 +168,7 @@ let grass_grid = [
 ];
 let addHighlight = false;
 let last_touch_distance = 0;
+let username;
 
 // for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
 //     grass_grid[grass_grid_y] = [];
@@ -1031,7 +1032,9 @@ class square {
             'level': this.level,
             'type': `${this.color}_square`,
             'created-at': this.createdAt,
-            'total-cost': this.totalCost
+            'total-cost': this.totalCost,
+            'coordX': this.coordX,
+            'coordY': this.coordY
         };
     }
 }
@@ -1071,6 +1074,9 @@ function eventListners() {
             buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
             document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${buy_costs[`${color.toLowerCase()}_squares`]}`;
         });
+        if (buy_costs[`${color.toLowerCase()}_squares`] > 0) {
+            document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${buy_costs[`${color.toLowerCase()}_squares`]}`;
+        }
     }
     
     document.getElementById("toggle-building-info").addEventListener('click', function () {
@@ -1302,18 +1308,38 @@ function getDistance(x1, y1, x2, y2){
     return Math.sqrt(x * x + y * y);
 }
 
-createGrass();
-eventListners();
-createIntialSquares(1);
-centerBoard();
-notification('hi');
-
-const UP_RESOURCES = setInterval(() => {
-    for (const building_key of Object.keys(buildings)) {
-        let building = buildings[building_key];
-        building.upResource();
+function createGame() {
+    const intial_player_data = JSON.parse(sessionStorage.getItem('intialPlayerData'));
+    grass_grid = JSON.parse(intial_player_data['grass-grid']);
+    user_settings = intial_player_data['user-settings'];
+    currencies = intial_player_data['currencies'];
+    buy_costs = intial_player_data['buy-costs'];
+    username = intial_player_data['username'];
+    createGrass();
+    eventListners();
+    centerBoard();
+    notification('hi');
+    const building_data = intial_player_data['building-data'];
+    for (const building_key of Object.keys(building_data)) {
+        const building = building_data[building_key];
+        const color = building.type.split('_')[0];
+        new square({
+            'id': building_key,
+            'level': building.level,
+            'createdAt': building['created-at'],
+            'totalCost': building['total-cost'],
+            'color': color,
+            'coordX': building.coordX,
+            'coordY': building.coordY
+        });
     }
-    for (const color of Object.keys(colors)) {
-        document.getElementById(`${color.toLowerCase()}-squares-count`).textContent = currencies[`${color.toLowerCase()}_squares`];
-    }
-}, 1000);
+    const UP_RESOURCES = setInterval(() => {
+        for (const building_key of Object.keys(buildings)) {
+            let building = buildings[building_key];
+            building.upResource();
+        }
+        for (const color of Object.keys(colors)) {
+            document.getElementById(`${color.toLowerCase()}-squares-count`).textContent = currencies[`${color.toLowerCase()}_squares`];
+        }
+    }, 1000);
+}
