@@ -8,19 +8,58 @@
   </head>
   <body id="body">
     <canvas id="game-canvas"></canvas>
+    <div id="notifications"></div>
     <h1 class="shimmer">Blue Squares</h1>
     <br>
-    <button>Play</button>
+    <button id="play">Play</button>
     <br>
-    <button>Tutorial</button>
+    <button id="tutorial">Tutorial</button>
     <br>
     <button id="google-sign-in">Sign In</button>
     <script src="../setup-webgl2.js"></script>
+    <script>
+      let notificationRemoved = {'id': 'removed or not'};
+      function notification(text) {
+          let x = getRandomInt();
+          const newDiv = document.createElement("div");
+          newDiv.innerHTML = `
+              <p class="notificationText">${text}</p>
+              <p class="deleteNotification" id="delete${x}">X</p>
+              <div class="notificationTimeBar"></div>
+          `;
+          newDiv.classList = 'notification';
+          newDiv.setAttribute("id", `noti${x}`);
+          const currentDiv = document.getElementById("notifications");
+          currentDiv.appendChild(newDiv);
+          notificationRemoved[x] = false;
+          document.getElementById(`delete${x}`).addEventListener('click', function () {
+              removeNotification(x);
+          });
+          setTimeout(function() {
+              if (notificationRemoved[x]) return;
+              removeNotification(x);
+          }, 3000);
+          function removeNotification(x) {
+              // document.getElementById("noti"+x).classList += " deletedNotification";
+              setTimeout(function() {
+                  // document.getElementById("noti"+x).remove();
+                  notificationRemoved[x] = true;
+              }, 500);
+          }
+      }
+    </script>
     <script type="module">
       // Import the functions you need from the SDKs you need
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics.js";
-      import { GoogleAuthProvider, getAuth, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+      import { 
+        getAuth, 
+        signInWithPopup,
+        GoogleAuthProvider, 
+        signInAnonymously,
+        EmailAuthProvider,
+        linkWithCredential
+      } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
       // TODO: Add SDKs for Firebase products that you want to use
       // https://firebase.google.com/docs/web/setup#available-libraries
     
@@ -40,13 +79,46 @@
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const analytics = getAnalytics(app);
-      const provider = new GoogleAuthProvider();
       const auth = getAuth();
+      if (localStorage.getItem('user') != null) document.getElementById("google-sign-in").textContent = "Sign Out";
+      document.getElementById("play").addEventListener('click', async function () {
+        if (localStorage.getItem('user') != null) return notification('Already signed into google');;
+        signInAnonymously(auth).then(() => {
+          // Signed in..
+          notification('Sign in anonymously success');
+          localStorage.setItem('sign-in-type', 'anonymous');
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // ...
+          notification('Sign in anonymously fail');
+        });
+        window.location.href = "../index.html";
+      });
       document.getElementById("google-sign-in").addEventListener('click', async function () {
-        // signInWithRedirect(auth, new GoogleAuthProvider());
+        if (localStorage.getItem('user') != null) {
+          localStorage.clear();
+          notification('Sign out');
+          window.location.href = "intro-page.html";
+          return;
+        }
         const userCred = await signInWithPopup(auth, new GoogleAuthProvider());
-        console.log(userCred)
-        // window.location.href = "../index.html";
+        console.log(userCred);
+        console.log(userCred.email, userCred.uid);
+        const credential = EmailAuthProvider.credential(userCred.user.email, userCred.user.uid);
+        console.log(credential);
+        await linkWithCredential(auth.currentUser, credential)
+          .then((usercred) => {
+            const user = usercred.user;
+            notification("Account linking success", user);
+          }).catch((error) => {
+            notification("Account linking error", error);
+          });
+        localStorage.setItem('user', JSON.stringify(userCred.user));
+        localStorage.setItem('sign-in-type', 'google');
+        notification('Sign into google');
+        window.location.href = "../index.html";
       });
     </script>
     <script src="intro-page.js"></script>

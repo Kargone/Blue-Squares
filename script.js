@@ -103,7 +103,6 @@ const colors = {
 };
 let building_info_open = true;
 let building_create_open = true;
-let notificationRemoved = {'id': 'removed or not'};
 let currencies = {
     'blue_squares': 10000000000,
     'red_squares': 10000000000,
@@ -1042,35 +1041,6 @@ function getRandomInt(max = 1000000000) {
     return Math.floor(Math.random() * max);
 }
 
-function notification(text) {
-    let x = getRandomInt();
-    const newDiv = document.createElement("div");
-    newDiv.innerHTML = `
-        <p class="notificationText">${text}</p>
-        <p class="deleteNotification" id="delete${x}">X</p>
-        <div class="notificationTimeBar"></div>
-    `;
-    newDiv.classList = 'notification';
-    newDiv.setAttribute("id", `noti${x}`);
-    const currentDiv = document.getElementById("notifications");
-    currentDiv.appendChild(newDiv);
-    notificationRemoved[x] = false;
-    document.getElementById(`delete${x}`).addEventListener('click', function () {
-        removeNotification(x);
-    });
-    setTimeout(function() {
-        if (notificationRemoved[x]) return;
-        removeNotification(x);
-    }, 3000);
-    function removeNotification(x) {
-        document.getElementById("noti"+x).classList += " deletedNotification";
-        setTimeout(function() {
-            document.getElementById("noti"+x).remove();
-            notificationRemoved[x] = true;
-        }, 500);
-    }
-}
-
 function copy(value) {
     return JSON.parse(JSON.stringify(value));
 }
@@ -1321,6 +1291,7 @@ eventListners();
 createIntialSquares(1);
 centerBoard();
 notification('hi');
+console.log(googleUserCred);
 
 const UP_RESOURCES = setInterval(() => {
     for (const building_key of Object.keys(buildings)) {

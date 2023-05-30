@@ -197,10 +197,43 @@
     <div id="fps">Hi</div>
     <script src="setup-webgl2.js"></script>
     <script src="init-webgl2-images.js"></script>
+    <script>
+      let notificationRemoved = {'id': 'removed or not'};
+      function notification(text) {
+          let x = getRandomInt();
+          const newDiv = document.createElement("div");
+          newDiv.innerHTML = `
+              <p class="notificationText">${text}</p>
+              <p class="deleteNotification" id="delete${x}">X</p>
+              <div class="notificationTimeBar"></div>
+          `;
+          newDiv.classList = 'notification';
+          newDiv.setAttribute("id", `noti${x}`);
+          const currentDiv = document.getElementById("notifications");
+          currentDiv.appendChild(newDiv);
+          notificationRemoved[x] = false;
+          document.getElementById(`delete${x}`).addEventListener('click', function () {
+              removeNotification(x);
+          });
+          setTimeout(function() {
+              if (notificationRemoved[x]) return;
+              removeNotification(x);
+          }, 3000);
+          function removeNotification(x) {
+              document.getElementById("noti"+x).classList += " deletedNotification";
+              setTimeout(function() {
+                  document.getElementById("noti"+x).remove();
+                  notificationRemoved[x] = true;
+              }, 500);
+          }
+      }
+    </script>
     <script type="module">
+      if (localStorage.getItem('user') === null) window.location.href = "/Intro Info/intro-page.html";
       // Import the functions you need from the SDKs you need
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-      import { GoogleAuthProvider, getAuth, getRedirectResult } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+      import { getAuth, signInWithEmailAndPassword  } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+      import { getDatabase } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
       // TODO: Add SDKs for Firebase products that you want to use
       // https://firebase.google.com/docs/web/setup#available-libraries
     
@@ -216,35 +249,27 @@
         appId: "1:902439481018:web:4cc44b28a38a62e8c01c83",
         measurementId: "G-Q5HDHVEEDJ"
       };
-    
+
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
-      const provider = new GoogleAuthProvider();
+      const googleUserCred = JSON.parse(localStorage.getItem('user'));
+      // localStorage.removeItem('user');
       const auth = getAuth();
-      // const userCred = ;
-      console.log(await getRedirectResult(auth))
-      // getRedirectResult(auth)
-      //     .then((result) => {
-      //       // This gives you a Google Access Token. You can use it to access Google APIs.
-      //       const credential = GoogleAuthProvider.credentialFromResult(result);
-      //       const token = credential.accessToken;
-
-      //       // The signed-in user info.
-      //       const user = result.user;
-      //       // IdP data available using getAdditionalUserInfo(result)
-      //       // ...
-      //       alert(user.displayName)
-      //     }).catch((error) => {
-      //       // Handle Errors here.
-      //       const errorCode = error.code;
-      //       alert(errorCode)
-      //       const errorMessage = error.message;
-      //       // The email of the user's account used.
-      //       const email = error.customData.email;
-      //       // The AuthCredential type that was used.
-      //       const credential = GoogleAuthProvider.credentialFromError(error);
-      //       // ...
-      //     });
+      let user;
+      await signInWithEmailAndPassword(auth, googleUserCred.email, googleUserCred.uid)
+        .then((userCredential) => {
+          // Signed in 
+          user = userCredential.user;
+          // ...
+          notification('signed in success', user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          notification(errorCode, errorMessage);
+        });
+      const database = getDatabase(app);
+      console.log(user);
     </script>
     <script src="script.js"></script>
   </body>
