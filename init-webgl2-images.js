@@ -89,8 +89,17 @@ let Resource_disps = 0;
 let Draw_shapes = 0;
 let counter = 0;
 let building_selected_id = '';
+let addHighlight = false;
+let user_settings = {};
+let global_scale = 1.5;
+let building_info_open = true;
+const GAME_BLOCK_AMOUNT_WIDTH = 50;
+const GAME_BLOCK_AMOUNT_HEIGHT = 30;
+const BLOCK_WIDTH = 30;
+const BLOCK_HEIGHT = 30;
+const GAME_BORDER = 4;
 
-function main() {
+function display() {
   // Get A WebGL context
   /** @type {HTMLCanvasElement} */
   var canvas = document.querySelector("#game-canvas");
@@ -494,8 +503,6 @@ function main() {
     checkedDragBoard = false;
   }
 }
-
-main();
 
 // creates a texture info { width: w, height: h, texture: tex }
 // The texture will start with 1x1 pixels and be updated

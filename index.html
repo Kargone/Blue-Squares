@@ -229,9 +229,9 @@
           }
       }
     </script>
+    <script type="module" src="script.js"></script>
     <script type="module">
       if (localStorage.getItem('sign-in-type') === null) window.location.href = "/Intro Info/intro-page.html";
-      // Import the functions you need from the SDKs you need
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
       import { getAuth, signInWithEmailAndPassword, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
       import { 
@@ -243,11 +243,8 @@
         push, 
         update
       } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
-    
-      // Your web app's Firebase configuration
-      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      import { createGame } from "./script.js";
+
       const firebaseConfig = {
         apiKey: "AIzaSyByhAfobvZt_OQu-32tVbXho6n2L4IaNEE",
         authDomain: "blue-squares-d1f83.firebaseapp.com",
@@ -399,13 +396,8 @@
         get(child(dbRef, `users/${userId}`)).then((snapshot) => {
             if (snapshot.exists()) {
               const intialPlayerData = snapshot.val();
-              console.log(intialPlayerData)
               let logins = snapshot.val().logins;
-              console.log(logins)
-              console.log(Object.keys(logins).length)
               let devices = snapshot.val().devices;
-              console.log(devices)
-              console.log(Object.keys(devices).length)
               const last_time_online = Date.now();
               const total_afk_time = snapshot.val()['total-time-collect-afk'] + last_time_online - snapshot.val()['last-time-online'] - logins[`login-${Object.keys(logins).length}`]['in-game-time'];
               const total_time = last_time_online - logins['login-1'].time;
@@ -457,6 +449,5 @@
           });
       }
     </script>
-    <script src="script.js"></script>
   </body>
 </html>

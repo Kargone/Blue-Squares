@@ -15,6 +15,31 @@ window.addEventListener('resize', () => {
     body.style.width = window.innerWidth + 'px';
     body.style.height = window.innerHeight + 'px';
 });
+display();
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { 
+    getDatabase,
+    child,
+    ref,
+    set,
+    get,
+    push, 
+    update,
+    remove
+  } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+const firebaseConfig = {
+    apiKey: "AIzaSyByhAfobvZt_OQu-32tVbXho6n2L4IaNEE",
+    authDomain: "blue-squares-d1f83.firebaseapp.com",
+    databaseURL: "https://blue-squares-d1f83-default-rtdb.firebaseio.com",
+    projectId: "blue-squares-d1f83",
+    storageBucket: "blue-squares-d1f83.appspot.com",
+    messagingSenderId: "902439481018",
+    appId: "1:902439481018:web:4cc44b28a38a62e8c01c83",
+    measurementId: "G-Q5HDHVEEDJ"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const dbRef = ref(getDatabase(app));
 
 const GAME_BLOCK_AMOUNT_WIDTH = 50;
 const GAME_BLOCK_AMOUNT_HEIGHT = 30;
@@ -27,7 +52,6 @@ shapes = {
     'z2': {}
 };
 buildings = {};
-let global_scale = 1.5;
 const MAX_GLOBAL_SCALE = Math.min(
     window.innerWidth / 5 / BLOCK_WIDTH, 
     window.innerHeight / 5 / BLOCK_WIDTH
@@ -36,6 +60,7 @@ const MIN_GLOBAL_SCALE = Math.max(
     window.innerWidth / 25 / BLOCK_WIDTH, 
     window.innerHeight / 25 / BLOCK_WIDTH
 );
+global_scale = MIN_GLOBAL_SCALE;
 grid = {
     'x': (GAME_BORDER) * BLOCK_WIDTH * global_scale, 
     'y': (GAME_BORDER) * BLOCK_HEIGHT * global_scale,
@@ -101,7 +126,7 @@ const colors = {
         'b2': 250,
     },
 };
-let building_info_open = true;
+building_info_open = true;
 let building_create_open = true;
 let currencies = {
     'blue_squares': 0,
@@ -131,7 +156,7 @@ let user_settings = {
     'double-tap-delete': true,
     'no-square-movement': false,
     'open-square-after-move': true
-}
+};
 let grass_grid = [
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
@@ -166,9 +191,10 @@ let grass_grid = [
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"]
 ];
-let addHighlight = false;
+addHighlight = false;
 let last_touch_distance = 0;
 let username;
+let userId = JSON.parse(localStorage.getItem('user')).uid;
 
 // for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
 //     grass_grid[grass_grid_y] = [];
@@ -706,6 +732,14 @@ class square {
         image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].highlightable = false;
         image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].highlightable = false;
         buildings[this.id] = this;
+        update(ref(db, `users/${userId}/game-data/building-data/${this.id}`), {
+            "level": this.level,
+            "type": `${this.color}_square`,
+            "created-at": this.createdAt,
+            "total-cost": this.totalCost,
+            "coordX": this.coordX,
+            "coordY": this.coordY
+        });
         return this.removed = false;
     }
     assignCoords() {
@@ -862,6 +896,7 @@ class square {
             grid[`${this.coordX + 1}_${this.coordY}`] = `${this.color}_square`;
             grid[`${this.coordX}_${this.coordY + 1}`] = `${this.color}_square`;
             grid[`${this.coordX + 1}_${this.coordY + 1}`] = `${this.color}_square`;
+            this.updateSquareInFirebase();
         } else {
             this.removeHighlights();
             this.x = copy(this.originalX);
@@ -919,6 +954,7 @@ class square {
         square_object.b = this.b;
         document.getElementById(`resource-display-${this.id}-count`).textContent = this.earningsPerSecond;
         document.getElementById(`${this.color.toLowerCase()}-squares-count`).textContent = currencies[`${this.color.toLowerCase()}_squares`];
+        this.updateSquareInFirebase();
     }
     displaySquare() {
         if (this.displayed) return;
@@ -987,6 +1023,7 @@ class square {
         grid[`${this.coordX + 1}_${this.coordY}`] = '';
         grid[`${this.coordX}_${this.coordY + 1}`] = '';
         grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
+        remove(ref(db, `users/${userId}/game-data/building-data/${this.id}`));
     }
     updateResourceDisplay() {
         document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 2.5 * 2 * global_scale) + 'px';
@@ -1026,9 +1063,16 @@ class square {
     collectAfktime(milliseconds) {
         currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond * Math.floor(milliseconds / 1000);
     }
+    updateSquareInFirebase() {
+        update(ref(db, `users/${userId}/game-data/building-data/${this.id}`), {
+            "level": this.level,
+            "total-cost": this.totalCost,
+            "coordX": this.coordX,
+            "coordY": this.coordY
+        });
+    }
     export() {
         return {
-            'id': this.id,
             'level': this.level,
             'type': `${this.color}_square`,
             'created-at': this.createdAt,
@@ -1073,6 +1117,7 @@ function eventListners() {
             currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_squares`];
             buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
             document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${buy_costs[`${color.toLowerCase()}_squares`]}`;
+            updateBuyCosts();
         });
         if (buy_costs[`${color.toLowerCase()}_squares`] > 0) {
             document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${buy_costs[`${color.toLowerCase()}_squares`]}`;
@@ -1150,6 +1195,7 @@ function eventListners() {
                     document.getElementById('open-square-after-move-container').className = 'toggle collapse-selector';
                 }
             }
+            updateUserSettings();
         });
     }
 
@@ -1282,10 +1328,10 @@ function createIntialSquares(count) {
 function centerBoard() {
     const orginal_grid_x = grid.x;
     grid.x = window.innerWidth / 2 - (GAME_BLOCK_AMOUNT_WIDTH / 2) * BLOCK_WIDTH * global_scale - BLOCK_WIDTH * global_scale;
-    translateX = grid.x - orginal_grid_x;
+    const translateX = grid.x - orginal_grid_x;
     const orginal_grid_y = grid.y;
     grid.y = window.innerHeight / 2 - (GAME_BLOCK_AMOUNT_HEIGHT / 2) * BLOCK_HEIGHT * global_scale - BLOCK_HEIGHT * global_scale;
-    translateY = grid.y - orginal_grid_y;
+    const translateY = grid.y - orginal_grid_y;
     for (const building_key of Object.keys(buildings)) {
         let building = buildings[building_key];
         building.translate(translateX, translateY);
@@ -1308,7 +1354,25 @@ function getDistance(x1, y1, x2, y2){
     return Math.sqrt(x * x + y * y);
 }
 
-function createGame() {
+function updateBuyCosts() {
+    update(ref(db, `users/${userId}/game-data`), {
+        "buy-costs": buy_costs
+    });
+}
+
+function updateCurrincies() {
+    update(ref(db, `users/${userId}/game-data`), {
+        "currencies": currencies
+    });
+}
+
+function updateUserSettings() {
+    update(ref(db, `users/${userId}/game-data`), {
+        "user-settings": user_settings
+    });
+}
+
+export function createGame() {
     const intial_player_data = JSON.parse(sessionStorage.getItem('intialPlayerData'));
     grass_grid = JSON.parse(intial_player_data['grass-grid']);
     user_settings = intial_player_data['user-settings'];
@@ -1318,7 +1382,6 @@ function createGame() {
     createGrass();
     eventListners();
     centerBoard();
-    notification('hi');
     const building_data = intial_player_data['building-data'];
     for (const building_key of Object.keys(building_data)) {
         const building = building_data[building_key];
@@ -1341,5 +1404,6 @@ function createGame() {
         for (const color of Object.keys(colors)) {
             document.getElementById(`${color.toLowerCase()}-squares-count`).textContent = currencies[`${color.toLowerCase()}_squares`];
         }
+        updateCurrincies();
     }, 1000);
 }
