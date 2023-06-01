@@ -1,0 +1,225 @@
+if (localStorage.getItem('sign-in-type') === null) window.location.href = "/Intro Info/intro-page.html";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { 
+    getDatabase,
+    child,
+    ref,
+    set,
+    get,
+    push, 
+    update
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+import { createGame } from "./script.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyByhAfobvZt_OQu-32tVbXho6n2L4IaNEE",
+    authDomain: "blue-squares-d1f83.firebaseapp.com",
+    databaseURL: "https://blue-squares-d1f83-default-rtdb.firebaseio.com",
+    projectId: "blue-squares-d1f83",
+    storageBucket: "blue-squares-d1f83.appspot.com",
+    messagingSenderId: "902439481018",
+    appId: "1:902439481018:web:4cc44b28a38a62e8c01c83",
+    measurementId: "G-Q5HDHVEEDJ"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const googleUserCred = JSON.parse(localStorage.getItem('user'));
+// localStorage.removeItem('user');
+const signInType = localStorage.getItem('sign-in-type');
+const auth = getAuth();
+const db = getDatabase(app);
+const dbRef = ref(getDatabase(app));
+if (signInType === 'google') {
+    await signInWithEmailAndPassword(auth, googleUserCred.email, googleUserCred.uid)
+    .then((userCredential) => {
+        console.log(userCredential)
+        const user = userCredential.user;
+        const userId = user.uid;
+        notification('Logged in', user.displayName);
+        connectToDatabase(user, userId);
+    })
+    .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        notification('Sign in with email/password fail');
+        console.log(errorCode, errorMessage);
+        setTimeout(() => {
+        // window.location.href = "/Intro Info/intro-page.html";
+        }, 1000);
+    });
+} else if (signInType === 'anonymous') {
+    signInAnonymously(auth).then((userCredential) => {
+        console.log(userCredential)
+        let user = userCredential.user;
+        user.displayName = 'Anonymous';
+        const userId = user.uid;
+        notification('Logged in', user.displayName);
+        connectToDatabase(user, userId);
+    })
+    .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        notification('Sign in anonymously fail');
+        console.log(errorCode, errorMessage);
+        setTimeout(() => {
+        // window.location.href = "/Intro Info/intro-page.html";
+        }, 1000);
+    });
+} else {
+    window.location.href = "/Intro Info/intro-page.html";
+}
+
+function connectToDatabase(user, userId) {
+    get(child(dbRef, `users/${userId}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+            notification('Retrived data')
+            const intialPlayerData = snapshot.val()['game-data'];
+            sessionStorage.setItem('intialPlayerData', JSON.stringify(intialPlayerData));
+            sessionStorage.setItem('username', snapshot.val()['username']);
+            updatePlayerInformation(userId);
+        } else {
+            notification('Creating new player node');
+            sessionStorage.setItem('afk-collected', 0);
+            let intialPlayerData = {
+            "username": user.displayName,
+            "tutorial-step-num": 1,
+            "user-settings": {
+                "all-notifications": true,
+                "notification-invalid-movement": true,
+                "notification-not-enough-upgrade": true,
+                "notification-not-enough-new-square": true,
+                "notification-deletion": true,
+                "no-delete": false,
+                "double-tap-delete": true,
+                "no-square-movement": false,
+                "open-square-after-move": true
+            },
+            "currencies": {
+                "blue_squares": 0,
+                "red_squares": 0,
+                "green_squares": 0,
+                "purple_squares": 0,
+                "orange_squares": 0,
+                "yellow_squares": 0,
+                "white_squares": 0
+            },
+            "buy-costs": {
+                "blue_squares": 0,
+                "red_squares": 0,
+                "green_squares": 0,
+                "purple_squares": 0,
+                "orange_squares": 0,
+                "yellow_squares": 0,
+                "white_squares": 0
+            },
+            "grass-grid": '[["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","i","i","i","i","i","i","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"]]',
+            "building-data": {}
+            };
+            intialPlayerData['building-data'][Math.floor(Math.random() * 1000000000)] = {
+            "level": 1,
+            "type": "Blue_square",
+            "created-at": Date.now(),
+            "total-cost": 0,
+            "coordX": 26,
+            "coordY": 15
+            };
+            sessionStorage.setItem('intialPlayerData', JSON.stringify(intialPlayerData));
+            sessionStorage.setItem('username', user.displayName);
+            set(ref(db, `users/${userId}`), {
+            "username": user.displayName,
+            "email-address": user.email,
+            "logins": {
+                "login-1": {
+                    "device-number": 1,
+                    "device-deminsions": `${window.innerWidth}x${window.innerHeight}`,
+                    "time": Date.now(),
+                    "collected-afk-time": 0,
+                    "in-game-time": 0
+                }
+            },
+            "devices": {
+                "device-1": {
+                    "dimensions": `${window.innerWidth}x${window.innerHeight}`,
+                    "number-of-logins": 1
+                }
+            },
+            "total-time-collect-afk": 0,
+            "total-in-game-time": 0,
+            "total-time": 0,
+            "last-time-online": Date.now(),
+            "game-data": intialPlayerData
+            });
+            createGame();
+        }
+        document.getElementById("loading-screen").style.display = 'none';
+        }).catch((error) => {
+        notification('Fail to get database');
+        console.log(error);
+        setTimeout(() => {
+        // window.location.href = "/Intro Info/intro-page.html";
+        }, 1000);  
+    });
+}
+
+function updatePlayerInformation(userId) {
+    get(child(dbRef, `users/${userId}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+            const intialPlayerData = snapshot.val();
+            let logins = snapshot.val().logins;
+            let devices = snapshot.val().devices;
+            const last_time_online = Date.now();
+            const total_afk_time = snapshot.val()['total-time-collect-afk'] + last_time_online - snapshot.val()['last-time-online'] - logins[`login-${Object.keys(logins).length}`]['in-game-time'];
+            const total_time = last_time_online - logins['login-1'].time;
+            const afk_collected = last_time_online - snapshot.val()['last-time-online'] - logins[`login-${Object.keys(logins).length}`]['in-game-time'];
+            const in_game_time = snapshot.val()['total-in-game-time'] + logins[`login-${Object.keys(logins).length}`]['in-game-time'];
+            sessionStorage.setItem('afk-collected', afk_collected);
+            let device_number = 0;
+            for (const device_key of Object.keys(devices)) {
+            let device = devices[device_key];
+            if (device.dimensions === `${window.innerWidth}x${window.innerHeight}`) {
+                device['number-of-logins'] += 1;
+                device_number = device_key.split('-')[1];
+                break;
+            }
+            }
+            if (device_number === 0) {
+            devices[`device-${Object.keys(devices).length + 1}`] = {
+                "dimensions": `${window.innerWidth}x${window.innerHeight}`,
+                "number-of-logins": 1
+            };
+            device_number = Object.keys(devices).length;
+            }
+            const login_in_number = Object.keys(logins).length + 1;
+            logins[`login-${login_in_number}`] = {
+            "device-number": device_number,
+            "device-deminsions": `${window.innerWidth}x${window.innerHeight}`,
+            "time": Date.now(),
+            "collected-afk-time": afk_collected,
+            "in-game-time": 0
+            };
+            sessionStorage.setItem('login_in_number', login_in_number);
+            update(ref(db, `users/${userId}`), {
+            "devices": devices,
+            "last-time-online": last_time_online,
+            "logins": logins,
+            "total-time": total_time,
+            "total-time-collect-afk": total_afk_time,
+            "total-in-game-time": in_game_time
+            });
+        } else {
+            notification('Player info no exist');
+            setTimeout(() => {
+            window.location.href = "/Intro Info/intro-page.html";
+            }, 1000); 
+        }
+        createGame();
+        }).catch((error) => {
+        notification('Fail to get player info');
+        console.log(error);
+        setTimeout(() => {
+        // window.location.href = "/Intro Info/intro-page.html";
+        }, 1000);  
+    });
+}

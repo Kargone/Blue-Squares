@@ -195,6 +195,7 @@ addHighlight = false;
 let last_touch_distance = 0;
 let username;
 let userId = JSON.parse(localStorage.getItem('user')).uid;
+let in_game_time = 0;
 
 // for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
 //     grass_grid[grass_grid_y] = [];
@@ -1203,6 +1204,33 @@ function eventListners() {
         document.getElementById(`${type}-toggle`).checked = user_settings[type];
     }
     
+    document.getElementById("settings-username-input").addEventListener('change', function () {
+        const tempUsername = this.value;
+        if ((tempUsername != "") && (tempUsername.length < 15)) {
+            username = tempUsername;
+            update(ref(db, `users/${userId}/game-data`), {
+                "username": username
+            });
+            update(ref(db, `users/${userId}`), {
+                "username": username
+            });
+        } else if (tempUsername.length >= 15) {
+            this.value = username;
+            notification("Username length must be less than 15 characters");
+        } else {
+            this.value = username;
+            notification("Not a valid username");
+        }
+    });
+
+    document.getElementById("settings-username-input").value = username;
+
+    document.getElementById("log-out").addEventListener('click', function () {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "/Intro Info/intro-page.html";
+    });
+
     document.getElementById("leaderboard").addEventListener('click', function () {
         document.getElementById("leaderboard-tab-container").style.display = 'block';
     });
@@ -1243,7 +1271,7 @@ function getFormatedTime(utc_code = Date.now()) {
 }
 
 function afkTime(since) {
-    let milliseconds = Date.now() - since;
+    let milliseconds = since;
     let days = Math.floor(milliseconds / 1000 / 60 / 60 / 24);
     milliseconds -= days * 1000 * 60 * 60 * 24;
     days = days > 0? `${days} ${days === 1? 'day' : 'days'} ` : '';
@@ -1366,6 +1394,12 @@ function updateCurrincies() {
     });
 }
 
+function updateInGameTime(log_in_number) {
+    update(ref(db, `users/${userId}/logins/login-${log_in_number}`), {
+        "in-game-time": in_game_time
+    });
+}
+
 function updateUserSettings() {
     update(ref(db, `users/${userId}/game-data`), {
         "user-settings": user_settings
@@ -1373,6 +1407,8 @@ function updateUserSettings() {
 }
 
 export function createGame() {
+    username = sessionStorage.getItem('username');
+    notification(`Hello ${username}`);
     const intial_player_data = JSON.parse(sessionStorage.getItem('intialPlayerData'));
     grass_grid = JSON.parse(intial_player_data['grass-grid']);
     user_settings = intial_player_data['user-settings'];
@@ -1396,6 +1432,14 @@ export function createGame() {
             'coordY': building.coordY
         });
     }
+    const afked_time = sessionStorage.getItem('afk-collected');
+    const afked_time_formated = afkTime(parseInt(afked_time));
+    for (const building_key of Object.keys(buildings)) {
+        let building = buildings[building_key];
+        building.collectAfktime(afked_time);
+    }
+    notification(`Collceted ${afked_time_formated} worth of time`);
+    const log_in_number = sessionStorage.getItem('login_in_number');
     const UP_RESOURCES = setInterval(() => {
         for (const building_key of Object.keys(buildings)) {
             let building = buildings[building_key];
@@ -1405,5 +1449,10 @@ export function createGame() {
             document.getElementById(`${color.toLowerCase()}-squares-count`).textContent = currencies[`${color.toLowerCase()}_squares`];
         }
         updateCurrincies();
+        in_game_time += 1000;
+        updateInGameTime(log_in_number); 
     }, 1000);
+    setTimeout(() => {
+        window.location.href = "/Intro Info/intro-page.html";
+    }, 1000 * 60 * 30);
 }
