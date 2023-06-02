@@ -211,7 +211,6 @@
 
 #building-info {
     height: fit-content;
-    aspect-ratio: 4 / 8;
     background: #d6c289;
     position: fixed;
     top: 20%;
@@ -223,8 +222,13 @@
     min-height: 35%;
 }
 
+#building-info > #building-info-no-content {
+    padding: 0px 5px 0px 5px;
+}
+
 #building-info > #building-info-content {
     visibility: hidden;
+    padding: 20px 5px 20px 5px;
 }
 
 #building-info > #building-info-content > #refund-text, #building-info-created {
@@ -233,6 +237,7 @@
 
 #building-info > #building-info-content > #building-info-square_type {
     margin-bottom: 3px;
+    margin-top: 0px;
 }
 
 #building-info > #building-info-content > #building-info-level {
