@@ -423,7 +423,7 @@ function display() {
     }
     mouseX = touch.clientX;
     mouseY = touch.clientY;
-  });
+  }, {passive: true});
   gl.canvas.addEventListener('mousedown', (e) => {
     mouse_down = true;
     const rect = canvas.getBoundingClientRect();
@@ -472,7 +472,7 @@ function display() {
       let image = image_draw_infos[image_key];
       image.updateDistFromStartX_Y();
     }
-  });
+  }, {passive: true});
   gl.canvas.addEventListener('mouseup', (e) => {
     mouseEnd();
     console.log('X ', mouseX);
@@ -480,7 +480,7 @@ function display() {
   });
   gl.canvas.addEventListener('touchend', (e) => {
     mouseEnd();
-  });
+  }, {passive: true});
   document.addEventListener('mouseup', function () {
     mouseEnd();
   });
