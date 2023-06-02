@@ -690,7 +690,7 @@ const textureInfos = {
         loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outer-right-ups/outer-right-up-light-3.png')
       ]
     },
-    'edge-bush': loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/bush.png')
+    'edge-bush': loadImageAndCreateTextureInfo('images/Grass/Outer-Blocks/outers/bush.png')
   },
 };
 
