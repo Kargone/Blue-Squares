@@ -1011,6 +1011,14 @@ class square {
         delete_button.removeEventListener('click', this.deleteButtonListner);
     }
     remove() {
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].highlightable = true;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].highlightable = true;
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].highlightable = true;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].highlightable = true;
+        grid[`${this.coordX}_${this.coordY}`] = '';
+        grid[`${this.coordX + 1}_${this.coordY}`] = '';
+        grid[`${this.coordX}_${this.coordY + 1}`] = '';
+        grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
         delete buildings[this.id];
         delete shapes['z1'][this.outelineId];
         delete shapes['z2'][this.squareId];
@@ -1019,10 +1027,6 @@ class square {
         this.removeUpgradeListener();
         document.getElementById('building-info-no-content').style.display = 'block';
         document.getElementById('building-info-content').style.visibility = 'hidden';
-        grid[`${this.coordX}_${this.coordY}`] = '';
-        grid[`${this.coordX + 1}_${this.coordY}`] = '';
-        grid[`${this.coordX}_${this.coordY + 1}`] = '';
-        grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
         remove(ref(db, `users/${userId}/game-data/building-data/${this.id}`));
     }
     updateResourceDisplay() {
