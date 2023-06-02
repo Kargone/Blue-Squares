@@ -863,8 +863,8 @@ class square {
     }
     updateXandY() {
         this.removeHighlights();
-        this.x = Math.round((mouseX - this.width / 2) / (BLOCK_WIDTH * global_scale)) * BLOCK_WIDTH * global_scale;
-        this.y = Math.round((mouseY - this.height / 2) / (BLOCK_HEIGHT * global_scale)) * BLOCK_HEIGHT * global_scale;
+        this.x = (mouseX - this.width / 2);
+        this.y = (mouseY - this.height / 2);
         this.setCoordXandY();
         this.x = (this.coordX - 1) * BLOCK_WIDTH * global_scale + grid.x;
         this.y = (this.coordY - 1) * BLOCK_HEIGHT * global_scale + grid.y;
