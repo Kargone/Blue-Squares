@@ -430,7 +430,7 @@ class grass_block {
         for (const check of check_types) {
             if (this[check](local_grass_grid, coordX, coordY)) return;
         }
-        if (getRandomInt(7) === 1) {
+        if (getRandomInt(30) === 1) {
             this.drawGrassImage(textureInfos.outer.outside.tree[getRandomInt(3)]);
         } else {
             this.drawGrassImage(textureInfos.outer.outside.block[getRandomInt(6)]);
@@ -953,7 +953,7 @@ class square {
         square_object.g = this.g;
         square_object.b = this.b;
         document.getElementById(`resource-display-${this.id}-count`).textContent = this.earningsPerSecond;
-        document.getElementById(`${this.color.toLowerCase()}-squares-count`).textContent = currencies[`${this.color.toLowerCase()}_squares`];
+        document.getElementById(`${this.color.toLowerCase()}-squares-count`).textContent = getFormatedNumber(currencies[`${this.color.toLowerCase()}_squares`]);
         this.updateSquareInFirebase();
     }
     displaySquare() {
@@ -972,8 +972,8 @@ class square {
         document.getElementById("building-info-created").textContent = `Created on: ${this.timeCreated}`;
         document.getElementById("building-info-earnings_second").textContent = `Earnings per second: ${this.earningsPerSecond}`;
         document.getElementById("building-info-earnings_hour").textContent = `Earnings per hour: ${this.earningsPerHour}`;
-        document.getElementById("building-info-upgrade-text").textContent = `Upgrade ${this.nextLevelUpgradeCost}`;
-        document.getElementById("building-info-delete-text").textContent = `Delete ${this.totalCost}`;
+        document.getElementById("building-info-upgrade-text").textContent = `Upgrade ${getFormatedNumber(this.nextLevelUpgradeCost)}`;
+        document.getElementById("building-info-delete-text").textContent = `Delete ${getFormatedNumber(this.totalCost)}`;
         document.getElementById("building-info-upgrade-resource-icon").className = `resource-icon ${this.color.toLowerCase()}`;
         document.getElementById("building-info-delete-resource-icon").className = `resource-icon ${this.color.toLowerCase()}`;
         if (this.maxLevel === this.level) {
@@ -1116,11 +1116,11 @@ function eventListners() {
             if  (new_square.removed) return;
             currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_squares`];
             buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
-            document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${buy_costs[`${color.toLowerCase()}_squares`]}`;
+            document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${getFormatedNumber(buy_costs[`${color.toLowerCase()}_squares`])}`;
             updateBuyCosts();
         });
         if (buy_costs[`${color.toLowerCase()}_squares`] > 0) {
-            document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${buy_costs[`${color.toLowerCase()}_squares`]}`;
+            document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${getFormatedNumber(buy_costs[`${color.toLowerCase()}_squares`])}`;
         }
     }
     
@@ -1267,6 +1267,24 @@ function getFormatedTime(utc_code = Date.now()) {
     const time = `${hours < 10 ? '0' + hours : hours}:${mintues < 10 ? '0' + mintues : mintues}:${seconds < 10 ? '0' + seconds : seconds} ${meridiem}`;
     const dateTime = time+'  '+date;
     return dateTime;
+}
+
+function getFormatedNumber(number = 0) {
+    let suffixes = ['K', 'M', 'B', 'T', 'Q'];
+    if (number < 1000) return `${number}`;
+    for (let suffix_key in suffixes) {
+        suffix_key = parseInt(suffix_key);
+        const suffex = suffixes[suffix_key];
+        const lower_bound = Math.pow(1000, suffix_key + 1);
+        const upper_bound = Math.pow(1000, suffix_key + 2);
+        if ((lower_bound <= number) && (number < upper_bound)) {
+            number /= lower_bound;
+            number = String(number).substring(0, 4);
+            if (number.substring(3, 4) === '.') return number.substring(0, 3) + suffex;
+            return number + suffex;
+        }
+    }
+    return 'ERROR';
 }
 
 function afkTime(since) {
@@ -1445,7 +1463,7 @@ export function createGame() {
             building.upResource();
         }
         for (const color of Object.keys(colors)) {
-            document.getElementById(`${color.toLowerCase()}-squares-count`).textContent = currencies[`${color.toLowerCase()}_squares`];
+            document.getElementById(`${color.toLowerCase()}-squares-count`).textContent = getFormatedNumber(currencies[`${color.toLowerCase()}_squares`]);
         }
         updateCurrincies();
         in_game_time += 1000;
