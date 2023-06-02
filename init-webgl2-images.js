@@ -704,7 +704,6 @@ function dragShape() {
       building_selected.displaySquare();
       canDragBoard = false;
       checkedDragBoard = true;
-      console.log('h')
       return true;
     }
   }

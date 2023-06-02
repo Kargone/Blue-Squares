@@ -234,7 +234,6 @@ for (let y = 0; y <= lines_height; y++) {
 const square_count = getRandomIntMinMax(10, 15);
 
 for (let square_number = 0; square_number < square_count; square_number++) {
-    console.log(square_count);
     const side_length = getRandomIntMinMax(30, 50);
     const square = new rect(
         getRandomIntMinMax(0, window.innerWidth - side_length), 
