@@ -146,7 +146,7 @@ let buy_costs = {
     'yellow_squares': 0,
     'white_squares': 0
 };
-let user_settings = {
+user_settings = {
     'all-notifications': true,
     'notification-invalid-movement': true,
     'notification-not-enough-upgrade': true,
@@ -617,7 +617,6 @@ class grass_block {
         image_draw_infos[this.id] = this;
     }
     translateX_YfromStartX_Y(x, y) {
-        if (user_settings['no-square-movement']) return;
         this.x = mouseStartX_Y.x + x + this.distFromStartX;
         this.y = mouseStartX_Y.y + y + this.distFromStartY;
     }
