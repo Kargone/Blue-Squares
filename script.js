@@ -711,7 +711,7 @@ class square {
         );
         this.squareId = SQUARE.getId();
         this.selected = false;
-        this.nextLevelUpgradeCost = object.nextLevelCost ?? this.level;
+        this.nextLevelUpgradeCost = object.nextLevelCost ?? this.level * 10000;
         this.earningsPerSecond = object.earningsPerSecond ?? this.level;
         this.earningsPerHour = this.earningsPerSecond * 3600;
         this.displayed = false;
