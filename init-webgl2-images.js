@@ -725,6 +725,8 @@ function dragShape() {
   let translateX = mouseX - mouseStartX_Y.x;
   let translateY = mouseY - mouseStartX_Y.y;
   translateBoardFromStart(translateX, translateY);
+  building_info_open = false;
+  if (user_settings['open-square-after-move']) document.getElementById("building-info").className = "collapse-building-info";
 }
 
 function translateBoardFromStart(translateX, translateY) {
