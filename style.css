@@ -126,13 +126,13 @@
     margin-right: auto;
     margin-top: 0px;
     display: table;
-    border-spacing: 5px;
+    /* border-spacing: 5px; */
 }
 
-#buy-buttons > div > button > span {
+/* #buy-buttons > div > button > span {
     display: table-cell;
     width: fit-content;
-}
+} */
 
 #toggle-building-create {
     position: absolute;
@@ -245,17 +245,17 @@
     margin-bottom: 3px;
 }
 
-#building-info > #building-info-content > #building-info-upgrade, #building-info-delete {
+/* #building-info > #building-info-content > #building-info-upgrade, #building-info-delete {
     border-spacing: 5px;
-}
+} */
 
-#building-info > #building-info-content > #building-info-upgrade > span {
+/* #building-info > #building-info-content > #building-info-upgrade > span {
     display: table-cell;
 }
 
 #building-info > #building-info-content > #building-info-delete > span {
     display: table-cell;
-}
+} */
 
 #toggle-building-info {
     position: absolute;
@@ -539,7 +539,7 @@
 }
 
 .resource-icon-button-container {
-    padding-right: 25px;
+    padding-right: 27px;
     position: relative;
 }
 
