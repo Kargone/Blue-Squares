@@ -80,13 +80,13 @@
       const app = initializeApp(firebaseConfig);
       const analytics = getAnalytics(app);
       const auth = getAuth();
-      if (localStorage.getItem('user') != null) document.getElementById("google-sign-in").textContent = "Sign Out";
+      if (localStorage.getItem('blue-squares:user') != null) document.getElementById("google-sign-in").textContent = "Sign Out";
       document.getElementById("play").addEventListener('click', async function () {
-        if (localStorage.getItem('user') != null) return window.location.href = "../index.html";
+        if (localStorage.getItem('blue-squares:user') != null) return window.location.href = "../index.html";
         signInAnonymously(auth).then(() => {
           // Signed in..
           notification('Sign in anonymously success');
-          localStorage.setItem('sign-in-type', 'anonymous');
+          localStorage.setItem('blue-squares:sign-in-type', 'anonymous');
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -97,8 +97,10 @@
         window.location.href = "../index.html";
       });
       document.getElementById("google-sign-in").addEventListener('click', async function () {
-        if (localStorage.getItem('user') != null) {
-          localStorage.clear();
+        if (localStorage.getItem('blue-squares:user') != null) {
+          localStorage.removeItem('blue-squares:user');
+          localStorage.removeItem('blue-squares:sign-in-type');
+          sessionStorage.clear();
           notification('Sign out');
           window.location.href = "intro-page.html";
           return;
@@ -115,8 +117,8 @@
           }).catch((error) => {
             notification("Account linking error", error);
           });
-        localStorage.setItem('user', JSON.stringify(userCred.user));
-        localStorage.setItem('sign-in-type', 'google');
+        localStorage.setItem('blue-squares:user', JSON.stringify(userCred.user));
+        localStorage.setItem('blue-squares:sign-in-type', 'google');
         notification('Sign into google');
         window.location.href = "../index.html";
       });

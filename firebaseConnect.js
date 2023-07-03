@@ -1,4 +1,4 @@
-if (localStorage.getItem('sign-in-type') === null) window.location.href = "/Intro Info/intro-page.html";
+if (localStorage.getItem('blue-squares:sign-in-type') === null) window.location.href = "/Intro Info/intro-page.html";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { 
@@ -25,9 +25,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const googleUserCred = JSON.parse(localStorage.getItem('user'));
+const googleUserCred = JSON.parse(localStorage.getItem('blue-squares:user'));
 // localStorage.removeItem('user');
-const signInType = localStorage.getItem('sign-in-type');
+const signInType = localStorage.getItem('blue-squares:sign-in-type');
 const auth = getAuth();
 const db = getDatabase(app);
 const dbRef = ref(getDatabase(app));
@@ -76,12 +76,12 @@ function connectToDatabase(user, userId) {
         if (snapshot.exists()) {
             notification('Retrived data')
             const intialPlayerData = snapshot.val()['game-data'];
-            sessionStorage.setItem('intialPlayerData', JSON.stringify(intialPlayerData));
-            sessionStorage.setItem('username', snapshot.val()['username']);
+            sessionStorage.setItem('blue-squares:intialPlayerData', JSON.stringify(intialPlayerData));
+            sessionStorage.setItem('blue-squares:username', snapshot.val()['username']);
             updatePlayerInformation(userId);
         } else {
             notification('Creating new player node');
-            sessionStorage.setItem('afk-collected', 0);
+            sessionStorage.setItem('blue-squares:afk-collected', 0);
             let intialPlayerData = {
             "username": user.displayName,
             "tutorial-step-num": 1,
@@ -125,8 +125,8 @@ function connectToDatabase(user, userId) {
             "coordX": 26,
             "coordY": 15
             };
-            sessionStorage.setItem('intialPlayerData', JSON.stringify(intialPlayerData));
-            sessionStorage.setItem('username', user.displayName);
+            sessionStorage.setItem('blue-squares:intialPlayerData', JSON.stringify(intialPlayerData));
+            sessionStorage.setItem('blue-squares:username', user.displayName);
             set(ref(db, `users/${userId}`), {
             "username": user.displayName,
             "email-address": user.email,
@@ -174,7 +174,7 @@ function updatePlayerInformation(userId) {
             const total_time = last_time_online - logins['login-1'].time;
             const afk_collected = last_time_online - snapshot.val()['last-time-online'] - logins[`login-${Object.keys(logins).length}`]['in-game-time'];
             const in_game_time = snapshot.val()['total-in-game-time'] + logins[`login-${Object.keys(logins).length}`]['in-game-time'];
-            sessionStorage.setItem('afk-collected', afk_collected);
+            sessionStorage.setItem('blue-squares:afk-collected', afk_collected);
             let device_number = 0;
             for (const device_key of Object.keys(devices)) {
             let device = devices[device_key];
@@ -199,7 +199,7 @@ function updatePlayerInformation(userId) {
             "collected-afk-time": afk_collected,
             "in-game-time": 0
             };
-            sessionStorage.setItem('login_in_number', login_in_number);
+            sessionStorage.setItem('blue-squares:login_in_number', login_in_number);
             update(ref(db, `users/${userId}`), {
             "devices": devices,
             "last-time-online": last_time_online,

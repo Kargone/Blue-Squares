@@ -194,7 +194,7 @@ let grass_grid = [
 addHighlight = false;
 let last_touch_distance = 0;
 let username;
-let userId = JSON.parse(localStorage.getItem('user')).uid;
+let userId = JSON.parse(localStorage.getItem('blue-squares:user')).uid;
 let in_game_time = 0;
 
 // for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
@@ -1229,7 +1229,8 @@ function eventListners() {
     document.getElementById("settings-username-input").value = username;
 
     document.getElementById("log-out").addEventListener('click', function () {
-        localStorage.clear();
+        localStorage.removeItem('blue-squares:user');
+        localStorage.removeItem('blue-squares:sign-in-type');
         sessionStorage.clear();
         window.location.href = "/Intro Info/intro-page.html";
     });
@@ -1428,9 +1429,9 @@ function updateUserSettings() {
 }
 
 export function createGame() {
-    username = sessionStorage.getItem('username');
+    username = sessionStorage.getItem('blue-squares:username');
     notification(`Hello ${username}`);
-    const intial_player_data = JSON.parse(sessionStorage.getItem('intialPlayerData'));
+    const intial_player_data = JSON.parse(sessionStorage.getItem('blue-squares:intialPlayerData'));
     grass_grid = JSON.parse(intial_player_data['grass-grid']);
     user_settings = intial_player_data['user-settings'];
     currencies = intial_player_data['currencies'];
@@ -1453,14 +1454,14 @@ export function createGame() {
             'coordY': building.coordY
         });
     }
-    const afked_time = sessionStorage.getItem('afk-collected');
+    const afked_time = sessionStorage.getItem('blue-squares:afk-collected');
     const afked_time_formated = afkTime(parseInt(afked_time));
     for (const building_key of Object.keys(buildings)) {
         let building = buildings[building_key];
         building.collectAfktime(afked_time);
     }
     notification(`Collceted ${afked_time_formated} worth of time`);
-    const log_in_number = sessionStorage.getItem('login_in_number');
+    const log_in_number = sessionStorage.getItem('blue-squares:login_in_number');
     const UP_RESOURCES = setInterval(() => {
         for (const building_key of Object.keys(buildings)) {
             let building = buildings[building_key];
