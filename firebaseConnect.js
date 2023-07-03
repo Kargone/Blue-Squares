@@ -76,7 +76,7 @@ function connectToDatabase(user, userId) {
     get(child(dbRef, `users/${userId}`)).then((snapshot) => {
         if (snapshot.exists()) {
             notification('Retrived data')
-            if (snapshot.val()['online'] === true) window.location.href = "/Intro Info/intro-page.html";
+            if (snapshot.val()['online'] === true) return window.location.href = "/Intro Info/intro-page.html";
             const intialPlayerData = snapshot.val()['game-data'];
             sessionStorage.setItem('blue-squares:intialPlayerData', JSON.stringify(intialPlayerData));
             sessionStorage.setItem('blue-squares:username', snapshot.val()['username']);
