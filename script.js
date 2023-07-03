@@ -195,7 +195,6 @@ addHighlight = false;
 let last_touch_distance = 0;
 let username;
 let userId = JSON.parse(localStorage.getItem('blue-squares:user')).uid;
-let in_game_time = 0;
 
 // for (let grass_grid_y = 0; grass_grid_y < GAME_BLOCK_AMOUNT_HEIGHT + 2; grass_grid_y++) {
 //     grass_grid[grass_grid_y] = [];
@@ -1369,12 +1368,6 @@ function getGrassBlockId(gridX, gridY) {
     }
 }
 
-function createIntialSquares(count) {
-    for (let i = 0; i < count; i++) {
-        new square({'color': 'Blue'});
-    }
-}
-
 function centerBoard() {
     const orginal_grid_x = grid.x;
     grid.x = window.innerWidth / 2 - (GAME_BLOCK_AMOUNT_WIDTH / 2) * BLOCK_WIDTH * global_scale - BLOCK_WIDTH * global_scale;
@@ -1413,12 +1406,6 @@ function updateBuyCosts() {
 function updateCurrincies() {
     update(ref(db, `users/${userId}/game-data`), {
         "currencies": currencies
-    });
-}
-
-function updateInGameTime(log_in_number) {
-    update(ref(db, `users/${userId}/logins/login-${log_in_number}`), {
-        "in-game-time": in_game_time
     });
 }
 
@@ -1471,8 +1458,6 @@ export function createGame() {
             document.getElementById(`${color.toLowerCase()}-squares-count`).textContent = getFormatedNumber(currencies[`${color.toLowerCase()}_squares`]);
         }
         updateCurrincies();
-        in_game_time += 1000;
-        updateInGameTime(log_in_number); 
     }, 1000);
     setTimeout(() => {
         window.location.href = "/Intro Info/intro-page.html";

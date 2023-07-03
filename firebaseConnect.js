@@ -9,7 +9,8 @@ import {
     get,
     push, 
     update,
-    onDisconnect
+    onDisconnect,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 import { createGame } from "./script.js";
 
@@ -170,13 +171,17 @@ function updatePlayerInformation(userId) {
     get(child(dbRef, `users/${userId}`)).then((snapshot) => {
         if (snapshot.exists()) {
             const intialPlayerData = snapshot.val();
-            let logins = snapshot.val().logins;
-            let devices = snapshot.val().devices;
+            let logins = intialPlayerData.logins;
+            let devices = intialPlayerData.devices;
+            let last_login = logins[`login-${Object.keys(logins).length}`];
+            console.log(last_login)
+            const last_in_game_time = last_login['disconnected-on'] - last_login['connected-on'];
+            last_login['in-game-time'] = last_in_game_time;
             const last_time_online = Date.now();
-            const total_afk_time = snapshot.val()['total-time-collect-afk'] + last_time_online - snapshot.val()['last-time-online'] - logins[`login-${Object.keys(logins).length}`]['in-game-time'];
+            const afk_collected = last_time_online - intialPlayerData['last-time-online'] - last_in_game_time;
+            const total_afk_time = intialPlayerData['total-time-collect-afk'] + afk_collected;
             const total_time = last_time_online - logins['login-1'].time;
-            const afk_collected = last_time_online - snapshot.val()['last-time-online'] - logins[`login-${Object.keys(logins).length}`]['in-game-time'];
-            const in_game_time = snapshot.val()['total-in-game-time'] + logins[`login-${Object.keys(logins).length}`]['in-game-time'];
+            const in_game_time = intialPlayerData['total-in-game-time'] + last_in_game_time;
             sessionStorage.setItem('blue-squares:afk-collected', afk_collected);
             let device_number = 0;
             for (const device_key of Object.keys(devices)) {
@@ -198,8 +203,9 @@ function updatePlayerInformation(userId) {
             logins[`login-${login_in_number}`] = {
                 "device-number": device_number,
                 "device-deminsions": `${window.innerWidth}x${window.innerHeight}`,
-                "time": Date.now(),
+                "connected-on": Date.now(),
                 "collected-afk-time": afk_collected,
+                "disconnected-on": Date.now(),
                 "in-game-time": 0
             };
             sessionStorage.setItem('blue-squares:login_in_number', login_in_number);
@@ -212,9 +218,10 @@ function updatePlayerInformation(userId) {
                 "total-in-game-time": in_game_time,
                 "online": true
             });
-            const now = Date.now();
-            const onlineRef = ref(db, `users/${userId}/online`)
+            const onlineRef = ref(db, `users/${userId}/online`);
             onDisconnect(onlineRef).set(false);
+            const inGameTimeRef = ref(db, `users/${userId}/logins/login-${login_in_number}/disconnected-on`);
+            onDisconnect(inGameTimeRef).set(serverTimestamp());
         } else {
             notification('Player info no exist');
             setTimeout(() => {
