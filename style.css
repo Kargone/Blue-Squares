@@ -7,6 +7,10 @@
     --orange: rgba(255, 150, 0, 1);
     --yellow: rgba(255, 255, 0, 1);
     --white: rgba(255, 255, 255, 1);
+    --buy-plot-container-padding-right: 30px;
+    --buy-plot-container-font-size: 15px;
+    --buy-plot-container-icon-height: 10px;
+    --buy-plot-container-icon-width: 10px;
 }
 
 /* width */
@@ -397,6 +401,24 @@
     display: inline-block;
 }
 
+.buy-plot-container {
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.buy-plot-container > button {
+    padding: 5px var(--buy-plot-container-padding-right) 5px 5px;
+    font-size: var(--buy-plot-container-font-size);
+    width: fit-content;
+    height: fit-content;
+    min-width: 0px;
+    white-space: nowrap;
+}
+
+.buy-plot-container > button > .resource-icon {
+    height: var(--buy-plot-container-icon-height);
+    width: var(--buy-plot-container-icon-width);
+}
+
 @keyframes up {
     from {
         transform : scale(1);
@@ -531,11 +553,6 @@
     width: 10px;
     height: 10px;
     border: 2px solid black;
-    display: table-cell;
-    min-width: 10px;
-    min-height: 10px;
-    max-width: 10px;
-    max-height: 10px;
 }
 
 .resource-icon-button-container {
@@ -545,8 +562,9 @@
 
 .resource-icon-button-container > .resource-icon {
     position: absolute;
-    top: 8px;
+    top: 50%;
     right: 8px;
+    transform: translateY(-50%);
 }
 
 .blue {

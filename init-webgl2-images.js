@@ -75,6 +75,7 @@ void main() {
 
 let shapes = {};
 let buildings = {};
+let plot_buttons = [];
 let mouseX = -1;
 let mouseY = -1;
 let mouse_down = false;
@@ -447,6 +448,7 @@ function display() {
       let image = image_draw_infos[image_key];
       image.updateDistFromStartX_Y();
     }
+    for (const plot_button of plot_buttons) plot_button.updateDistFromStartX_Y();
   });
   gl.canvas.addEventListener('touchstart', (e) => {
     mouse_down = true;
@@ -472,6 +474,7 @@ function display() {
       let image = image_draw_infos[image_key];
       image.updateDistFromStartX_Y();
     }
+    for (const plot_button of plot_buttons) plot_button.updateDistFromStartX_Y();
   }, {passive: true});
   gl.canvas.addEventListener('mouseup', (e) => {
     mouseEnd();
@@ -760,6 +763,7 @@ function translateBoardFromStart(translateX, translateY) {
     let image = image_draw_infos[image_key];
     image.translateX_YfromStartX_Y(translateX, translateY);
   }
+  for (const plot_button of plot_buttons) plot_button.translateX_YfromStartX_Y(translateX, translateY);
 }
 
 function updateResourceDisplays() {

@@ -52,6 +52,7 @@ shapes = {
     'z2': {}
 };
 buildings = {};
+plot_buttons = [];
 const MAX_GLOBAL_SCALE = Math.min(
     window.innerWidth / 5 / BLOCK_WIDTH, 
     window.innerHeight / 5 / BLOCK_WIDTH
@@ -258,7 +259,7 @@ window.addEventListener('touchend', (e) => {
     last_touch_distance = 1;
 });
 
-class rect {
+class Rect {
     constructor(x, y, width, height, rgb, z) {
         this.scale = 1;
         this.x = x ?? 0;
@@ -332,7 +333,7 @@ class rect {
     }
 }
 
-class grass_block {
+class GrassBlock {
     constructor(x, y, width, height) {
         this.scale = 1;
         this.x = x ?? 0;
@@ -352,9 +353,10 @@ class grass_block {
             ) return this.drawGrassImage(textureInfos.outer["edge-bush"]);
         this.gridX = coordX - GAME_BORDER - 1;
         this.gridY = coordY - GAME_BORDER - 1;
+        grid[`${coordX - GAME_BORDER}_${coordY - GAME_BORDER}`] = 'o';
         if (grass_grid[coordY - GAME_BORDER][coordX - GAME_BORDER] != 'o') {
-            const DO_SHADE = ((this.x / (BLOCK_WIDTH * global_scale)) + (this.y / (BLOCK_HEIGHT * global_scale))) % 2;
             grid[`${coordX - GAME_BORDER}_${coordY - GAME_BORDER}`] = '';
+            const DO_SHADE = ((this.x / (BLOCK_WIDTH * global_scale)) + (this.y / (BLOCK_HEIGHT * global_scale))) % 2;
             this.highlightable = true;
             if (getRandomInt(10) === 1) {
                 if ((Math.round(DO_SHADE) === 0) || (Math.round(DO_SHADE) === 2)) return this.drawGrassImage(textureInfos.inner.bush.dark[getRandomInt(2)]);
@@ -646,7 +648,7 @@ class grass_block {
     }
 }
 
-class square {
+class Square {
     constructor(object) {
         if (object == undefined) object = {};
         const WIDTH_GAME_BLOCKS = object.gameBlockWidth ?? 2;
@@ -694,14 +696,14 @@ class square {
         const BORDER_WIDTH = 2 * global_scale;
         this.blockInline = BLOCK_INLINE;
         this.borderWidth = BORDER_WIDTH;
-        const OUTLINE = new rect(
+        const OUTLINE = new Rect(
             this.x + BLOCK_INLINE,
             this.y + BLOCK_INLINE,
             this.width - (2 * BLOCK_INLINE),
             this.height - (2 * BLOCK_INLINE)
         );
         this.outelineId = OUTLINE.getId();
-        const SQUARE = new rect(
+        const SQUARE = new Rect(
             this.x + BLOCK_INLINE + BORDER_WIDTH,
             this.y + BLOCK_INLINE + BORDER_WIDTH,
             this.width - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
@@ -1086,10 +1088,105 @@ class square {
     }
 }
 
+class PlotButton {
+    constructor(x, y) {
+        this.scale = global_scale;
+        const price = 50;
+        const price_color = 'blue';
+        this.id = `buy-plot-${x}-${y}-container`;
+        let new_div = document.createElement('div');
+        new_div.innerHTML = `
+            <button id="buy-plot-${x}-${y}-button" class="resource-icon-button-container">
+                <span>Buy ${price}</span>
+                <div id="buy-plot-${x}-${y}-resource-icon" class="resource-icon ${price_color}"></div>
+            </button>
+        `;
+        new_div.style.position = 'fixed';
+        new_div.style.zIndex = '50';
+        new_div.className = 'buy-plot-container';
+        new_div.id = this.id;
+        this.grassGridX = x;
+        this.grassGridY = y;
+        this.x = (x * BLOCK_WIDTH * global_scale + grid.x);
+        this.y = (y * BLOCK_WIDTH * global_scale + grid.y);
+        new_div.style.top = this.y + 'px';
+        new_div.style.left = this.x + 'px';
+        document.getElementById('plot-button-container').appendChild(new_div);
+        const this_plot_button = this;
+        document.getElementById(`buy-plot-${x}-${y}-button`).addEventListener('click', function() {
+            grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX] = 'i';
+            grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX] = 'i';
+            grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX + 1] = 'i';
+            grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX + 1] = 'i';
+            for (let gridX = this_plot_button.grassGridX - 2; 
+                gridX < this_plot_button.grassGridX + 2;
+                gridX++
+            ) {
+                for (let gridY = this_plot_button.grassGridY - 2; 
+                    gridY < this_plot_button.grassGridY + 2;
+                    gridY++
+                ) {
+                    // console.log(getSqaureStatus(gridX, gridY).includes('square'))
+                    if (getSqaureStatus(gridX + 1, gridY + 1).includes('square') || getBlock(gridX, gridY) === 'na') continue;
+                    const image_info = image_draw_infos[getGrassBlockId(gridX, gridY)];
+                    const copied_image_info = {
+                        'x': image_info.x,
+                        'y': image_info.y
+                    };
+                    delete image_draw_infos[getGrassBlockId(gridX, gridY)];
+                    const BLOCK = new GrassBlock(
+                        copied_image_info.x, 
+                        copied_image_info.y, 
+                        BLOCK_WIDTH * global_scale, 
+                        BLOCK_HEIGHT * global_scale
+                    );
+                    BLOCK.drawGrass(gridX + 1 + GAME_BORDER, gridY + 1 + GAME_BORDER);
+                }
+            }
+            update(ref(db, `users/${userId}/game-data/`), {
+                "grass-grid": JSON.stringify(grass_grid)
+            });
+            createPlotButtons();
+            function getBlock(x, y) {
+                if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
+                return grass_grid[y][x];
+            }
+            function getSqaureStatus(x, y) {
+                if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
+                return grid[`${x}_${y}`];
+            }
+        });
+        plot_buttons.push(this);
+    }
+    translateX_YfromStartX_Y(x, y) {
+        this.x = mouseStartX_Y.x + x + this.distFromStartX;
+        this.y = mouseStartX_Y.y + y + this.distFromStartY;
+        document.getElementById(this.id).style.top = this.y + 'px';
+        document.getElementById(this.id).style.left = this.x + 'px';
+    }
+    updateDistFromStartX_Y() {
+        this.distFromStartX = this.x - mouseStartX_Y.x;
+        this.distFromStartY = this.y - mouseStartX_Y.y;
+    }
+    setScale(multiplier) {
+        this.scale = multiplier;
+        this.x = multiplier * (this.x - mouseX) + mouseX;
+        this.y = multiplier * (this.y - mouseY) + mouseY;
+        document.getElementById(this.id).style.top = this.y + 'px';
+        document.getElementById(this.id).style.left = this.x + 'px';
+    }
+    translate(x, y) {
+        this.x += x;
+        this.y += y;
+        document.getElementById(this.id).style.top = this.y + 'px';
+        document.getElementById(this.id).style.left = this.x + 'px';
+    }
+}
+
 function createGrass() {
     for (let current_block_y = 1; current_block_y <= GAME_BLOCK_AMOUNT_HEIGHT + GAME_BORDER * 2; current_block_y++) {
         for (let current_block_x = 1; current_block_x <= GAME_BLOCK_AMOUNT_WIDTH + GAME_BORDER * 2; current_block_x++) {
-            const BLOCK = new grass_block(
+            const BLOCK = new GrassBlock(
                 (current_block_x - 1) * BLOCK_WIDTH * global_scale, 
                 (current_block_y - 1) * BLOCK_HEIGHT * global_scale, 
                 BLOCK_WIDTH * global_scale, 
@@ -1097,6 +1194,34 @@ function createGrass() {
             );
             BLOCK.drawGrass(current_block_x, current_block_y);
         }
+    }
+}
+
+function createPlotButtons() {
+    document.getElementById('plot-button-container').innerHTML = '';
+    plot_buttons = [];
+    for (let current_block_y = 0; current_block_y < grass_grid.length; current_block_y += 2) {
+        for (let current_block_x = 0; current_block_x < grass_grid[0].length; current_block_x += 2) {
+            /* [
+                ['i', 'i', 'i', 'i'],
+                ['i', 'x', 'o', 'i'],
+                ['i', 'o', 'o', 'i'],
+                ['i', 'i', 'i', 'i'],
+            ] */
+            if (getBlock(current_block_x, current_block_y) === 'i') continue;
+            if (
+                ((getBlock(current_block_x, current_block_y - 1) === 'i') && (getBlock(current_block_x + 1, current_block_y - 1) === 'i')) ||
+                ((getBlock(current_block_x, current_block_y + 2) === 'i') && (getBlock(current_block_x + 1, current_block_y + 2) === 'i')) ||
+                ((getBlock(current_block_x - 1, current_block_y) === 'i') && (getBlock(current_block_x - 1, current_block_y + 1) === 'i')) ||
+                ((getBlock(current_block_x + 2, current_block_y) === 'i') && (getBlock(current_block_x + 2, current_block_y + 1) === 'i'))
+            ) {
+                new PlotButton(current_block_x, current_block_y);
+            }
+        }
+    }
+    function getBlock(x, y) {
+        if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'o';
+        return grass_grid[y][x];
     }
 }
 
@@ -1115,7 +1240,7 @@ function eventListners() {
                 user_settings['notification-not-enough-new-square'] &&
                 user_settings['all-notifications']) return notification('Not enough resources');
             if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`]) return;
-            const new_square = new square({'color': color});
+            const new_square = new Square({'color': color});
             if  (new_square.removed) return;
             currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_squares`];
             buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
@@ -1324,6 +1449,7 @@ function setScales(multiplier) {
         let image = image_draw_infos[image_key];
         image.setScale(multiplier);
     }
+    for (const plot_button of plot_buttons) plot_button.setScale(multiplier);
     grid.x = multiplier * (grid.x - mouseX) + mouseX;
     grid.y = multiplier * (grid.y - mouseY) + mouseY;
     global_scale *= multiplier;
@@ -1359,6 +1485,11 @@ function setScales(multiplier) {
         let image = image_draw_infos[image_key];
         image.translate(translateX, translateY);
     }
+    for (const plot_button of plot_buttons) plot_button.translate(translateX, translateY);
+    document.querySelector(':root').style.setProperty('--buy-plot-container-padding-right', `${BLOCK_HEIGHT * global_scale / 5 + 15}px`);
+    document.querySelector(':root').style.setProperty('--buy-plot-container-font-size', `${BLOCK_HEIGHT * global_scale / 5}px`);
+    document.querySelector(':root').style.setProperty('--buy-plot-container-icon-height', `${BLOCK_HEIGHT * global_scale / 5}px`);
+    document.querySelector(':root').style.setProperty('--buy-plot-container-icon-width', `${BLOCK_HEIGHT * global_scale / 5}px`);
 }
 
 function getGrassBlockId(gridX, gridY) {
@@ -1389,6 +1520,10 @@ function centerBoard() {
         let image = image_draw_infos[image_key];
         image.translate(translateX, translateY);
     }
+    document.querySelector(':root').style.setProperty('--buy-plot-container-padding-right', `${BLOCK_HEIGHT * global_scale / 5 + 15}px`);
+    document.querySelector(':root').style.setProperty('--buy-plot-container-font-size', `${BLOCK_HEIGHT * global_scale / 5}px`);
+    document.querySelector(':root').style.setProperty('--buy-plot-container-icon-height', `${BLOCK_HEIGHT * global_scale / 5}px`);
+    document.querySelector(':root').style.setProperty('--buy-plot-container-icon-width', `${BLOCK_HEIGHT * global_scale / 5}px`);
 }
 
 function getDistance(x1, y1, x2, y2){
@@ -1427,11 +1562,12 @@ export function createGame() {
     createGrass();
     eventListners();
     centerBoard();
+    createPlotButtons();
     const building_data = intial_player_data['building-data'];
     for (const building_key of Object.keys(building_data)) {
         const building = building_data[building_key];
         const color = building.type.split('_')[0];
-        new square({
+        new Square({
             'id': building_key,
             'level': building.level,
             'createdAt': building['created-at'],
