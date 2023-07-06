@@ -648,14 +648,109 @@ class GrassBlock {
     }
 }
 
-class Square {
-    constructor(object) {
-        if (object == undefined) object = {};
-        const WIDTH_GAME_BLOCKS = object.gameBlockWidth ?? 2;
-        const HEIGHT_GAME_BLOCKS = object.gameBlockHeight ?? 2;
+class PlotButton {
+    constructor(x, y) {
         this.scale = global_scale;
-        this.width = object.width ?? WIDTH_GAME_BLOCKS * BLOCK_WIDTH * global_scale;
-        this.height = object.height ?? HEIGHT_GAME_BLOCKS * BLOCK_HEIGHT * global_scale;
+        const price = 50;
+        const price_color = 'blue';
+        this.id = `buy-plot-${x}-${y}-container`;
+        let new_div = document.createElement('div');
+        new_div.innerHTML = `
+            <button id="buy-plot-${x}-${y}-button" class="resource-icon-button-container">
+                <span>Buy ${price}</span>
+                <div id="buy-plot-${x}-${y}-resource-icon" class="resource-icon ${price_color}"></div>
+            </button>
+        `;
+        new_div.style.position = 'fixed';
+        new_div.style.zIndex = '50';
+        new_div.className = 'buy-plot-container';
+        new_div.id = this.id;
+        this.grassGridX = x;
+        this.grassGridY = y;
+        this.x = (x * BLOCK_WIDTH * global_scale + grid.x);
+        this.y = (y * BLOCK_WIDTH * global_scale + grid.y);
+        new_div.style.top = this.y + 'px';
+        new_div.style.left = this.x + 'px';
+        document.getElementById('plot-button-container').appendChild(new_div);
+        const this_plot_button = this;
+        document.getElementById(`buy-plot-${x}-${y}-button`).addEventListener('click', function() {
+            grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX] = 'i';
+            grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX] = 'i';
+            grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX + 1] = 'i';
+            grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX + 1] = 'i';
+            for (let gridX = this_plot_button.grassGridX - 2; 
+                gridX < this_plot_button.grassGridX + 2;
+                gridX++
+            ) {
+                for (let gridY = this_plot_button.grassGridY - 2; 
+                    gridY < this_plot_button.grassGridY + 2;
+                    gridY++
+                ) {
+                    // console.log(getSqaureStatus(gridX, gridY).includes('square'))
+                    if (getSqaureStatus(gridX + 1, gridY + 1).includes('square') || getBlock(gridX, gridY) === 'na') continue;
+                    const image_info = image_draw_infos[getGrassBlockId(gridX, gridY)];
+                    const copied_image_info = {
+                        'x': image_info.x,
+                        'y': image_info.y
+                    };
+                    delete image_draw_infos[getGrassBlockId(gridX, gridY)];
+                    const BLOCK = new GrassBlock(
+                        copied_image_info.x, 
+                        copied_image_info.y, 
+                        BLOCK_WIDTH * global_scale, 
+                        BLOCK_HEIGHT * global_scale
+                    );
+                    BLOCK.drawGrass(gridX + 1 + GAME_BORDER, gridY + 1 + GAME_BORDER);
+                }
+            }
+            update(ref(db, `users/${userId}/game-data/`), {
+                "grass-grid": JSON.stringify(grass_grid)
+            });
+            createPlotButtons();
+            function getBlock(x, y) {
+                if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
+                return grass_grid[y][x];
+            }
+            function getSqaureStatus(x, y) {
+                if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
+                return grid[`${x}_${y}`];
+            }
+        });
+        plot_buttons.push(this);
+    }
+    translateX_YfromStartX_Y(x, y) {
+        this.x = mouseStartX_Y.x + x + this.distFromStartX;
+        this.y = mouseStartX_Y.y + y + this.distFromStartY;
+        document.getElementById(this.id).style.top = this.y + 'px';
+        document.getElementById(this.id).style.left = this.x + 'px';
+    }
+    updateDistFromStartX_Y() {
+        this.distFromStartX = this.x - mouseStartX_Y.x;
+        this.distFromStartY = this.y - mouseStartX_Y.y;
+    }
+    setScale(multiplier) {
+        this.scale = multiplier;
+        this.x = multiplier * (this.x - mouseX) + mouseX;
+        this.y = multiplier * (this.y - mouseY) + mouseY;
+        document.getElementById(this.id).style.top = this.y + 'px';
+        document.getElementById(this.id).style.left = this.x + 'px';
+    }
+    translate(x, y) {
+        this.x += x;
+        this.y += y;
+        document.getElementById(this.id).style.top = this.y + 'px';
+        document.getElementById(this.id).style.left = this.x + 'px';
+    }
+}
+
+class Building {
+    constructor(object) {
+        const WIDTH_GAME_BLOCKS = 2;
+        const HEIGHT_GAME_BLOCKS = 2;
+        this.type = object.type;
+        this.scale = global_scale;
+        this.width = WIDTH_GAME_BLOCKS * BLOCK_WIDTH * global_scale;
+        this.height = HEIGHT_GAME_BLOCKS * BLOCK_HEIGHT * global_scale;
         this.gl = document.querySelector("#game-canvas").getContext("webgl2");
         this.colorLocation = '';
         this.level = object.level ?? 1;
@@ -690,58 +785,31 @@ class Square {
             grid[`${this.coordX}_${this.coordY + 1}`] = `${this.color}_square`;
             grid[`${this.coordX + 1}_${this.coordY + 1}`] = `${this.color}_square`;
         } else {
-            if (!this.assignCoords()) return this.removed = true;
+            this.removed = true;
+            if (!this.assignCoords()) return;
         }
-        const BLOCK_INLINE = (24 - this.level * 2) * global_scale;
-        const BORDER_WIDTH = 2 * global_scale;
-        this.blockInline = BLOCK_INLINE;
-        this.borderWidth = BORDER_WIDTH;
-        const OUTLINE = new Rect(
-            this.x + BLOCK_INLINE,
-            this.y + BLOCK_INLINE,
-            this.width - (2 * BLOCK_INLINE),
-            this.height - (2 * BLOCK_INLINE)
-        );
-        this.outelineId = OUTLINE.getId();
-        const SQUARE = new Rect(
-            this.x + BLOCK_INLINE + BORDER_WIDTH,
-            this.y + BLOCK_INLINE + BORDER_WIDTH,
-            this.width - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
-            this.height - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
-            `(${this.r},${this.g},${this.b})`, 2
-        );
-        this.squareId = SQUARE.getId();
         this.selected = false;
         this.nextLevelUpgradeCost = object.nextLevelCost ?? this.level * 10000;
-        this.earningsPerSecond = object.earningsPerSecond ?? this.level;
-        this.earningsPerHour = this.earningsPerSecond * 3600;
         this.displayed = false;
-        this.health = object.health ?? 100;
         this.maxHealth = object.maxHealth ?? 100;
+        this.health = object.health ?? this.maxHealth;
         this.id = object.id ?? getRandomInt();
-        this.totalCost = object.totalCost ?? buy_costs[`${this.color.toLowerCase()}_squares`];
-        document.getElementById('resource-displays').innerHTML += `
-            <div id="resource-display-${this.id}" class="resource-display">+
-                <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
-                <div id="resource-display-resource-icon-${this.id}" class="resource-icon ${this.color.toLowerCase()}">
-            </div>
-        `;
+        this.totalCost = object.totalCost ?? 0;
         this.createdAt = object.createdAt ?? Date.now();
         this.timeCreated = object.timeCreated ?? getFormatedTime(this.createdAt);
         image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].highlightable = false;
         image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].highlightable = false;
         image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].highlightable = false;
         image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].highlightable = false;
-        buildings[this.id] = this;
         update(ref(db, `users/${userId}/game-data/building-data/${this.id}`), {
             "level": this.level,
-            "type": `${this.color}_square`,
+            "type": `${this.color}_${this.type}`,
             "created-at": this.createdAt,
             "total-cost": this.totalCost,
             "coordX": this.coordX,
             "coordY": this.coordY
         });
-        return this.removed = false;
+        this.removed = false;
     }
     assignCoords() {
         for (let x_y of Object.keys(grid)) {
@@ -775,7 +843,7 @@ class Square {
                 building_selected_id = '';
                 this.removeHighlights();
             }
-            document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
+            if (this.type === 'square') document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
             this.selected = false;
             return false;
         }
@@ -789,7 +857,7 @@ class Square {
                             grid[`${this.coordX}_${this.coordY + 1}`] = '';
                             grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
                         }
-                        document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
+                        if (this.type === 'square') document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
                         this.addHighlights();
                         this.selected = true;
                         building_selected_id = copy(this.id);
@@ -807,7 +875,7 @@ class Square {
                             grid[`${this.coordX}_${this.coordY + 1}`] = '';
                             grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
                         }
-                        document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
+                        if (this.type === 'square') document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
                         this.addHighlights();
                         this.selected = true;
                         building_selected_id = copy(this.id);
@@ -821,7 +889,7 @@ class Square {
             building_selected_id = '';
             this.removeHighlights();
         }
-        document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
+        if (this.type === 'square') document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
         this.selected = false;
         return false;
     }
@@ -870,13 +938,9 @@ class Square {
         this.x = (this.coordX - 1) * BLOCK_WIDTH * global_scale + grid.x;
         this.y = (this.coordY - 1) * BLOCK_HEIGHT * global_scale + grid.y;
         if (this.selected) this.addHighlights();
-        let outline_object = shapes['z1'][this.outelineId];
-        outline_object.x = this.x + this.blockInline;
-        outline_object.y = this.y + this.blockInline;
-        let square_object = shapes['z2'][this.squareId];
-        square_object.x = this.x + this.blockInline + this.borderWidth;
-        square_object.y = this.y + this.blockInline + this.borderWidth;
+        this.updateObjectOnScreen();
     }
+    updateObjectOnScreen() {}
     checkXandY() {
         this.selected = false;
         if (
@@ -907,18 +971,109 @@ class Square {
             grid[`${this.coordX + 1}_${this.coordY}`] = `${this.color}_square`;
             grid[`${this.coordX}_${this.coordY + 1}`] = `${this.color}_square`;
             grid[`${this.coordX + 1}_${this.coordY + 1}`] = `${this.color}_square`;
-            let outline_object = shapes['z1'][this.outelineId];
-            outline_object.x = this.x + this.blockInline;
-            outline_object.y = this.y + this.blockInline;
-            let square_object = shapes['z2'][this.squareId];
-            square_object.x = this.x + this.blockInline + this.borderWidth;
-            square_object.y = this.y + this.blockInline + this.borderWidth;
+            this.updateObjectOnScreen();
             if (user_settings['notification-invalid-movement'] && user_settings['all-notifications']) notification('Invalid Movement');
         }
     }
     setCoordXandY() {
         this.coordX = Math.round((this.x - grid.x) / (BLOCK_WIDTH * global_scale)) + 1;
         this.coordY = Math.round((this.y - grid.y) / (BLOCK_WIDTH * global_scale)) + 1;
+    }
+    translateX_YfromStartX_Y(x, y) {
+        this.x = mouseStartX_Y.x + x + this.distFromStartX;
+        this.y = mouseStartX_Y.y + y + this.distFromStartY;
+        this.originalX = copy(this.x);
+        this.originalY = copy(this.y);
+    }
+    translate(x, y) {
+        this.x += x;
+        this.y += y;
+        this.originalX = copy(this.x);
+        this.originalY = copy(this.y);
+    }
+    updateDistFromStartX_Y() {
+        this.distFromStartX = this.x - mouseStartX_Y.x;
+        this.distFromStartY = this.y - mouseStartX_Y.y;
+    }
+    setScale(multiplier) {
+        this.scale *= multiplier;
+        this.width *= multiplier;
+        this.height *= multiplier;
+        this.x = multiplier * (this.x - mouseX) + mouseX;
+        this.y = multiplier * (this.y - mouseY) + mouseY;
+        this.originalX = copy(this.x);
+        this.originalY = copy(this.y);
+        this.updateBorders(multiplier);
+    }
+    updateBorders(multiplier) {}
+    export() {
+        return {
+            'level': this.level,
+            'type': `${this.color}_${this.type}`,
+            'created-at': this.createdAt,
+            'total-cost': this.totalCost,
+            'coordX': this.coordX,
+            'coordY': this.coordY
+        };
+    }
+}
+
+class Square extends Building {
+    constructor(object) {
+        if (object == undefined) object = {};
+        object.type = 'square';
+        object.level = object.level ?? 1;
+        object.maxLevel = 10;
+        object.color = object.color ?? 'Blue';
+        object.maxHealth = object.maxHealth ?? 100;
+        object.health = object.health ?? object.maxHealth;
+        object.nextLevelUpgradeCost = object.level * 10000;
+        object.totalCost = object.totalCost ?? buy_costs[`${object.color.toLowerCase()}_squares`];
+        super(object);
+        this.createSquareOnScreen();
+        this.earningsPerSecond = object.earningsPerSecond ?? this.level;
+        this.earningsPerHour = this.earningsPerSecond * 3600;
+        document.getElementById('resource-displays').innerHTML += `
+            <div id="resource-display-${this.id}" class="resource-display">+
+                <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
+                <div id="resource-display-resource-icon-${this.id}" class="resource-icon ${this.color.toLowerCase()}">
+            </div>
+        `;
+        buildings[this.id] = this;
+        return;
+    }
+    createSquareOnScreen() {
+        const BLOCK_INLINE = (24 - this.level * 2) * global_scale;
+        const BORDER_WIDTH = 2 * global_scale;
+        this.blockInline = BLOCK_INLINE;
+        this.borderWidth = BORDER_WIDTH;
+        const OUTLINE = new Rect(
+            this.x + BLOCK_INLINE,
+            this.y + BLOCK_INLINE,
+            this.width - (2 * BLOCK_INLINE),
+            this.height - (2 * BLOCK_INLINE)
+        );
+        this.outelineId = OUTLINE.getId();
+        const SQUARE = new Rect(
+            this.x + BLOCK_INLINE + BORDER_WIDTH,
+            this.y + BLOCK_INLINE + BORDER_WIDTH,
+            this.width - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
+            this.height - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
+            `(${this.r},${this.g},${this.b})`, 2
+        );
+        this.squareId = SQUARE.getId();
+    }
+    updateObjectOnScreen() {
+        let outline_object = shapes['z1'][this.outelineId];
+        outline_object.x = this.x + this.blockInline;
+        outline_object.y = this.y + this.blockInline;
+        let square_object = shapes['z2'][this.squareId];
+        square_object.x = this.x + this.blockInline + this.borderWidth;
+        square_object.y = this.y + this.blockInline + this.borderWidth;
+    }
+    updateBorders(multiplier) {
+        this.blockInline *= multiplier;
+        this.borderWidth *= multiplier;
     }
     upResource() {
         currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond;
@@ -1038,33 +1193,6 @@ class Square {
         document.getElementById(`resource-display-resource-icon-${this.id}`).style.width = (10 * global_scale) + 'px';
         document.getElementById(`resource-display-resource-icon-${this.id}`).style.borderWidth = (2 * global_scale) + 'px';
     }
-    translateX_YfromStartX_Y(x, y) {
-        this.x = mouseStartX_Y.x + x + this.distFromStartX;
-        this.y = mouseStartX_Y.y + y + this.distFromStartY;
-        this.originalX = copy(this.x);
-        this.originalY = copy(this.y);
-    }
-    translate(x, y) {
-        this.x += x;
-        this.y += y;
-        this.originalX = copy(this.x);
-        this.originalY = copy(this.y);
-    }
-    updateDistFromStartX_Y() {
-        this.distFromStartX = this.x - mouseStartX_Y.x;
-        this.distFromStartY = this.y - mouseStartX_Y.y;
-    }
-    setScale(multiplier) {
-        this.scale *= multiplier;
-        this.width *= multiplier;
-        this.height *= multiplier;
-        this.x = multiplier * (this.x - mouseX) + mouseX;
-        this.y = multiplier * (this.y - mouseY) + mouseY;
-        this.originalX = copy(this.x);
-        this.originalY = copy(this.y);
-        this.blockInline *= multiplier;
-        this.borderWidth *= multiplier;
-    }
     collectAfktime(milliseconds) {
         currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond * Math.floor(milliseconds / 1000);
     }
@@ -1076,111 +1204,24 @@ class Square {
             "coordY": this.coordY
         });
     }
-    export() {
-        return {
-            'level': this.level,
-            'type': `${this.color}_square`,
-            'created-at': this.createdAt,
-            'total-cost': this.totalCost,
-            'coordX': this.coordX,
-            'coordY': this.coordY
-        };
+}
+
+class Collector extends Building {
+    constructor(object) {
+        if (object == undefined) object = {};
+        super(object);
     }
 }
 
-class PlotButton {
-    constructor(x, y) {
-        this.scale = global_scale;
-        const price = 50;
-        const price_color = 'blue';
-        this.id = `buy-plot-${x}-${y}-container`;
-        let new_div = document.createElement('div');
-        new_div.innerHTML = `
-            <button id="buy-plot-${x}-${y}-button" class="resource-icon-button-container">
-                <span>Buy ${price}</span>
-                <div id="buy-plot-${x}-${y}-resource-icon" class="resource-icon ${price_color}"></div>
-            </button>
-        `;
-        new_div.style.position = 'fixed';
-        new_div.style.zIndex = '50';
-        new_div.className = 'buy-plot-container';
-        new_div.id = this.id;
-        this.grassGridX = x;
-        this.grassGridY = y;
-        this.x = (x * BLOCK_WIDTH * global_scale + grid.x);
-        this.y = (y * BLOCK_WIDTH * global_scale + grid.y);
-        new_div.style.top = this.y + 'px';
-        new_div.style.left = this.x + 'px';
-        document.getElementById('plot-button-container').appendChild(new_div);
-        const this_plot_button = this;
-        document.getElementById(`buy-plot-${x}-${y}-button`).addEventListener('click', function() {
-            grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX] = 'i';
-            grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX] = 'i';
-            grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX + 1] = 'i';
-            grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX + 1] = 'i';
-            for (let gridX = this_plot_button.grassGridX - 2; 
-                gridX < this_plot_button.grassGridX + 2;
-                gridX++
-            ) {
-                for (let gridY = this_plot_button.grassGridY - 2; 
-                    gridY < this_plot_button.grassGridY + 2;
-                    gridY++
-                ) {
-                    // console.log(getSqaureStatus(gridX, gridY).includes('square'))
-                    if (getSqaureStatus(gridX + 1, gridY + 1).includes('square') || getBlock(gridX, gridY) === 'na') continue;
-                    const image_info = image_draw_infos[getGrassBlockId(gridX, gridY)];
-                    const copied_image_info = {
-                        'x': image_info.x,
-                        'y': image_info.y
-                    };
-                    delete image_draw_infos[getGrassBlockId(gridX, gridY)];
-                    const BLOCK = new GrassBlock(
-                        copied_image_info.x, 
-                        copied_image_info.y, 
-                        BLOCK_WIDTH * global_scale, 
-                        BLOCK_HEIGHT * global_scale
-                    );
-                    BLOCK.drawGrass(gridX + 1 + GAME_BORDER, gridY + 1 + GAME_BORDER);
-                }
-            }
-            update(ref(db, `users/${userId}/game-data/`), {
-                "grass-grid": JSON.stringify(grass_grid)
-            });
-            createPlotButtons();
-            function getBlock(x, y) {
-                if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
-                return grass_grid[y][x];
-            }
-            function getSqaureStatus(x, y) {
-                if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
-                return grid[`${x}_${y}`];
-            }
-        });
-        plot_buttons.push(this);
+class Defense extends Building {
+    constructor(object) {
+        if (object == undefined) object = {};
+        super(object);
     }
-    translateX_YfromStartX_Y(x, y) {
-        this.x = mouseStartX_Y.x + x + this.distFromStartX;
-        this.y = mouseStartX_Y.y + y + this.distFromStartY;
-        document.getElementById(this.id).style.top = this.y + 'px';
-        document.getElementById(this.id).style.left = this.x + 'px';
-    }
-    updateDistFromStartX_Y() {
-        this.distFromStartX = this.x - mouseStartX_Y.x;
-        this.distFromStartY = this.y - mouseStartX_Y.y;
-    }
-    setScale(multiplier) {
-        this.scale = multiplier;
-        this.x = multiplier * (this.x - mouseX) + mouseX;
-        this.y = multiplier * (this.y - mouseY) + mouseY;
-        document.getElementById(this.id).style.top = this.y + 'px';
-        document.getElementById(this.id).style.left = this.x + 'px';
-    }
-    translate(x, y) {
-        this.x += x;
-        this.y += y;
-        document.getElementById(this.id).style.top = this.y + 'px';
-        document.getElementById(this.id).style.left = this.x + 'px';
-    }
+}
+
+class Wall {
+
 }
 
 function createGrass() {
