@@ -1370,6 +1370,18 @@ function eventListners() {
     document.getElementById("leaderboard-tab-close").addEventListener('click', function () {
         document.getElementById("leaderboard-tab-container").style.display = 'none';
     });
+
+    document.getElementById("building-type-selector").addEventListener('click', function() {
+        hideBuyButtons(this.value);
+    });
+    hideBuyButtons('square');
+}
+
+function hideBuyButtons(expect) {
+    for (const buy_button_type of ['square', 'collector', 'defense', 'wall']) {
+        if (buy_button_type === expect) document.getElementById(`${buy_button_type}-buy-buttons`).style.display = 'flex';
+            else document.getElementById(`${buy_button_type}-buy-buttons`).style.display = 'none';
+    }
 }
 
 function getFormatedTime(utc_code = Date.now()) {

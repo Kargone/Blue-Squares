@@ -70,7 +70,7 @@
     border-radius: 5px;
 }
 
-#buy-buttons {
+.buy-buttons-container {
     width: 100%;
     height: 120px;
     background: #d6c289;
@@ -87,9 +87,10 @@
     margin: auto;
     padding: 8px 0px 0px 0px;
     flex-direction: row;
+    display: none;
 }
 
-#buy-buttons > div {
+.buy-buttons-container > div {
     display: table;
     min-width: 80px;
     width: fit-content;
@@ -97,7 +98,7 @@
     text-align: center;
 }
 
-#buy-buttons > div > img {
+.buy-buttons-container > div > img {
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 8px;
@@ -106,7 +107,7 @@
     border: 2px solid black;
 }
 
-#buy-buttons > div > div {
+.buy-buttons-container > div > div {
     margin-left: auto;
     margin-right: auto;
     width: 60px;
@@ -116,7 +117,7 @@
     position: relative;
 }
 
-#buy-buttons > div > div > img {
+.buy-buttons-container > div > div > img {
     position: absolute;
     top: 5px;
     left: 5px;
@@ -125,18 +126,13 @@
     height: 50px;
 }
 
-#buy-buttons > div > button {
+.buy-buttons-container > div > button {
     margin-left: auto;
     margin-right: auto;
     margin-top: 0px;
     display: table;
     /* border-spacing: 5px; */
 }
-
-/* #buy-buttons > div > button > span {
-    display: table-cell;
-    width: fit-content;
-} */
 
 #toggle-building-create {
     position: absolute;
@@ -335,15 +331,22 @@
 }
 
 #options {
-    width: 85px;
+    width: 125px;
     height: 40px;
     background: #d6c289;
     position: fixed;
     top: -4px;
-    left: calc(100% - 89px);
+    left: calc(100% - 129px);
     border-radius: 0px 0px 0px 10px;
     border: 4px solid brown;
     z-index: 100;
+}
+
+#options > #zombies {
+    width: 35px;
+    position: absolute;
+    right: 86px;
+    top: 2px;
 }
 
 #options > #leaderboard {

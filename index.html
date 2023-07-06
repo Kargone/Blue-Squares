@@ -10,7 +10,7 @@
     <canvas id="game-canvas"></canvas>
     <div id="notifications"></div>
     <div id="building-create" class="collapse-building-create open-building-create">
-      <div id="buy-buttons">
+      <div id="square-buy-buttons" class="buy-buttons-container">
         <div id="blue-square-buy-container">
           <img src="images/create-squares/create-blue-square.png" alt="Blue Square">
           <button id="blue-square-buy" class="resource-icon-button-container">
@@ -25,7 +25,7 @@
             <div class="resource-icon red"></div>
           </button>
           <!-- <div>
-            <img src="images/lock.png">
+            <img src="images/icons/lock.png">
           </div> -->
           <!-- <button id="red-square-buy">Locked</button> -->
         </div>
@@ -36,7 +36,7 @@
             <div class="resource-icon green"></div>
           </button>
           <!-- <div>
-            <img src="images/lock.png">
+            <img src="images/icons/lock.png">
           </div> -->
           <!-- <button id="green-square-buy">Locked</button> -->
         </div>
@@ -47,7 +47,7 @@
             <div class="resource-icon purple"></div>
           </button>
           <!-- <div>
-            <img src="images/lock.png">
+            <img src="images/icons/lock.png">
           </div> -->
           <!-- <button id="purple-square-buy">Locked</button> -->
         </div>
@@ -58,7 +58,7 @@
             <div class="resource-icon orange"></div>
           </button>
           <!-- <div>
-            <img src="images/lock.png">
+            <img src="images/icons/lock.png">
           </div> -->
           <!-- <button id="orange-square-buy">Locked</button> -->
         </div>
@@ -69,7 +69,7 @@
             <div class="resource-icon yellow"></div>
           </button>
           <!-- <div>
-            <img src="images/lock.png">
+            <img src="images/icons/lock.png">
           </div> -->
           <!-- <button id="yellow-square-buy">Locked</button> -->
         </div>
@@ -80,17 +80,227 @@
             <div class="resource-icon white"></div>
           </button>
           <!-- <div>
-            <img src="images/lock.png">
+            <img src="images/icons/lock.png">
           </div> -->
           <!-- <button id="white-square-buy">Locked</button> -->
         </div>
       </div>
+      <div id="collector-buy-buttons" class="buy-buttons-container">
+        <div id="blue-collector-buy-container">
+          <!-- images/create-collectors/create-blue-collector.png -->
+          <img src="" alt="Blue collector">
+          <button id="blue-collector-buy" class="resource-icon-button-container">
+            <span id="blue-collector-cost">Buy 0</span>
+            <div class="resource-icon blue"></div>
+          </button>
+        </div>
+        <div id="red-collector-buy-container">
+          <!-- images/create-collectors/create-red-collector.png -->
+          <img src="" alt="Red collector"> 
+          <button id="red-collector-buy" class="resource-icon-button-container">
+            <span id="red-collector-cost">Buy 0</span>
+            <div class="resource-icon red"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="red-collector-buy">Locked</button> -->
+        </div>
+        <div id="green-collector-buy-container">
+          <!-- images/create-collectors/create-green-collector.png -->
+          <img src="" alt="Green collector">
+          <button id="green-collector-buy" class="resource-icon-button-container">
+            <span id="green-collector-cost">Buy 0</span>
+            <div class="resource-icon green"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="green-collector-buy">Locked</button> -->
+        </div>
+        <div id="purple-collector-buy-container">
+          <!-- images/create-collectors/create-purple-collector.png -->
+          <img src="" alt="Purple collector">
+          <button id="purple-collector-buy" class="resource-icon-button-container">
+            <span id="purple-collector-cost">Buy 0</span>
+            <div class="resource-icon purple"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="purple-collector-buy">Locked</button> -->
+        </div>
+        <div id="orange-collector-buy-container">
+          <!-- images/create-collectors/create-orange-collector.png -->
+          <img src="" alt="Orange collector">
+          <button id="orange-collector-buy" class="resource-icon-button-container">
+            <span id="orange-collector-cost">Buy 0</span>
+            <div class="resource-icon orange"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="orange-collector-buy">Locked</button> -->
+        </div>
+        <div id="yellow-collector-buy-container">
+          <!-- images/create-collectors/create-yellow-collector.png -->
+          <img src="" alt="Yellow collector">
+          <button id="yellow-collector-buy" class="resource-icon-button-container">
+            <span id="yellow-collector-cost">Buy 0</span>
+            <div class="resource-icon yellow"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="yellow-collector-buy">Locked</button> -->
+        </div>
+        <div id="white-collector-buy-container">
+          <!-- images/create-collectors/create-white-collector.png -->
+          <img src="" alt="White collector">
+          <button id="white-collector-buy" class="resource-icon-button-container">
+            <span id="white-collector-cost">Buy 0</span>
+            <div class="resource-icon white"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="white-collector-buy">Locked</button> -->
+        </div>
+      </div>
+      <div id="defense-buy-buttons" class="buy-buttons-container">
+        <div id="cannon-buy-container">
+          <img src="" alt="cannon">
+          <button id="cannon-buy" class="resource-icon-button-container">
+            <span id="cannon-cost">Buy 0</span>
+            <div class="resource-icon blue"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="cannon-buy">Locked</button> -->
+        </div>
+        <div id="arrow-tower-buy-container">
+          <img src="" alt="arrow-tower">
+          <button id="arrow-tower-buy" class="resource-icon-button-container">
+            <span id="arrow-tower-cost">Buy 0</span>
+            <div class="resource-icon red"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="arrow-tower-buy">Locked</button> -->
+        </div>
+        <div id="laser-tower-buy-container">
+          <img src="" alt="laser-tower">
+          <button id="laser-tower-buy" class="resource-icon-button-container">
+            <span id="laser-tower-cost">Buy 0</span>
+            <div class="resource-icon green"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="laser-tower-buy">Locked</button> -->
+        </div>
+        <div id="lighting-tower-buy-container">
+          <img src="" alt="lighting-tower">
+          <button id="lighting-tower-buy" class="resource-icon-button-container">
+            <span id="lighting-tower-cost">Buy 0</span>
+            <div class="resource-icon purple"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="lighting-tower-buy">Locked</button> -->
+        </div>
+      </div>
+      <div id="wall-buy-buttons" class="buy-buttons-container">
+        <div id="blue-wall-buy-container">
+          <!-- images/create-walls/create-blue-wall.png -->
+          <img src="" alt="Blue wall">
+          <button id="blue-wall-buy" class="resource-icon-button-container">
+            <span id="blue-wall-cost">Buy 0</span>
+            <div class="resource-icon blue"></div>
+          </button>
+        </div>
+        <div id="red-wall-buy-container">
+          <!-- images/create-walls/create-red-wall.png -->
+          <img src="" alt="Red wall"> 
+          <button id="red-wall-buy" class="resource-icon-button-container">
+            <span id="red-wall-cost">Buy 0</span>
+            <div class="resource-icon red"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="red-wall-buy">Locked</button> -->
+        </div>
+        <div id="green-wall-buy-container">
+          <!-- images/create-walls/create-green-wall.png -->
+          <img src="" alt="Green wall">
+          <button id="green-wall-buy" class="resource-icon-button-container">
+            <span id="green-wall-cost">Buy 0</span>
+            <div class="resource-icon green"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="green-wall-buy">Locked</button> -->
+        </div>
+        <div id="purple-wall-buy-container">
+          <!-- images/create-walls/create-purple-wall.png -->
+          <img src="" alt="Purple wall">
+          <button id="purple-wall-buy" class="resource-icon-button-container">
+            <span id="purple-wall-cost">Buy 0</span>
+            <div class="resource-icon purple"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="purple-wall-buy">Locked</button> -->
+        </div>
+        <div id="orange-wall-buy-container">
+          <!-- images/create-walls/create-orange-wall.png -->
+          <img src="" alt="Orange wall">
+          <button id="orange-wall-buy" class="resource-icon-button-container">
+            <span id="orange-wall-cost">Buy 0</span>
+            <div class="resource-icon orange"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="orange-wall-buy">Locked</button> -->
+        </div>
+        <div id="yellow-wall-buy-container">
+          <!-- images/create-walls/create-yellow-wall.png -->
+          <img src="" alt="Yellow wall">
+          <button id="yellow-wall-buy" class="resource-icon-button-container">
+            <span id="yellow-wall-cost">Buy 0</span>
+            <div class="resource-icon yellow"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="yellow-wall-buy">Locked</button> -->
+        </div>
+        <div id="white-wall-buy-container">
+          <!-- images/create-walls/create-white-wall.png -->
+          <img src="" alt="White wall">
+          <button id="white-wall-buy" class="resource-icon-button-container">
+            <span id="white-wall-cost">Buy 0</span>
+            <div class="resource-icon white"></div>
+          </button>
+          <!-- <div>
+            <img src="images/icons/lock.png">
+          </div> -->
+          <!-- <button id="white-wall-buy">Locked</button> -->
+        </div>
+      </div>
       <div id="building-type-selector-container">
         <select name="building-type-selector" id="building-type-selector">
-          <option value="squares">Squares</option>
-          <option value="collectors">Collectors</option>
-          <option value="defenses">Defenses</option>
-          <option value="walls">Walls</option>
+          <option value="square">Squares</option>
+          <option value="collector">Collectors</option>
+          <option value="defense">Defenses</option>
+          <option value="wall">Walls</option>
         </select>
       </div>
       <div id="toggle-building-create">
@@ -120,8 +330,9 @@
        </div>
     </div>
     <div id="options">
-      <img src="images/leaderboard.png" id="leaderboard" alt="Leaderboard">
-      <img src="images/settings.png" id="settings" alt="Settings">
+      <img src="images/icons/zombies.png" id="zombies" alt="Zombies">
+      <img src="images/icons/leaderboard.png" id="leaderboard" alt="Leaderboard">
+      <img src="images/icons/settings.png" id="settings" alt="Settings">
     </div>
     <div id="resources">
       <div><span id="blue-squares-count">XXXXX</span><div class="resource-icon blue"></div></div>
