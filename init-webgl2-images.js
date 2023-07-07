@@ -73,7 +73,50 @@ void main() {
 }
 `;
 
-let shapes = {};
+const vs = `#version 300 es
+uniform int numVerts;
+uniform vec2 resolution;
+uniform vec2 scale;
+uniform vec2 position;
+
+#define PI radians(180.0)
+
+void main() {
+  int numSlices = 30;
+  int sliceId = gl_VertexID / 3;
+  int triVertexId = gl_VertexID % 3;
+  int edge = triVertexId + sliceId;
+  float angleU = float(edge) / float(numSlices);  // 0.0 to 1.0
+  float angle = angleU * PI * 2.0;
+  float radius = step(float(triVertexId), 1.5);
+  vec2 pos = vec2(cos(angle), sin(angle)) * radius * scale + position;
+
+  // convert the position from pixels to 0.0 to 1.0
+  vec2 zeroToOne = pos / resolution;
+  
+  // convert from 0->1 to 0->2
+  vec2 zeroToTwo = zeroToOne * 2.0;
+
+  // convert from 0->2 to -1->+1 (clipspace)
+  vec2 clipSpace = zeroToTwo - 1.0;
+  gl_Position = vec4(clipSpace  * vec2(1, -1), 0, 1);
+}
+`;
+
+const fs = `#version 300 es
+precision highp float;
+
+uniform vec4 u_color;
+
+out vec4 outColor;
+
+void main() {
+  outColor = u_color;
+}
+`;
+
+let rects = {};
+let circles = {};
 let buildings = {};
 let plot_buttons = [];
 let mouseX = -1;
@@ -114,11 +157,14 @@ function display() {
       [vertexShaderSource, fragmentShaderSource]);
   var programShapes = webglUtils.createProgramFromSources(gl,
       [vertexShaderSourceShapes, fragmentShaderSourceShapes]);
+  // const programCircles = webglUtils.createProgramFromSources(gl, [vs, fs]);
 
   // look up where the vertex data needs to go.
   var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
   var texcoordAttributeLocation = gl.getAttribLocation(program, "a_texcoord");
   var positionAttributeLocationShapes = gl.getAttribLocation(programShapes, "a_position");
+  // var positionAttributeLocationCircles = gl.getAttribLocation(programCircles, "a_position");
+  // var texcoordAttributeLocationCircles = gl.getAttribLocation(programCircles, "a_texcoord");
 
   // lookup uniforms
   var matrixLocation = gl.getUniformLocation(program, "u_matrix");
@@ -127,6 +173,18 @@ function display() {
   var fogAmountLocation = gl.getUniformLocation(program, "u_fogAmount");
   var resolutionUniformLocationShapes = gl.getUniformLocation(programShapes, "u_resolution");
   var colorLocationShapes = gl.getUniformLocation(programShapes, "u_color");
+
+  // setup GLSL program
+  const programCircles = webglUtils.createProgramFromSources(gl, [vs, fs]);
+  const numVertsLoc = gl.getUniformLocation(programCircles, 'numVerts');
+  const resolutionLoc = gl.getUniformLocation(programCircles, 'resolution');
+  const scaleLoc = gl.getUniformLocation(programCircles, 'scale');
+  const colorLoc = gl.getUniformLocation(programCircles, 'u_color');
+  const positionLoc = gl.getUniformLocation(programCircles, 'position');
+
+  // Make a buffer with just a count in it.
+
+  const numVerts = 40 * 3;
 
   // Create a vertex array object (attribute state)
   var vao = gl.createVertexArray();
@@ -149,9 +207,11 @@ function display() {
   ];
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
   var positionBufferShapes = gl.createBuffer();
+  var positionBufferCircles = gl.createBuffer();
 
   // Create a vertex array object (attribute state)
   var vaoShapes = gl.createVertexArray();
+  // var vaoCircles = gl.createVertexArray();
 
   // Turn on the attribute
   gl.enableVertexAttribArray(positionAttributeLocation);
@@ -191,7 +251,7 @@ function display() {
   var offset = 0;        // start at the beginning of the buffer
   gl.vertexAttribPointer(
       texcoordAttributeLocation, size, type, normalize, stride, offset);
-
+  
 
   function draw() {
     // webglUtils.resizeCanvasToDisplaySize(gl.canvas);
@@ -213,72 +273,21 @@ function display() {
     updateResourceDisplays();
     if (d) Resource_disps = Date.now() - time;
     time = Date.now();
-    refreshCanvas();
+    drawSquares();
     if (d) Draw_shapes = Date.now() - time;
     time = Date.now();
     d = false;
+    drawCircles();
     if (getRandomInt(30) === 1) d = true;
     const fps = 1000 / (Date.now() - begin);
     if (counter % 5 === 0) document.getElementById('fps').textContent = Math.floor(fps);
     counter++;
     requestAnimationFrame(draw);
   }
-  // setInterval(() => {
-  //   draw();
-  // }, 1000/60);
   requestAnimationFrame(draw);
-
-  // Unlike images, textures do not have a width and height associated
-  // with them so we'll pass in the width and height of the texture
-  function drawImage(tex, texWidth, texHeight, dstX, dstY, fogColor, fogAmount, dstWidth, dstHeight) {
-    if (dstWidth === undefined) {
-      dstWidth = texWidth;
-    }
-
-    if (dstHeight === undefined) {
-      dstHeight = texHeight;
-    }
-
-    gl.useProgram(program);
-
-    // Setup the attributes for the quad
-    gl.bindVertexArray(vao);
-
-    var textureUnit = 0;
-    // The the shader we're putting the texture on texture unit 0
-    gl.uniform1i(textureLocation, textureUnit);
-
-    // set the fog color and amount
-    gl.uniform4fv(fogColorLocation, fogColor);
-    gl.uniform1f(fogAmountLocation, fogAmount);
-
-    // Bind the texture to texture unit 0
-    gl.activeTexture(gl.TEXTURE0 + textureUnit);
-    gl.bindTexture(gl.TEXTURE_2D, tex);
-
-    // this matrix will convert from pixels to clip space
-    var matrix = m4.orthographic(
-        0, gl.canvas.clientWidth, gl.canvas.clientHeight, 0, -1, 1);
-
-    // translate our quad to dstX, dstY
-    matrix = m4.translate(matrix, dstX, dstY, 0);
-
-    // scale our 1 unit quad
-    // from 1 unit to dstWidth, dstHeight units
-    matrix = m4.scale(matrix, dstWidth, dstHeight, 1);
-
-    // Set the matrix.
-    gl.uniformMatrix4fv(matrixLocation, false, matrix);
-
-    // draw the quad (2 triangles, 6 vertices)
-    var offset = 0;
-    var count = 6;
-    gl.drawArrays(gl.TRIANGLES, offset, count);
-  }
   function drawImages() {
-    const image_keys = Object.keys(image_draw_infos);
-    for (const drawInfoKey of image_keys) {
-      let drawInfo = image_draw_infos[drawInfoKey];
+    const drawInfoValues = Object.values(image_draw_infos);
+    for (const drawInfo of drawInfoValues) {
       var dstX      = drawInfo.x;
       var dstY      = drawInfo.y;
       var dstWidth  = drawInfo.textureInfo.width  * drawInfo.xScale;
@@ -344,7 +353,7 @@ function display() {
       gl.drawArrays(gl.TRIANGLES, offset, count);
     }
   }
-  function refreshCanvas() {
+  function drawSquares() {
   // and make it the one we're currently working with
   gl.bindVertexArray(vaoShapes);
 
@@ -377,11 +386,10 @@ function display() {
   // Pass in the canvas resolution so we can convert from
   // pixels to clipspace in the shader
   gl.uniform2f(resolutionUniformLocationShapes, gl.canvas.width, gl.canvas.height);
-  const zs = Object.keys(shapes);
+  const zs = Object.keys(rects);
   for (const z of zs) {
-    const shape_keys = Object.keys(shapes[z]);
-    for (const shape_key of shape_keys) {
-      let object = shapes[z][shape_key];
+    const objects = Object.values(rects[z]);
+    for (const object of objects) {
       let x1 = object.x;
       let x2 = object.x + object.width;
       let y1 = object.y;
@@ -407,6 +415,30 @@ function display() {
     }
   }
   return 'Success';
+  }
+  function drawCircles() {
+    webglUtils.resizeCanvasToDisplaySize(gl.canvas);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    gl.useProgram(programCircles);
+
+    // tell the shader the number of verts
+    gl.uniform1i(numVertsLoc, numVerts);
+    // tell the shader the resolution
+    gl.uniform2f(resolutionLoc, gl.canvas.width, gl.canvas.height);
+
+    const zs = Object.keys(circles);
+    for (const z of zs) {
+      const objects = Object.values(circles[z]);
+      for (const object of objects) {
+        gl.uniform2f(scaleLoc, object.width, object.height);
+        gl.uniform2f(positionLoc, object.x, object.y);
+        gl.uniform4f(colorLoc, object.r/255, object.g/255, object.b/255, 1);
+
+        const offset = 0;
+        gl.drawArrays(gl.TRIANGLES, offset, numVerts);
+      }
+    }
   }
   function getRandomInt(max = 1000000000) {
     return Math.floor(Math.random() * max);
@@ -434,18 +466,15 @@ function display() {
     mouseStartX_Y.y = mouseY;
     grid.distFromStartX = grid.x - mouseStartX_Y.x;
     grid.distFromStartY = grid.y - mouseStartX_Y.y;
-    for (const building_key of Object.keys(buildings)) {
-      let building = buildings[building_key];
+    for (const building of Object.values(buildings)) {
       building.updateDistFromStartX_Y();
     }
-    for (const z of Object.keys(shapes)) {
-      for (const shape_key of Object.keys(shapes[z])) {
-        let shape = shapes[z][shape_key];
+    for (const z of Object.keys(rects)) {
+      for (const shape of Object.values(rects[z])) {
         shape.updateDistFromStartX_Y();
       }
     }
-    for (const image_key of Object.keys(image_draw_infos)) {
-      let image = image_draw_infos[image_key];
+    for (const image of Object.values(image_draw_infos)) {
       image.updateDistFromStartX_Y();
     }
     for (const plot_button of plot_buttons) plot_button.updateDistFromStartX_Y();
@@ -460,18 +489,15 @@ function display() {
     mouseStartX_Y.y = mouseY;
     grid.distFromStartX = grid.x - mouseStartX_Y.x;
     grid.distFromStartY = grid.y - mouseStartX_Y.y;
-    for (const building_key of Object.keys(buildings)) {
-      let building = buildings[building_key];
+    for (const building of Object.values(buildings)) {
       building.updateDistFromStartX_Y();
     }
-    for (const z of Object.keys(shapes)) {
-      for (const shape_key of Object.keys(shapes[z])) {
-        let shape = shapes[z][shape_key];
+    for (const z of Object.keys(rects)) {
+      for (const shape of Object.values(rects[z])) {
         shape.updateDistFromStartX_Y();
       }
     }
-    for (const image_key of Object.keys(image_draw_infos)) {
-      let image = image_draw_infos[image_key];
+    for (const image of Object.values(image_draw_infos)) {
       image.updateDistFromStartX_Y();
     }
     for (const plot_button of plot_buttons) plot_button.updateDistFromStartX_Y();
@@ -712,8 +738,7 @@ function dragShape() {
   }
   if (!mouse_down) return;
   if (!canDragBoard && (!user_settings['no-square-movement'])) {
-    for (const building_key of Object.keys(buildings)) {
-      let building = buildings[building_key];
+    for (const building of Object.values(buildings)) {
       if (building.checkForMouseHover()) {
         checkedDragBoard = true;
         canDragBoard = false;
@@ -749,26 +774,22 @@ function translateBoardFromStart(translateX, translateY) {
     grid.y = window.innerHeight - (GAME_BORDER + GAME_BLOCK_AMOUNT_HEIGHT) * BLOCK_HEIGHT * global_scale;
     translateY = grid.y - mouseStartX_Y.y - grid.distFromStartY;
   }
-  for (const building_key of Object.keys(buildings)) {
-    let building = buildings[building_key];
+  for (const building of Object.values(buildings)) {
     building.translateX_YfromStartX_Y(translateX, translateY);
   }
-  for (const z of Object.keys(shapes)) {
-    for (const shape_key of Object.keys(shapes[z])) {
-      let shape = shapes[z][shape_key];
+  for (const z of Object.keys(rects)) {
+    for (const shape of Object.values(rects[z])) {
       shape.translateX_YfromStartX_Y(translateX, translateY);
     }
   }
-  for (const image_key of Object.keys(image_draw_infos)) {
-    let image = image_draw_infos[image_key];
+  for (const image of Object.values(image_draw_infos)) {
     image.translateX_YfromStartX_Y(translateX, translateY);
   }
   for (const plot_button of plot_buttons) plot_button.translateX_YfromStartX_Y(translateX, translateY);
 }
 
 function updateResourceDisplays() {
-  for (const building_key of Object.keys(buildings)) {
-    let building = buildings[building_key];
+  for (const building of Object.values(buildings)) {
     building.updateResourceDisplay();
   }
 }

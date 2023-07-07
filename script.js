@@ -47,7 +47,11 @@ const BLOCK_WIDTH = 30;
 const BLOCK_HEIGHT = 30;
 const GAME_BORDER = 4;
 
-shapes = {
+rects = {
+    'z1': {}, 
+    'z2': {}
+};
+circles = {
     'z1': {}, 
     'z2': {}
 };
@@ -259,7 +263,7 @@ window.addEventListener('touchend', (e) => {
     last_touch_distance = 1;
 });
 
-class Rect {
+class Shape {
     constructor(x, y, width, height, rgb, z) {
         this.scale = 1;
         this.x = x ?? 0;
@@ -282,7 +286,35 @@ class Rect {
         this.colorLocation = '';
         this.id = getRandomInt();
         this.z = z ?? 1;
-        shapes[`z${this.z}`][this.id] = this;
+    }
+    getId() {
+        return this.id;
+    }
+    translateX_YfromStartX_Y(x, y) {
+        this.x = mouseStartX_Y.x + x + this.distFromStartX;
+        this.y = mouseStartX_Y.y + y + this.distFromStartY;
+    }
+    translate(x, y) {
+        this.x += x;
+        this.y += y;
+    }
+    updateDistFromStartX_Y() {
+        this.distFromStartX = this.x - mouseStartX_Y.x;
+        this.distFromStartY = this.y - mouseStartX_Y.y;
+    }
+    setScale(multiplier) {
+        this.scale *= multiplier;
+        this.width = this.width * multiplier;
+        this.height = this.height * multiplier;
+        this.x = multiplier * (this.x - mouseX) + mouseX;
+        this.y = multiplier * (this.y - mouseY) + mouseY;
+    }
+}
+
+class Rect extends Shape {
+    constructor(x, y, width, height, rgb, z) {
+        super(x, y, width, height, rgb, z);
+        rects[`z${this.z}`][this.id] = this;
     }
     draw() {
         let x1 = this.x;
@@ -309,27 +341,25 @@ class Rect {
         var count = 6;
         gl.drawArrays(primitiveType, offset, count);
     }
-    getId() {
-        return this.id;
+}
+
+class Circle extends Shape {
+    constructor(x, y, width, height, rgb, z) {
+        super(x, y, width, height, rgb, z);
+        circles[`z${this.z}`][this.id] = this;
     }
-    translateX_YfromStartX_Y(x, y) {
-        this.x = mouseStartX_Y.x + x + this.distFromStartX;
-        this.y = mouseStartX_Y.y + y + this.distFromStartY;
-    }
-    translate(x, y) {
-        this.x += x;
-        this.y += y;
-    }
-    updateDistFromStartX_Y() {
-        this.distFromStartX = this.x - mouseStartX_Y.x;
-        this.distFromStartY = this.y - mouseStartX_Y.y;
-    }
-    setScale(multiplier) {
-        this.scale *= multiplier;
-        this.width = this.width * multiplier;
-        this.height = this.height * multiplier;
-        this.x = multiplier * (this.x - mouseX) + mouseX;
-        this.y = multiplier * (this.y - mouseY) + mouseY;
+    draw() {
+        // tell the shader the number of verts
+        gl.uniform1i(numVertsLoc, numVerts);
+        // tell the shader the resolution
+        gl.uniform2f(resolutionLoc, gl.canvas.width, gl.canvas.height);
+        
+        gl.uniform2f(scaleLoc, this.width, this.height);
+
+        gl.uniform2f(positionLoc, this.x, this.y);
+        gl.uniform4f(colorLoc, 0, 0, 0, 1);
+
+        gl.drawArrays(gl.TRIANGLES, offset, numVerts);
     }
 }
 
@@ -1016,6 +1046,14 @@ class Building {
             'coordY': this.coordY
         };
     }
+    updateSquareInFirebase() {
+        update(ref(db, `users/${userId}/game-data/building-data/${this.id}`), {
+            "level": this.level,
+            "total-cost": this.totalCost,
+            "coordX": this.coordX,
+            "coordY": this.coordY
+        });
+    }
 }
 
 class Square extends Building {
@@ -1030,7 +1068,7 @@ class Square extends Building {
         object.nextLevelUpgradeCost = object.level * 10000;
         object.totalCost = object.totalCost ?? buy_costs[`${object.color.toLowerCase()}_squares`];
         super(object);
-        this.createSquareOnScreen();
+        this.createObjectOnScreen();
         this.earningsPerSecond = object.earningsPerSecond ?? this.level;
         this.earningsPerHour = this.earningsPerSecond * 3600;
         document.getElementById('resource-displays').innerHTML += `
@@ -1040,9 +1078,8 @@ class Square extends Building {
             </div>
         `;
         buildings[this.id] = this;
-        return;
     }
-    createSquareOnScreen() {
+    createObjectOnScreen() {
         const BLOCK_INLINE = (24 - this.level * 2) * global_scale;
         const BORDER_WIDTH = 2 * global_scale;
         this.blockInline = BLOCK_INLINE;
@@ -1064,10 +1101,10 @@ class Square extends Building {
         this.squareId = SQUARE.getId();
     }
     updateObjectOnScreen() {
-        let outline_object = shapes['z1'][this.outelineId];
+        let outline_object = rects['z1'][this.outelineId];
         outline_object.x = this.x + this.blockInline;
         outline_object.y = this.y + this.blockInline;
-        let square_object = shapes['z2'][this.squareId];
+        let square_object = rects['z2'][this.squareId];
         square_object.x = this.x + this.blockInline + this.borderWidth;
         square_object.y = this.y + this.blockInline + this.borderWidth;
     }
@@ -1095,12 +1132,12 @@ class Square extends Building {
         this.r += this.rChangePerLevel;
         this.g += this.gChangePerLevel;
         this.b += this.bChangePerLevel;
-        let outline_object = shapes['z1'][this.outelineId];
+        let outline_object = rects['z1'][this.outelineId];
         outline_object.x = this.x + this.blockInline;
         outline_object.y = this.y + this.blockInline;
         outline_object.width = this.width - (2 * this.blockInline);
         outline_object.height = this.height - (2 * this.blockInline);
-        let square_object = shapes['z2'][this.squareId];
+        let square_object = rects['z2'][this.squareId];
         square_object.x = this.x + this.blockInline + this.borderWidth;
         square_object.y = this.y + this.blockInline + this.borderWidth;
         square_object.width = this.width - (2 * this.blockInline) - (2 * this.borderWidth);
@@ -1116,8 +1153,7 @@ class Square extends Building {
         if (this.displayed) return;
         document.getElementById('building-info-no-content').style.display = 'none';
         document.getElementById('building-info-content').style.visibility = 'visible';
-        for (const building_key of Object.keys(buildings)) {
-            let building = buildings[building_key];
+        for (const building of Object.values(buildings)) {
             building.displayed = false;
             building.removeUpgradeListener();
             building.removeDeleteListener();
@@ -1176,8 +1212,8 @@ class Square extends Building {
         grid[`${this.coordX}_${this.coordY + 1}`] = '';
         grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
         delete buildings[this.id];
-        delete shapes['z1'][this.outelineId];
-        delete shapes['z2'][this.squareId];
+        delete rects['z1'][this.outelineId];
+        delete rects['z2'][this.squareId];
         currencies[`${this.color.toLowerCase()}_squares`] += this.totalCost;
         document.getElementById(`resource-display-${this.id}`).remove();
         this.removeUpgradeListener();
@@ -1196,20 +1232,39 @@ class Square extends Building {
     collectAfktime(milliseconds) {
         currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond * Math.floor(milliseconds / 1000);
     }
-    updateSquareInFirebase() {
-        update(ref(db, `users/${userId}/game-data/building-data/${this.id}`), {
-            "level": this.level,
-            "total-cost": this.totalCost,
-            "coordX": this.coordX,
-            "coordY": this.coordY
-        });
-    }
 }
 
 class Collector extends Building {
     constructor(object) {
         if (object == undefined) object = {};
+        object.type = 'collector';
+        object.level = object.level ?? 1;
+        object.maxLevel = 10;
+        object.color = object.color ?? 'Blue';
+        object.maxHealth = object.maxHealth ?? 100;
+        object.health = object.health ?? object.maxHealth;
+        object.nextLevelUpgradeCost = object.level * 10000;
+        object.totalCost = object.totalCost ?? buy_costs[`${object.color.toLowerCase()}_collectors`];
         super(object);
+        this.createObjectOnScreen();
+        document.getElementById('resource-displays').innerHTML += `
+            <div id="resource-display-${this.id}" class="resource-display">+
+                <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
+                <div id="resource-display-resource-icon-${this.id}" class="resource-icon ${this.color.toLowerCase()}">
+            </div>
+        `;
+        buildings[this.id] = this;
+    }
+    createObjectOnScreen() {
+        
+    }
+    updateResourceDisplay() {
+        document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 2.5 * 2 * global_scale) + 'px';
+        document.getElementById(`resource-display-${this.id}`).style.left = (this.x + 1 * 2 * global_scale) + 'px';
+        document.getElementById(`resource-display-${this.id}`).style.fontSize = (20 * global_scale) + 'px';
+        document.getElementById(`resource-display-resource-icon-${this.id}`).style.height = (10 * global_scale) + 'px';
+        document.getElementById(`resource-display-resource-icon-${this.id}`).style.width = (10 * global_scale) + 'px';
+        document.getElementById(`resource-display-resource-icon-${this.id}`).style.borderWidth = (2 * global_scale) + 'px';
     }
 }
 
@@ -1488,18 +1543,15 @@ function afkTime(since) {
 }
 
 function setScales(multiplier) {
-    for (const building_key of Object.keys(buildings)) {
-        let building = buildings[building_key];
+    for (const building of Object.values(buildings)) {
         building.setScale(multiplier);
     }
-    for (const z of Object.keys(shapes)) {
-        for (const shape_key of Object.keys(shapes[z])) {
-            let shape = shapes[z][shape_key];
+    for (const z of Object.keys(rects)) {
+        for (const shape of Object.values(rects[z])) {
             shape.setScale(multiplier);
         }
     }
-    for (const image_key of Object.keys(image_draw_infos)) {
-        let image = image_draw_infos[image_key];
+    for (const image of Object.values(image_draw_infos)) {
         image.setScale(multiplier);
     }
     for (const plot_button of plot_buttons) plot_button.setScale(multiplier);
@@ -1524,18 +1576,15 @@ function setScales(multiplier) {
         grid.y = window.innerHeight - (GAME_BORDER + GAME_BLOCK_AMOUNT_HEIGHT) * BLOCK_HEIGHT * global_scale;
         translateY = grid.y - orginal_grid_y;
     }
-    for (const building_key of Object.keys(buildings)) {
-        let building = buildings[building_key];
+    for (const building of Object.values(buildings)) {
         building.translate(translateX, translateY);
     }
-    for (const z of Object.keys(shapes)) {
-        for (const shape_key of Object.keys(shapes[z])) {
-        let shape = shapes[z][shape_key];
+    for (const z of Object.keys(rects)) {
+        for (const shape of Object.values(rects[z])) {
         shape.translate(translateX, translateY);
         }
     }
-    for (const image_key of Object.keys(image_draw_infos)) {
-        let image = image_draw_infos[image_key];
+    for (const image of Object.values(image_draw_infos)) {
         image.translate(translateX, translateY);
     }
     for (const plot_button of plot_buttons) plot_button.translate(translateX, translateY);
@@ -1546,8 +1595,7 @@ function setScales(multiplier) {
 }
 
 function getGrassBlockId(gridX, gridY) {
-    for (const image_key of Object.keys(image_draw_infos)) {
-        let image = image_draw_infos[image_key];
+    for (const image of Object.values(image_draw_infos)) {
         if ((image.gridX === gridX) && (image.gridY === gridY)) return image.id;
     }
 }
@@ -1559,18 +1607,15 @@ function centerBoard() {
     const orginal_grid_y = grid.y;
     grid.y = window.innerHeight / 2 - (GAME_BLOCK_AMOUNT_HEIGHT / 2) * BLOCK_HEIGHT * global_scale - BLOCK_HEIGHT * global_scale;
     const translateY = grid.y - orginal_grid_y;
-    for (const building_key of Object.keys(buildings)) {
-        let building = buildings[building_key];
+    for (const building of Object.values(buildings)) {
         building.translate(translateX, translateY);
     }
-    for (const z of Object.keys(shapes)) {
-        for (const shape_key of Object.keys(shapes[z])) {
-        let shape = shapes[z][shape_key];
+    for (const z of Object.keys(rects)) {
+        for (const shape of Object.values(rects[z])) {
         shape.translate(translateX, translateY);
         }
     }
-    for (const image_key of Object.keys(image_draw_infos)) {
-        let image = image_draw_infos[image_key];
+    for (const image of Object.values(image_draw_infos)) {
         image.translate(translateX, translateY);
     }
     document.querySelector(':root').style.setProperty('--buy-plot-container-padding-right', `${BLOCK_HEIGHT * global_scale / 5 + 15}px`);
@@ -1632,15 +1677,13 @@ export function createGame() {
     }
     const afked_time = sessionStorage.getItem('blue-squares:afk-collected');
     const afked_time_formated = afkTime(parseInt(afked_time));
-    for (const building_key of Object.keys(buildings)) {
-        let building = buildings[building_key];
+    for (const building of Object.values(buildings)) {
         building.collectAfktime(afked_time);
     }
     notification(`Collceted ${afked_time_formated} worth of time`);
     const log_in_number = sessionStorage.getItem('blue-squares:login_in_number');
     const UP_RESOURCES = setInterval(() => {
-        for (const building_key of Object.keys(buildings)) {
-            let building = buildings[building_key];
+        for (const building of Object.values(buildings)) {
             building.upResource();
         }
         for (const color of Object.keys(colors)) {
