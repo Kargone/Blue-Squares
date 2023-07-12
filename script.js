@@ -716,48 +716,57 @@ class PlotButton {
         new_div.style.left = this.x + 'px';
         document.getElementById('plot-button-container').appendChild(new_div);
         const this_plot_button = this;
-        // document.getElementById(`buy-plot-${x}-${y}-button`).addEventListener('click', function() {
-        //     grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX] = 'i';
-        //     grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX] = 'i';
-        //     grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX + 1] = 'i';
-        //     grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX + 1] = 'i';
-        //     for (let gridX = this_plot_button.grassGridX - 2; 
-        //         gridX < this_plot_button.grassGridX + 2;
-        //         gridX++
-        //     ) {
-        //         for (let gridY = this_plot_button.grassGridY - 2; 
-        //             gridY < this_plot_button.grassGridY + 2;
-        //             gridY++
-        //         ) {
-        //             if (getSqaureStatus(gridX + 1, gridY + 1).includes('_') || getBlock(gridX, gridY) === 'na') continue;
-        //             const image_info = image_draw_infos[getGrassBlockId(gridX, gridY)];
-        //             const copied_image_info = {
-        //                 'x': image_info.x,
-        //                 'y': image_info.y
-        //             };
-        //             delete image_draw_infos[getGrassBlockId(gridX, gridY)];
-        //             const BLOCK = new GrassBlock(
-        //                 copied_image_info.x, 
-        //                 copied_image_info.y, 
-        //                 BLOCK_WIDTH * global_scale, 
-        //                 BLOCK_HEIGHT * global_scale
-        //             );
-        //             BLOCK.drawGrass(gridX + 1 + GAME_BORDER, gridY + 1 + GAME_BORDER);
-        //         }
-        //     }
-        //     update(ref(db, `users/${userId}/game-data/`), {
-        //         "grass-grid": JSON.stringify(grass_grid)
-        //     });
-        //     createPlotButtons();
-        //     function getBlock(x, y) {
-        //         if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
-        //         return grass_grid[y][x];
-        //     }
-        //     function getSqaureStatus(x, y) {
-        //         if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
-        //         return grid[`${x}_${y}`];
-        //     }
-        // });
+        document.getElementById(`buy-plot-${x}-${y}-button`).clicked = false;
+        document.getElementById(`buy-plot-${x}-${y}-button`).addEventListener('click', function() {
+            if ((this.clicked === false) && (user_settings["double-tap-buy-plot"])) {
+                notification('Click again to buy plot');
+                this.clicked = true;
+                setTimeout(() => {
+                    if (document.getElementById(`buy-plot-${x}-${y}-button`)) document.getElementById(`buy-plot-${x}-${y}-button`).clicked = false;
+                }, 1000);
+                return;
+            }
+            grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX] = 'i';
+            grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX] = 'i';
+            grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX + 1] = 'i';
+            grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX + 1] = 'i';
+            for (let gridX = this_plot_button.grassGridX - 2; 
+                gridX < this_plot_button.grassGridX + 2;
+                gridX++
+            ) {
+                for (let gridY = this_plot_button.grassGridY - 2; 
+                    gridY < this_plot_button.grassGridY + 2;
+                    gridY++
+                ) {
+                    if (getSqaureStatus(gridX + 1, gridY + 1).includes('_') || getBlock(gridX, gridY) === 'na') continue;
+                    const image_info = image_draw_infos[getGrassBlockId(gridX, gridY)];
+                    const copied_image_info = {
+                        'x': image_info.x,
+                        'y': image_info.y
+                    };
+                    delete image_draw_infos[getGrassBlockId(gridX, gridY)];
+                    const BLOCK = new GrassBlock(
+                        copied_image_info.x, 
+                        copied_image_info.y, 
+                        BLOCK_WIDTH * global_scale, 
+                        BLOCK_HEIGHT * global_scale
+                    );
+                    BLOCK.drawGrass(gridX + 1 + GAME_BORDER, gridY + 1 + GAME_BORDER);
+                }
+            }
+            update(ref(db, `users/${userId}/game-data/`), {
+                "grass-grid": JSON.stringify(grass_grid)
+            });
+            createPlotButtons();
+            function getBlock(x, y) {
+                if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
+                return grass_grid[y][x];
+            }
+            function getSqaureStatus(x, y) {
+                if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
+                return grid[`${x}_${y}`];
+            }
+        });
         plot_buttons.push(this);
     }
     translateX_YfromStartX_Y(x, y) {
@@ -880,7 +889,7 @@ class Building {
     createObjectOnScreen() {}
     updateObjectOnScreen() {}
     checkForMouseHover() {
-        if (user_settings['no-square-movement']) return;
+        if (user_settings['no-building-movement']) return;
         if (!mouse_down) {
             if (this.selected) {
                 this.checkXandY();
@@ -1538,7 +1547,6 @@ class Wall {
 
 }
 
-
 function createGrass() {
     for (let current_block_y = 1; current_block_y <= GAME_BLOCK_AMOUNT_HEIGHT + GAME_BORDER * 2; current_block_y++) {
         for (let current_block_x = 1; current_block_x <= GAME_BLOCK_AMOUNT_WIDTH + GAME_BORDER * 2; current_block_x++) {
@@ -1593,7 +1601,7 @@ function eventListeners() {
     for (const color of Object.keys(colors)) {
         document.getElementById(`${color.toLowerCase()}-square-buy`).addEventListener('click', function () {
             if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`] &&
-                user_settings['notification-not-enough-new-square'] &&
+                user_settings['notification-not-enough-new-building'] &&
                 user_settings['all-notifications']) return notification('Not enough resources');
             if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`]) return;
             const new_square = new Square({'color': color});
@@ -1609,7 +1617,7 @@ function eventListeners() {
         if (color === 'Blue') continue;
         document.getElementById(`${color.toLowerCase()}-collector-buy`).addEventListener('click', function () {
             if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_collectors`] &&
-                user_settings['notification-not-enough-new-square'] &&
+                user_settings['notification-not-enough-new-building'] &&
                 user_settings['all-notifications']) return notification('Not enough resources');
             if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_collectors`]) return;
             const collector = new Collector({'color': color});

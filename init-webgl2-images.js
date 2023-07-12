@@ -534,7 +534,7 @@ function display() {
       if (building_selected.mouseHover()) {
         building_selected.displayObjectInfo();
         building_info_open = true;
-        if (user_settings['open-square-after-move']) document.getElementById("building-info").className = "collapse-building-info open-building-info";
+        if (user_settings['open-info-after-building-move']) document.getElementById("building-info").className = "collapse-building-info open-building-info";
       }
     }
     canDragBoard = false;
@@ -746,24 +746,25 @@ function dragShape() {
     }
   }
   if (!mouse_down) return;
-  if (!canDragBoard && (!user_settings['no-square-movement'])) {
+  if (!canDragBoard && (!user_settings['no-building-movement'])) {
     for (const building of Object.values(buildings)) {
       if (building.checkForMouseHover()) {
         checkedDragBoard = true;
         canDragBoard = false;
         building.updateXandY();
         building.displayObjectInfo();
+        if (user_settings['close-info-during-building-move']) document.getElementById("building-info").className = "collapse-building-info";
         return true;
       }
     }
   }
-  if ((!mouse_down) || (checkedDragBoard)) return;
+  if ((!mouse_down) || (checkedDragBoard) || (user_settings["no-board-movement"])) return;
   canDragBoard = true;
   let translateX = mouseX - mouseStartX_Y.x;
   let translateY = mouseY - mouseStartX_Y.y;
   translateBoardFromStart(translateX, translateY);
   building_info_open = false;
-  if (user_settings['open-square-after-move']) document.getElementById("building-info").className = "collapse-building-info";
+  if (user_settings['close-info-during-board-move']) document.getElementById("building-info").className = "collapse-building-info";
 }
 
 function translateBoardFromStart(translateX, translateY) {

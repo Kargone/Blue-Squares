@@ -92,12 +92,16 @@ function connectToDatabase(user, userId) {
                     "all-notifications": true,
                     "notification-invalid-movement": true,
                     "notification-not-enough-upgrade": true,
-                    "notification-not-enough-new-square": true,
+                    "notification-not-enough-new-building": true,
                     "notification-deletion": true,
                     "no-delete": false,
+                    "double-tap-buy-plot": true,
                     "double-tap-delete": true,
-                    "no-square-movement": false,
-                    "open-square-after-move": true
+                    "no-building-movement": false,
+                    "open-info-after-building-move": true,
+                    "close-info-during-building-move": true,
+                    "no-board-movement": false,
+                    "close-info-during-board-move": true
                 },
                 "currencies": {
                     "blue_squares": 0,
