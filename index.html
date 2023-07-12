@@ -86,14 +86,6 @@
         </div>
       </div>
       <div id="collector-buy-buttons" class="buy-buttons-container">
-        <div id="blue-collector-buy-container">
-          <!-- images/create-collectors/create-blue-collector.png -->
-          <img src="" alt="Blue collector">
-          <button id="blue-collector-buy" class="resource-icon-button-container">
-            <span id="blue-collector-cost">Buy 0</span>
-            <div class="resource-icon blue"></div>
-          </button>
-        </div>
         <div id="red-collector-buy-container">
           <!-- images/create-collectors/create-red-collector.png -->
           <img src="" alt="Red collector"> 
@@ -308,26 +300,56 @@
        </div>
     </div>
     <div id="building-info" class="collapse-building-info open-building-info">
-      <h2 id="building-info-no-content">Select a Square</h2>
-      <div id="building-info-content">
-        <h2 id="building-info-square_type">Square</h2>
-        <h3 id="building-info-level">Level: </h3>
-        <p id="building-info-created">Created on: </p>
-        <p id="building-info-earnings_second">Earnings per second: </p>
-        <p id="building-info-earnings_hour">Earnings per second: </p>
-        <button id="building-info-upgrade" class="resource-icon-button-container">
-          <span id="building-info-upgrade-text">Upgrade </span>
-          <div id="building-info-upgrade-resource-icon" class="resource-icon blue">
+      <div id="building-info-no-content-container">
+        <h2 id="building-info-no-content">Select a Square</h2>
+      </div>
+      <div id="building-info-square-container" class="building-info-container">
+        <h2 id="building-info-square-type">Square</h2>
+        <h3 id="building-info-square-level">Level: </h3>
+        <p id="building-info-square-created" class="building-info-small-text">Created on: </p>
+        <p id="building-info-square-earnings_second">Earnings per second: </p>
+        <p id="building-info-square-earnings_hour">Earnings per second: </p>
+        <button id="building-info-square-upgrade" class="resource-icon-button-container">
+          <span id="building-info-square-upgrade-text">Upgrade </span>
+          <div id="building-info-square-upgrade-resource-icon" class="resource-icon blue">
         </button>
-        <p id="refund-text">*square will be 100% refunded*</p>
-        <button id="building-info-delete" class="resource-icon-button-container">
-          <span id="building-info-delete-text">Delete </span>
-          <div id="building-info-delete-resource-icon" class="resource-icon blue">
+        <p id="building-info-square-refund-text" class="building-info-small-text">*square will be 100% refunded*</p>
+        <button id="building-info-square-delete" class="resource-icon-button-container">
+          <span id="building-info-square-delete-text">Delete </span>
+          <div id="building-info-square-delete-resource-icon" class="resource-icon blue">
         </button>
       </div>
-       <div id="toggle-building-info">
+      <div id="building-info-collector-container" class="building-info-container">
+        <h2 id="building-info-collector-type">collector</h2>
+        <h3 id="building-info-collector-level">Level: </h3>
+        <p id="building-info-collector-created" class="building-info-small-text">Created on: </p>
+        <p id="building-info-collector-max_earnings_second">Max earnings per second: </p>
+        <p id="building-info-collector-max_earnings_hour">Max earnings per second: </p>
+        <div class="toggle">
+          <label for="building-info-collector-active-toggle">Active</label>
+          <label class="switch settings-switch">
+              <input type="checkbox" id="building-info-collector-active-toggle">
+              <span class="slider round"></span>
+          </label>
+        </div>
+        <div id="building-info-collector-resource-edit-container">
+          <label id="building-info-collector-resource-input-text">Transfer 0 blue <br>square(s) per second to</label>
+          <input id="building-info-collector-resource-rate" value="0" min="0" max="1" step="1" type="number" style="width: 25px;">
+          <p id="building-info-collector-resource-output-type-text" style="margin-top: 0px;">Blue square(s) per second</p>
+        </div>
+        <button id="building-info-collector-upgrade" class="resource-icon-button-container">
+          <span id="building-info-collector-upgrade-text">Upgrade </span>
+          <div id="building-info-collector-upgrade-resource-icon" class="resource-icon blue">
+        </button>
+        <p id="building-info-collector-refund-text" class="building-info-small-text">*collector will be 100% refunded*</p>
+        <button id="building-info-collector-delete" class="resource-icon-button-container">
+          <span id="building-info-collector-delete-text">Delete </span>
+          <div id="building-info-collector-delete-resource-icon" class="resource-icon blue">
+        </button>
+      </div>
+      <div id="toggle-building-info">
         <p>▶</p>
-       </div>
+      </div>
     </div>
     <div id="options">
       <img src="images/icons/zombies.png" id="zombies" alt="Zombies">
@@ -365,29 +387,29 @@
               <span class="slider round"></span>
           </label>
         </div>
-        <div id="other-notification-contianer">
-          <div class="other-notification-toggle" id="selector-1">
+        <div id="all-notifications-sub-toggles-container" class="multi-toggle-container">
+          <div class="sub-toggle">
             <label for="notification-invalid-movement-toggle">Invalid movement</label>
             <label class="switch settings-switch">
                 <input type="checkbox" id="notification-invalid-movement-toggle">
                 <span class="slider round"></span>
             </label>
           </div>
-          <div class="other-notification-toggle" id="selector-2">
+          <div class="sub-toggle">
             <label for="notification-not-enough-upgrade-toggle">Not enough for upgrade</label>
             <label class="switch settings-switch">
                 <input type="checkbox" id="notification-not-enough-upgrade-toggle">
                 <span class="slider round"></span>
             </label>
           </div>
-          <div class="other-notification-toggle" id="selector-3">
-            <label for="notification-not-enough-new-square-toggle">Not enough for new square</label>
+          <div class="sub-toggle">
+            <label for="notification-not-enough-new-building-toggle">Not enough for new building</label>
             <label class="switch settings-switch">
-                <input type="checkbox" id="notification-not-enough-new-square-toggle">
+                <input type="checkbox" id="notification-not-enough-new-building-toggle">
                 <span class="slider round"></span>
             </label>
           </div>
-          <div class="other-notification-toggle" id="selector-4">
+          <div class="sub-toggle">
             <label for="notification-deletion-toggle">Deletion</label>
             <label class="switch settings-switch">
                 <input type="checkbox" id="notification-deletion-toggle">
@@ -402,26 +424,60 @@
               <span class="slider round"></span>
           </label>
         </div>
-        <div id="double-delete-container" class="toggle">
-          <label for="double-tap-delete-toggle">Double tap for delete</label>
+        <div id="no-delete-sub-toggles-container" class="multi-toggle-container">
+          <div class="sub-toggle">
+            <label for="double-tap-delete-toggle">Double tap for delete</label>
+            <label class="switch settings-switch">
+                <input type="checkbox" id="double-tap-delete-toggle">
+                <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+        <div class="toggle">
+          <label for="double-tap-buy-plot-toggle">Double tap to buy plot</label>
           <label class="switch settings-switch">
-              <input type="checkbox" id="double-tap-delete-toggle">
+              <input type="checkbox" id="double-tap-buy-plot-toggle">
               <span class="slider round"></span>
           </label>
         </div>
         <div class="toggle">
-          <label for="no-square-movement-toggle">No square movement</label>
+          <label for="no-building-movement-toggle">No building movement</label>
           <label class="switch settings-switch">
-              <input type="checkbox" id="no-square-movement-toggle">
+              <input type="checkbox" id="no-building-movement-toggle">
               <span class="slider round"></span>
           </label>
         </div>
-        <div id="open-square-after-move-container" class="toggle">
-          <label for="open-square-after-move-toggle">Open sqaure after move</label>
+        <div id="no-building-movement-sub-toggles-container" class="multi-toggle-container">
+          <div class="sub-toggle">
+            <label for="open-info-after-building-move-toggle">Open info after building move</label>
+            <label class="switch settings-switch">
+                <input type="checkbox" id="open-info-after-building-move-toggle">
+                <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="sub-toggle">
+            <label for="close-info-during-building-move-toggle">Close info during building move</label>
+            <label class="switch settings-switch">
+                <input type="checkbox" id="close-info-during-building-move-toggle">
+                <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+        <div class="toggle">
+          <label for="no-board-movement-toggle">No board movement</label>
           <label class="switch settings-switch">
-              <input type="checkbox" id="open-square-after-move-toggle">
+              <input type="checkbox" id="no-board-movement-toggle">
               <span class="slider round"></span>
           </label>
+        </div>
+        <div id="no-board-movement-sub-toggles-container" class="multi-toggle-container">
+          <div class="sub-toggle">
+            <label for="close-info-during-board-move-toggle">Close info during board move</label>
+            <label class="switch settings-switch">
+                <input type="checkbox" id="close-info-during-board-move-toggle">
+                <span class="slider round"></span>
+            </label>
+          </div>
         </div>
         <div class="toggle">
           <label for="settings-username-input">Username:</label>

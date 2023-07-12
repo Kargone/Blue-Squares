@@ -89,7 +89,7 @@ void main() {
   float angleU = float(edge) / float(numSlices);  // 0.0 to 1.0
   float angle = angleU * PI * 2.0;
   float radius = step(float(triVertexId), 1.5);
-  vec2 pos = vec2(cos(angle), sin(angle)) * radius * scale + position;
+  vec2 pos = vec2(cos(angle), sin(angle)) * radius * scale / vec2(2, 2) + position;
 
   // convert the position from pixels to 0.0 to 1.0
   vec2 zeroToOne = pos / resolution;
@@ -474,6 +474,11 @@ function display() {
         shape.updateDistFromStartX_Y();
       }
     }
+    for (const z of Object.keys(circles)) {
+      for (const circle of Object.values(circles[z])) {
+        circle.updateDistFromStartX_Y();
+      }
+    }
     for (const image of Object.values(image_draw_infos)) {
       image.updateDistFromStartX_Y();
     }
@@ -497,6 +502,11 @@ function display() {
         shape.updateDistFromStartX_Y();
       }
     }
+    for (const z of Object.keys(circles)) {
+      for (const circle of Object.values(circles[z])) {
+        circle.updateDistFromStartX_Y();
+      }
+    }
     for (const image of Object.values(image_draw_infos)) {
       image.updateDistFromStartX_Y();
     }
@@ -518,17 +528,16 @@ function display() {
   });
   function mouseEnd() {
     if (!mouse_down) return;
-    for (let building_key of Object.keys(buildings)) {
-      let building = buildings[building_key];
-      if (building.checkForMouseHover()) {
-        building.displaySquare();
+    mouse_down = false;
+    if (building_selected_id != '') {
+      let building_selected = buildings[building_selected_id];
+      if (building_selected.mouseHover()) {
+        building_selected.displayObjectInfo();
         building_info_open = true;
         if (user_settings['open-square-after-move']) document.getElementById("building-info").className = "collapse-building-info open-building-info";
-        break;
       }
     }
     canDragBoard = false;
-    mouse_down = false;
     checkedDragBoard = false;
   }
 }
@@ -730,7 +739,7 @@ function dragShape() {
     let building_selected = buildings[building_selected_id];
     if (building_selected.checkForMouseHover()) {
       building_selected.updateXandY();
-      building_selected.displaySquare();
+      building_selected.displayObjectInfo();
       canDragBoard = false;
       checkedDragBoard = true;
       return true;
@@ -743,7 +752,7 @@ function dragShape() {
         checkedDragBoard = true;
         canDragBoard = false;
         building.updateXandY();
-        building.displaySquare();
+        building.displayObjectInfo();
         return true;
       }
     }
@@ -778,8 +787,13 @@ function translateBoardFromStart(translateX, translateY) {
     building.translateX_YfromStartX_Y(translateX, translateY);
   }
   for (const z of Object.keys(rects)) {
-    for (const shape of Object.values(rects[z])) {
-      shape.translateX_YfromStartX_Y(translateX, translateY);
+    for (const rect of Object.values(rects[z])) {
+      rect.translateX_YfromStartX_Y(translateX, translateY);
+    }
+  }
+  for (const z of Object.keys(circles)) {
+    for (const circle of Object.values(circles[z])) {
+      circle.translateX_YfromStartX_Y(translateX, translateY);
     }
   }
   for (const image of Object.values(image_draw_infos)) {

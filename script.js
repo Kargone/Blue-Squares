@@ -26,7 +26,9 @@ import {
     push, 
     update,
     remove
-  } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+import { constants } from "./constants.js";
+
 const firebaseConfig = {
     apiKey: "AIzaSyByhAfobvZt_OQu-32tVbXho6n2L4IaNEE",
     authDomain: "blue-squares-d1f83.firebaseapp.com",
@@ -149,18 +151,29 @@ let buy_costs = {
     'purple_squares': 0,
     'orange_squares': 0,
     'yellow_squares': 0,
-    'white_squares': 0
+    'white_squares': 0,
+    'blue_collectors': 0,
+    'red_collectors': 0,
+    'green_collectors': 0,
+    'purple_collectors': 0,
+    'orange_collectors': 0,
+    'yellow_collectors': 0,
+    'white_collectors': 0
 };
 user_settings = {
     'all-notifications': true,
     'notification-invalid-movement': true,
     'notification-not-enough-upgrade': true,
-    'notification-not-enough-new-square': true,
+    'notification-not-enough-new-building': true,
     'notification-deletion': true,
     'no-delete': false,
+    'double-tap-buy-plot': true,
     'double-tap-delete': true,
-    'no-square-movement': false,
-    'open-square-after-move': true
+    'no-building-movement': false,
+    'open-info-after-building-move': true,
+    'close-info-during-building-move': true,
+    'no-board-movement': false,
+    'close-info-during-board-move': true
 };
 let grass_grid = [
     ["o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o","o"],
@@ -228,11 +241,11 @@ let userId = JSON.parse(localStorage.getItem('blue-squares:user')).uid;
 window.addEventListener('wheel', function(event) {
     if (mouse_down) return;
     if (event.deltaY < 0) {
-        // console.log('scrolling up');
+        // scrolling up
         const multiplier = 1.1;
         if (global_scale * multiplier <= MAX_GLOBAL_SCALE) setScales(multiplier);
     } else if (event.deltaY > 0) {
-        // console.log('scrolling down');
+        // scrolling down
         const multiplier = 0.9;
         if (global_scale * multiplier >= MIN_GLOBAL_SCALE) setScales(multiplier);
     }
@@ -240,7 +253,7 @@ window.addEventListener('wheel', function(event) {
 
 window.addEventListener('touchstart', (e) => {
     last_touch_distance = 1;
-    console.log(e.targetTouches[0]);
+    // console.log(e.targetTouches[0]);
     if (e.targetTouches.length != 2) return;
     const touch_1 = e.targetTouches[0];
     const touch_2 = e.targetTouches[1];
@@ -703,49 +716,48 @@ class PlotButton {
         new_div.style.left = this.x + 'px';
         document.getElementById('plot-button-container').appendChild(new_div);
         const this_plot_button = this;
-        document.getElementById(`buy-plot-${x}-${y}-button`).addEventListener('click', function() {
-            grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX] = 'i';
-            grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX] = 'i';
-            grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX + 1] = 'i';
-            grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX + 1] = 'i';
-            for (let gridX = this_plot_button.grassGridX - 2; 
-                gridX < this_plot_button.grassGridX + 2;
-                gridX++
-            ) {
-                for (let gridY = this_plot_button.grassGridY - 2; 
-                    gridY < this_plot_button.grassGridY + 2;
-                    gridY++
-                ) {
-                    // console.log(getSqaureStatus(gridX, gridY).includes('square'))
-                    if (getSqaureStatus(gridX + 1, gridY + 1).includes('square') || getBlock(gridX, gridY) === 'na') continue;
-                    const image_info = image_draw_infos[getGrassBlockId(gridX, gridY)];
-                    const copied_image_info = {
-                        'x': image_info.x,
-                        'y': image_info.y
-                    };
-                    delete image_draw_infos[getGrassBlockId(gridX, gridY)];
-                    const BLOCK = new GrassBlock(
-                        copied_image_info.x, 
-                        copied_image_info.y, 
-                        BLOCK_WIDTH * global_scale, 
-                        BLOCK_HEIGHT * global_scale
-                    );
-                    BLOCK.drawGrass(gridX + 1 + GAME_BORDER, gridY + 1 + GAME_BORDER);
-                }
-            }
-            update(ref(db, `users/${userId}/game-data/`), {
-                "grass-grid": JSON.stringify(grass_grid)
-            });
-            createPlotButtons();
-            function getBlock(x, y) {
-                if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
-                return grass_grid[y][x];
-            }
-            function getSqaureStatus(x, y) {
-                if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
-                return grid[`${x}_${y}`];
-            }
-        });
+        // document.getElementById(`buy-plot-${x}-${y}-button`).addEventListener('click', function() {
+        //     grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX] = 'i';
+        //     grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX] = 'i';
+        //     grass_grid[this_plot_button.grassGridY][this_plot_button.grassGridX + 1] = 'i';
+        //     grass_grid[this_plot_button.grassGridY + 1][this_plot_button.grassGridX + 1] = 'i';
+        //     for (let gridX = this_plot_button.grassGridX - 2; 
+        //         gridX < this_plot_button.grassGridX + 2;
+        //         gridX++
+        //     ) {
+        //         for (let gridY = this_plot_button.grassGridY - 2; 
+        //             gridY < this_plot_button.grassGridY + 2;
+        //             gridY++
+        //         ) {
+        //             if (getSqaureStatus(gridX + 1, gridY + 1).includes('_') || getBlock(gridX, gridY) === 'na') continue;
+        //             const image_info = image_draw_infos[getGrassBlockId(gridX, gridY)];
+        //             const copied_image_info = {
+        //                 'x': image_info.x,
+        //                 'y': image_info.y
+        //             };
+        //             delete image_draw_infos[getGrassBlockId(gridX, gridY)];
+        //             const BLOCK = new GrassBlock(
+        //                 copied_image_info.x, 
+        //                 copied_image_info.y, 
+        //                 BLOCK_WIDTH * global_scale, 
+        //                 BLOCK_HEIGHT * global_scale
+        //             );
+        //             BLOCK.drawGrass(gridX + 1 + GAME_BORDER, gridY + 1 + GAME_BORDER);
+        //         }
+        //     }
+        //     update(ref(db, `users/${userId}/game-data/`), {
+        //         "grass-grid": JSON.stringify(grass_grid)
+        //     });
+        //     createPlotButtons();
+        //     function getBlock(x, y) {
+        //         if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
+        //         return grass_grid[y][x];
+        //     }
+        //     function getSqaureStatus(x, y) {
+        //         if ((x < 0) || (y < 0) || (x >= grass_grid[0].length) || (y >= grass_grid.length)) return 'na';
+        //         return grid[`${x}_${y}`];
+        //     }
+        // });
         plot_buttons.push(this);
     }
     translateX_YfromStartX_Y(x, y) {
@@ -810,10 +822,10 @@ class Building {
             this.y = (this.coordY - 1) * BLOCK_HEIGHT * global_scale + grid.y;
             this.originalX = copy(this.x);
             this.originalY = copy(this.y);
-            grid[`${this.coordX}_${this.coordY}`] = `${this.color}_square`;
-            grid[`${this.coordX + 1}_${this.coordY}`] = `${this.color}_square`;
-            grid[`${this.coordX}_${this.coordY + 1}`] = `${this.color}_square`;
-            grid[`${this.coordX + 1}_${this.coordY + 1}`] = `${this.color}_square`;
+            grid[`${this.coordX}_${this.coordY}`] = `${this.color}_${this.type}`;
+            grid[`${this.coordX + 1}_${this.coordY}`] = `${this.color}_${this.type}`;
+            grid[`${this.coordX}_${this.coordY + 1}`] = `${this.color}_${this.type}`;
+            grid[`${this.coordX + 1}_${this.coordY + 1}`] = `${this.color}_${this.type}`;
         } else {
             this.removed = true;
             if (!this.assignCoords()) return;
@@ -854,10 +866,10 @@ class Building {
             this.y = (gridY - 1) * BLOCK_HEIGHT * global_scale + grid.y;
             this.originalX = copy(this.x);
             this.originalY = copy(this.y);
-            grid[`${gridX}_${gridY}`] = `${this.color}_square`;
-            grid[`${gridX + 1}_${gridY}`] = `${this.color}_square`;
-            grid[`${gridX}_${gridY + 1}`] = `${this.color}_square`;
-            grid[`${gridX + 1}_${gridY + 1}`] = `${this.color}_square`;
+            grid[`${gridX}_${gridY}`] = `${this.color}_${this.type}`;
+            grid[`${gridX + 1}_${gridY}`] = `${this.color}_${this.type}`;
+            grid[`${gridX}_${gridY + 1}`] = `${this.color}_${this.type}`;
+            grid[`${gridX + 1}_${gridY + 1}`] = `${this.color}_${this.type}`;
             this.coordX = gridX;
             this.coordY = gridY;
             return true;
@@ -865,6 +877,8 @@ class Building {
         notification('Cannot be created');
         return false;
     }
+    createObjectOnScreen() {}
+    updateObjectOnScreen() {}
     checkForMouseHover() {
         if (user_settings['no-square-movement']) return;
         if (!mouse_down) {
@@ -873,21 +887,16 @@ class Building {
                 building_selected_id = '';
                 this.removeHighlights();
             }
-            if (this.type === 'square') document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
+            if ((this.type === 'square') || (this.type === 'collector')) document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
             this.selected = false;
             return false;
         }
+        if (building_selected_id === this.id) this.selected = true;
         if (this.selected) {
-            if ((this.x - 10 < mouseX) && (mouseX < this.x + this.width + 10)) {
-                if ((this.y - 10 < mouseY) && (mouseY < this.y + this.height + 10)) {
+            if ((this.x - 100 < mouseX) && (mouseX < this.x + this.width + 100)) {
+                if ((this.y - 100 < mouseY) && (mouseY < this.y + this.height + 100)) {
                     if ((mouseX > grid.x) && (mouseY > grid.y) && (mouseX < grid.x + BLOCK_WIDTH * global_scale * GAME_BLOCK_AMOUNT_WIDTH) && (mouseY < grid.y + BLOCK_HEIGHT * global_scale * GAME_BLOCK_AMOUNT_HEIGHT)) {
-                        if (!this.selected) {
-                            grid[`${this.coordX}_${this.coordY}`] = '';
-                            grid[`${this.coordX + 1}_${this.coordY}`] = '';
-                            grid[`${this.coordX}_${this.coordY + 1}`] = '';
-                            grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
-                        }
-                        if (this.type === 'square') document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
+                        if ((this.type === 'square') || (this.type === 'collector')) document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
                         this.addHighlights();
                         this.selected = true;
                         building_selected_id = copy(this.id);
@@ -899,13 +908,11 @@ class Building {
             if ((this.x + this.blockInline < mouseX) && (mouseX < this.x + this.width - this.blockInline)) {
                 if ((this.y + this.blockInline < mouseY) && (mouseY < this.y + this.height - this.blockInline)) {
                     if ((mouseX > grid.x) && (mouseY > grid.y) && (mouseX < grid.x + BLOCK_WIDTH * global_scale * GAME_BLOCK_AMOUNT_WIDTH) && (mouseY < grid.y + BLOCK_HEIGHT * global_scale * GAME_BLOCK_AMOUNT_HEIGHT)) {
-                        if (!this.selected) {
-                            grid[`${this.coordX}_${this.coordY}`] = '';
-                            grid[`${this.coordX + 1}_${this.coordY}`] = '';
-                            grid[`${this.coordX}_${this.coordY + 1}`] = '';
-                            grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
-                        }
-                        if (this.type === 'square') document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
+                        grid[`${this.coordX}_${this.coordY}`] = '';
+                        grid[`${this.coordX + 1}_${this.coordY}`] = '';
+                        grid[`${this.coordX}_${this.coordY + 1}`] = '';
+                        grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
+                        if ((this.type === 'square') || (this.type === 'collector')) document.getElementById(`resource-display-${this.id}`).style.visibility = 'hidden';
                         this.addHighlights();
                         this.selected = true;
                         building_selected_id = copy(this.id);
@@ -919,9 +926,18 @@ class Building {
             building_selected_id = '';
             this.removeHighlights();
         }
-        if (this.type === 'square') document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
+        if ((this.type === 'square') || (this.type === 'collector')) document.getElementById(`resource-display-${this.id}`).style.visibility = 'visible';
         this.selected = false;
         return false;
+    }
+    mouseHover() {
+        if ((this.x - 10 < mouseX) && (mouseX < this.x + this.width + 10)) {
+            if ((this.y - 10 < mouseY) && (mouseY < this.y + this.height + 10)) {
+                if ((mouseX > grid.x) && (mouseY > grid.y) && (mouseX < grid.x + BLOCK_WIDTH * global_scale * GAME_BLOCK_AMOUNT_WIDTH) && (mouseY < grid.y + BLOCK_HEIGHT * global_scale * GAME_BLOCK_AMOUNT_HEIGHT)) {
+                    return true;
+                }
+            }
+        }
     }
     addHighlights() {
         addHighlight = true;
@@ -970,7 +986,6 @@ class Building {
         if (this.selected) this.addHighlights();
         this.updateObjectOnScreen();
     }
-    updateObjectOnScreen() {}
     checkXandY() {
         this.selected = false;
         if (
@@ -987,20 +1002,20 @@ class Building {
             this.originalX = copy(this.x);
             this.originalY = copy(this.y);
             this.setCoordXandY();
-            grid[`${this.coordX}_${this.coordY}`] = `${this.color}_square`;
-            grid[`${this.coordX + 1}_${this.coordY}`] = `${this.color}_square`;
-            grid[`${this.coordX}_${this.coordY + 1}`] = `${this.color}_square`;
-            grid[`${this.coordX + 1}_${this.coordY + 1}`] = `${this.color}_square`;
-            this.updateSquareInFirebase();
+            grid[`${this.coordX}_${this.coordY}`] = `${this.color}_${this.type}`;
+            grid[`${this.coordX + 1}_${this.coordY}`] = `${this.color}_${this.type}`;
+            grid[`${this.coordX}_${this.coordY + 1}`] = `${this.color}_${this.type}`;
+            grid[`${this.coordX + 1}_${this.coordY + 1}`] = `${this.color}_${this.type}`;
+            this.updateObjectInFirebase();
         } else {
             this.removeHighlights();
             this.x = copy(this.originalX);
             this.y = copy(this.originalY);
             this.setCoordXandY();
-            grid[`${this.coordX}_${this.coordY}`] = `${this.color}_square`;
-            grid[`${this.coordX + 1}_${this.coordY}`] = `${this.color}_square`;
-            grid[`${this.coordX}_${this.coordY + 1}`] = `${this.color}_square`;
-            grid[`${this.coordX + 1}_${this.coordY + 1}`] = `${this.color}_square`;
+            grid[`${this.coordX}_${this.coordY}`] = `${this.color}_${this.type}`;
+            grid[`${this.coordX + 1}_${this.coordY}`] = `${this.color}_${this.type}`;
+            grid[`${this.coordX}_${this.coordY + 1}`] = `${this.color}_${this.type}`;
+            grid[`${this.coordX + 1}_${this.coordY + 1}`] = `${this.color}_${this.type}`;
             this.updateObjectOnScreen();
             if (user_settings['notification-invalid-movement'] && user_settings['all-notifications']) notification('Invalid Movement');
         }
@@ -1036,6 +1051,12 @@ class Building {
         this.updateBorders(multiplier);
     }
     updateBorders(multiplier) {}
+    upgrade() {}
+    displayObjectInfo() {}
+    removeListeners() {}
+    removeUpgradeListener() {}
+    removeDeleteListener() {}
+    remove() {}
     export() {
         return {
             'level': this.level,
@@ -1046,7 +1067,7 @@ class Building {
             'coordY': this.coordY
         };
     }
-    updateSquareInFirebase() {
+    updateObjectInFirebase() {
         update(ref(db, `users/${userId}/game-data/building-data/${this.id}`), {
             "level": this.level,
             "total-cost": this.totalCost,
@@ -1104,16 +1125,20 @@ class Square extends Building {
         let outline_object = rects['z1'][this.outelineId];
         outline_object.x = this.x + this.blockInline;
         outline_object.y = this.y + this.blockInline;
+        outline_object.width = this.width - (2 * this.blockInline);
+        outline_object.height = this.height - (2 * this.blockInline);
         let square_object = rects['z2'][this.squareId];
         square_object.x = this.x + this.blockInline + this.borderWidth;
         square_object.y = this.y + this.blockInline + this.borderWidth;
+        square_object.width = this.width - (2 * this.blockInline) - (2 * this.borderWidth);
+        square_object.height = this.height - (2 * this.blockInline) - (2 * this.borderWidth);
+        square_object.r = this.r;
+        square_object.g = this.g;
+        square_object.b = this.b;
     }
     updateBorders(multiplier) {
         this.blockInline *= multiplier;
         this.borderWidth *= multiplier;
-    }
-    upResource() {
-        currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond;
     }
     upgrade() {
         if ((this.level >= this.maxLevel) && user_settings['all-notifications']) return notification('Reached max level');
@@ -1132,75 +1157,66 @@ class Square extends Building {
         this.r += this.rChangePerLevel;
         this.g += this.gChangePerLevel;
         this.b += this.bChangePerLevel;
-        let outline_object = rects['z1'][this.outelineId];
-        outline_object.x = this.x + this.blockInline;
-        outline_object.y = this.y + this.blockInline;
-        outline_object.width = this.width - (2 * this.blockInline);
-        outline_object.height = this.height - (2 * this.blockInline);
-        let square_object = rects['z2'][this.squareId];
-        square_object.x = this.x + this.blockInline + this.borderWidth;
-        square_object.y = this.y + this.blockInline + this.borderWidth;
-        square_object.width = this.width - (2 * this.blockInline) - (2 * this.borderWidth);
-        square_object.height = this.height - (2 * this.blockInline) - (2 * this.borderWidth);
-        square_object.r = this.r;
-        square_object.g = this.g;
-        square_object.b = this.b;
+        this.updateObjectOnScreen();
         document.getElementById(`resource-display-${this.id}-count`).textContent = this.earningsPerSecond;
         document.getElementById(`${this.color.toLowerCase()}-squares-count`).textContent = getFormatedNumber(currencies[`${this.color.toLowerCase()}_squares`]);
-        this.updateSquareInFirebase();
+        this.updateObjectInFirebase();
     }
-    displaySquare() {
+    displayObjectInfo() {
         if (this.displayed) return;
-        document.getElementById('building-info-no-content').style.display = 'none';
-        document.getElementById('building-info-content').style.visibility = 'visible';
+        hideInfos('square');
         for (const building of Object.values(buildings)) {
             building.displayed = false;
-            building.removeUpgradeListener();
-            building.removeDeleteListener();
+            building.removeListeners();
         }
         this.displayed = true;
-        document.getElementById("building-info-square_type").textContent = `${this.color} Square`;
-        document.getElementById("building-info-level").textContent = `Level: ${this.level}`;
-        document.getElementById("building-info-created").textContent = `Created on: ${this.timeCreated}`;
-        document.getElementById("building-info-earnings_second").textContent = `Earnings per second: ${this.earningsPerSecond}`;
-        document.getElementById("building-info-earnings_hour").textContent = `Earnings per hour: ${this.earningsPerHour}`;
-        document.getElementById("building-info-upgrade-text").textContent = `Upgrade ${getFormatedNumber(this.nextLevelUpgradeCost)}`;
-        document.getElementById("building-info-delete-text").textContent = `Delete ${getFormatedNumber(this.totalCost)}`;
-        document.getElementById("building-info-upgrade-resource-icon").className = `resource-icon ${this.color.toLowerCase()}`;
-        document.getElementById("building-info-delete-resource-icon").className = `resource-icon ${this.color.toLowerCase()}`;
+        document.getElementById("building-info-square-type").textContent = `${this.color} Square`;
+        document.getElementById("building-info-square-level").textContent = `Level: ${this.level}`;
+        document.getElementById("building-info-square-created").textContent = `Created on: ${this.timeCreated}`;
+        document.getElementById("building-info-square-earnings_second").textContent = `Earnings per second: ${this.earningsPerSecond}`;
+        document.getElementById("building-info-square-earnings_hour").textContent = `Earnings per hour: ${this.earningsPerHour}`;
+        document.getElementById("building-info-square-upgrade-text").textContent = `Upgrade ${getFormatedNumber(this.nextLevelUpgradeCost)}`;
+        document.getElementById("building-info-square-delete-text").textContent = `Delete ${getFormatedNumber(this.totalCost)}`;
+        document.getElementById("building-info-square-upgrade-resource-icon").className = `resource-icon ${this.color.toLowerCase()}`;
+        document.getElementById("building-info-square-delete-resource-icon").className = `resource-icon ${this.color.toLowerCase()}`;
         if (this.maxLevel === this.level) {
-            document.getElementById("building-info-upgrade").style.display = 'none';
+            document.getElementById("building-info-square-upgrade").style.display = 'none';
         } else {
-            document.getElementById("building-info-upgrade").style.display = 'inline-block';
+            document.getElementById("building-info-square-upgrade").style.display = 'inline-block';
         }
         const THIS_SQUARE = this;
-        let upgrade_button = document.getElementById("building-info-upgrade");
-        this.upgradeButtonListner = function upgradeSquare() {
+
+        const upgrade_button = document.getElementById("building-info-square-upgrade");
+        this.upgradeButtonListener = function upgradeSquare() {
             THIS_SQUARE.displayed = false;
             THIS_SQUARE.upgrade();
-            THIS_SQUARE.displaySquare();
+            THIS_SQUARE.displayObjectInfo();
         }
-        upgrade_button.addEventListener('click', this.upgradeButtonListner, {'once': true});
-        let delete_button = document.getElementById("building-info-delete");
-        this.deleteButtonListner = function tryToDeleteSquare() {
-            let delete_button = document.getElementById("building-info-delete");
-            if (user_settings['no-delete']) return delete_button.addEventListener('click', THIS_SQUARE.deleteButtonListner, {'once': true});
-            THIS_SQUARE.deleteButtonListner = function deleteSquare() {
+        upgrade_button.addEventListener('click', this.upgradeButtonListener, {'once': true});
+
+        const delete_button = document.getElementById("building-info-square-delete");
+        this.deleteButtonListener = function tryToDeleteSquare() {
+            if (user_settings['no-delete']) return delete_button.addEventListener('click', THIS_SQUARE.deleteButtonListener, {'once': true});
+            THIS_SQUARE.deleteButtonListener = function deleteSquare() {
                 THIS_SQUARE.remove();
             }
-            if (!user_settings['double-tap-delete']) return THIS_SQUARE.deleteButtonListner();
+            if (!user_settings['double-tap-delete']) return THIS_SQUARE.deleteButtonListener();
             if (user_settings['notification-deletion'] && user_settings['all-notifications']) notification('Are you sure?');
-            delete_button.addEventListener('click', THIS_SQUARE.deleteButtonListner, {'once': true});
+            delete_button.addEventListener('click', THIS_SQUARE.deleteButtonListener, {'once': true});
         }
-        delete_button.addEventListener('click', this.deleteButtonListner, {'once': true});
+        delete_button.addEventListener('click', this.deleteButtonListener, {'once': true});
+    }
+    removeListeners() {
+        this.removeUpgradeListener();
+        this.removeDeleteListener();
     }
     removeUpgradeListener() {
-        let upgrade_button = document.getElementById("building-info-upgrade");
-        upgrade_button.removeEventListener('click', this.upgradeButtonListner);
+        const upgrade_button = document.getElementById("building-info-square-upgrade");
+        upgrade_button.removeEventListener('click', this.upgradeButtonListener);
     }
     removeDeleteListener() {
-        let delete_button = document.getElementById("building-info-delete");
-        delete_button.removeEventListener('click', this.deleteButtonListner);
+        const delete_button = document.getElementById("building-info-square-delete");
+        delete_button.removeEventListener('click', this.deleteButtonListener);
     }
     remove() {
         image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].highlightable = true;
@@ -1217,8 +1233,7 @@ class Square extends Building {
         currencies[`${this.color.toLowerCase()}_squares`] += this.totalCost;
         document.getElementById(`resource-display-${this.id}`).remove();
         this.removeUpgradeListener();
-        document.getElementById('building-info-no-content').style.display = 'block';
-        document.getElementById('building-info-content').style.visibility = 'hidden';
+        hideInfos('no-content');
         remove(ref(db, `users/${userId}/game-data/building-data/${this.id}`));
     }
     updateResourceDisplay() {
@@ -1228,6 +1243,9 @@ class Square extends Building {
         document.getElementById(`resource-display-resource-icon-${this.id}`).style.height = (10 * global_scale) + 'px';
         document.getElementById(`resource-display-resource-icon-${this.id}`).style.width = (10 * global_scale) + 'px';
         document.getElementById(`resource-display-resource-icon-${this.id}`).style.borderWidth = (2 * global_scale) + 'px';
+    }
+    upResource() {
+        currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond;
     }
     collectAfktime(milliseconds) {
         currencies[`${this.color.toLowerCase()}_squares`] += this.earningsPerSecond * Math.floor(milliseconds / 1000);
@@ -1240,31 +1258,272 @@ class Collector extends Building {
         object.type = 'collector';
         object.level = object.level ?? 1;
         object.maxLevel = 10;
-        object.color = object.color ?? 'Blue';
+        object.color = object.color ?? 'Red';
+        if (object.color === 'Blue') object.color = 'Red';
         object.maxHealth = object.maxHealth ?? 100;
         object.health = object.health ?? object.maxHealth;
         object.nextLevelUpgradeCost = object.level * 10000;
         object.totalCost = object.totalCost ?? buy_costs[`${object.color.toLowerCase()}_collectors`];
         super(object);
         this.createObjectOnScreen();
+        this.active = object.active ?? false;
+        this.conversionRates = constants["conversion-rates"]["to/from"][this.color.toLowerCase()];
+        this.transferType = object.transferType ?? 'to';
+        this.earningsPerSecond = object.earningsPerSecond ?? 0;
+        this.earningsPerHour = this.earningsPerSecond * 3600;
+        this.maxEarningsPerSecond = this.level;
+        this.maxEarningsPerHour = this.earningsPerSecond * 3600;
+        this.inputColor = copy(this.color);
         document.getElementById('resource-displays').innerHTML += `
-            <div id="resource-display-${this.id}" class="resource-display">+
-                <span id="resource-display-${this.id}-count">${this.earningsPerSecond}</span>
+            <div id="resource-display-${this.id}" class="resource-display">
+                <span id="resource-display-${this.id}-count">${this.transferType === 'to' ? '+' : '-'}${this.earningsPerSecond}</span>
                 <div id="resource-display-resource-icon-${this.id}" class="resource-icon ${this.color.toLowerCase()}">
             </div>
         `;
         buildings[this.id] = this;
     }
     createObjectOnScreen() {
-        
+        const BLOCK_INLINE = (24 - this.level * 2) * global_scale;
+        const BORDER_WIDTH = 2 * global_scale;
+        this.blockInline = BLOCK_INLINE;
+        this.borderWidth = BORDER_WIDTH;
+        const OUTLINE = new Circle(
+            this.x + this.width / 2,
+            this.y + this.height / 2,
+            this.width - (2 * BLOCK_INLINE),
+            this.height - (2 * BLOCK_INLINE)
+        );
+        this.outelineId = OUTLINE.getId();
+        const CIRCLE = new Circle(
+            this.x + this.width / 2,
+            this.y + this.height / 2,
+            this.width - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
+            this.height - (2 * BLOCK_INLINE) - (2 * BORDER_WIDTH),
+            `(${this.r},${this.g},${this.b})`, 2
+        );
+        this.circleId = CIRCLE.getId();
+    }
+    updateObjectOnScreen() {
+        let outline_object = circles['z1'][this.outelineId];
+        outline_object.x = this.x + this.width / 2;
+        outline_object.y = this.y + this.height / 2;
+        outline_object.width = this.width - (2 * this.blockInline);
+        outline_object.height = this.height - (2 * this.blockInline);
+        let circle_object = circles['z2'][this.circleId];
+        circle_object.x = this.x + this.width / 2;
+        circle_object.y = this.y + this.height / 2;
+        circle_object.width = this.width - (2 * this.blockInline) - (2 * this.borderWidth);
+        circle_object.height = this.height - (2 * this.blockInline) - (2 * this.borderWidth);
+        circle_object.r = this.r;
+        circle_object.g = this.g;
+        circle_object.b = this.b;
+    }
+    updateBorders(multiplier) {
+        this.blockInline *= multiplier;
+        this.borderWidth *= multiplier;
+    }
+    upgrade() {
+        if ((this.level >= this.maxLevel) && user_settings['all-notifications']) return notification('Reached max level');
+        if (this.level >= this.maxLevel) return;
+        if ((currencies[`${this.color.toLowerCase()}_squares`] < this.nextLevelUpgradeCost) && 
+            user_settings['notification-not-enough-upgrade'] && 
+            user_settings['all-notifications']) return notification('Not enough resources');
+        if (currencies[`${this.color.toLowerCase()}_squares`] < this.nextLevelUpgradeCost) return;
+        currencies[`${this.color.toLowerCase()}_squares`] -= this.nextLevelUpgradeCost;
+        this.totalCost += this.nextLevelUpgradeCost;
+        this.maxEarningsPerSecond += 1;
+        this.maxEarningsPerHour = this.maxEarningsPerSecond * 3600;
+        this.nextLevelUpgradeCost += 1;
+        this.level += 1;
+        this.blockInline -= 2 * global_scale;
+        this.r += this.rChangePerLevel;
+        this.g += this.gChangePerLevel;
+        this.b += this.bChangePerLevel;
+        this.updateObjectOnScreen();
+        if (this.displayed) document.getElementById("building-info-collector-resource-rate").max = this.maxEarningsPerSecond;
+        document.getElementById(`${this.color.toLowerCase()}-squares-count`).textContent = getFormatedNumber(currencies[`${this.color.toLowerCase()}_squares`]);
+        this.updateObjectInFirebase();
+    }
+    displayObjectInfo() {
+        if (this.displayed) return;
+        hideInfos('collector');
+        for (const building of Object.values(buildings)) {
+            building.displayed = false;
+            building.removeListeners();
+        }
+        this.displayed = true;
+        document.getElementById("building-info-collector-type").textContent = `${this.color} Collector`;
+        document.getElementById("building-info-collector-level").textContent = `Level: ${this.level}`;
+        document.getElementById("building-info-collector-created").textContent = `Created on: ${this.timeCreated}`;
+        document.getElementById("building-info-collector-max_earnings_second").textContent = `Max earnings per second: ${this.maxEarningsPerSecond}`;
+        document.getElementById("building-info-collector-resource-rate").value = this.earningsPerSecond;
+        document.getElementById("building-info-collector-resource-rate").max = this.maxEarningsPerSecond;
+        document.getElementById("building-info-collector-max_earnings_hour").textContent = `Max earnings per hour: ${this.maxEarningsPerHour}`;
+        document.getElementById("building-info-collector-upgrade-text").textContent = `Upgrade ${getFormatedNumber(this.nextLevelUpgradeCost)}`;
+        document.getElementById("building-info-collector-delete-text").textContent = `Delete ${getFormatedNumber(this.totalCost)}`;
+        document.getElementById("building-info-collector-active-toggle").checked = this.active;
+        if (this.transferType === 'to') {
+            document.getElementById("building-info-collector-resource-input-text").innerHTML = `Transfer ${this.conversionRates["resource-count"] * this.earningsPerSecond} ${this.conversionRates["resource-types"].join(", ")} <br>square(s) per second to`;
+            document.getElementById("building-info-collector-resource-output-type-text").innerHTML = `${this.color} squares(s) per second`;
+        } else {
+            document.getElementById("building-info-collector-resource-input-text").innerHTML = `Transfer`;
+            document.getElementById("building-info-collector-resource-output-type-text").innerHTML = `${this.color} square(s) per second <br> to ${this.conversionRates["resource-count"] * this.earningsPerSecond} ${this.conversionRates["resource-types"].join(", ")} squares(s)<br> per second`;
+        }
+        document.getElementById("building-info-collector-upgrade-resource-icon").className = `resource-icon ${this.color.toLowerCase()}`;
+        document.getElementById("building-info-collector-delete-resource-icon").className = `resource-icon ${this.color.toLowerCase()}`;
+        if (this.maxLevel === this.level) {
+            document.getElementById("building-info-collector-upgrade").style.display = 'none';
+        } else {
+            document.getElementById("building-info-collector-upgrade").style.display = 'inline-block';
+        }
+        const THIS_COLLECTOR = this;
+
+        const upgrade_button = document.getElementById("building-info-collector-upgrade");
+        this.upgradeButtonListener = function upgradeCollector() {
+            THIS_COLLECTOR.displayed = false;
+            THIS_COLLECTOR.upgrade();
+            THIS_COLLECTOR.displayObjectInfo();
+        }
+        upgrade_button.addEventListener('click', this.upgradeButtonListener, {'once': true});
+
+        const delete_button = document.getElementById("building-info-collector-delete");
+        this.deleteButtonListener = function tryToDeleteCollector() {
+            let delete_button = document.getElementById("building-info-collector-delete");
+            if (user_settings['no-delete']) return delete_button.addEventListener('click', THIS_COLLECTOR.deleteButtonListener, {'once': true});
+            THIS_COLLECTOR.deleteButtonListener = function deleteCollector() {
+                THIS_COLLECTOR.remove();
+            }
+            if (!user_settings['double-tap-delete']) return THIS_COLLECTOR.deleteButtonListener();
+            if (user_settings['notification-deletion'] && user_settings['all-notifications']) notification('Are you sure?');
+            delete_button.addEventListener('click', THIS_COLLECTOR.deleteButtonListener, {'once': true});
+            setTimeout(() => {
+                THIS_COLLECTOR.displayed = false;
+                THIS_COLLECTOR.displayObjectInfo();
+            }, 500);
+        }
+        delete_button.addEventListener('click', this.deleteButtonListener, {'once': true});
+
+        const resource_input = document.getElementById("building-info-collector-resource-rate");
+        this.resourceInputListener = function getResourceInput() {
+            THIS_COLLECTOR.displayed = false;
+            THIS_COLLECTOR.earningsPerSecond = Math.ceil(parseInt(resource_input.value));
+            if (THIS_COLLECTOR.earningsPerSecond > THIS_COLLECTOR.maxEarningsPerSecond) THIS_COLLECTOR.earningsPerSecond = copy(THIS_COLLECTOR.maxEarningsPerSecond);
+            if (THIS_COLLECTOR.earningsPerSecond < 0) THIS_COLLECTOR.earningsPerSecond = 0; 
+            THIS_COLLECTOR.earningsPerHour = THIS_COLLECTOR.earningsPerSecond * 3600; 
+            resource_input.value = THIS_COLLECTOR.earningsPerSecond;
+            THIS_COLLECTOR.active = true;
+            THIS_COLLECTOR.updateObjectInFirebase();
+            THIS_COLLECTOR.displayObjectInfo();
+        }
+        resource_input.addEventListener('change', this.resourceInputListener, {'once': true});
+
+        const resource_edit_container = document.getElementById("building-info-collector-resource-edit-container");
+        this.resourceToggleButtonListener = function toggleTransferType() {
+            if (document.activeElement.id === "building-info-collector-resource-rate") return;
+            if (THIS_COLLECTOR.transferType === 'to') {
+                THIS_COLLECTOR.transferType = 'from';
+            } else {
+                THIS_COLLECTOR.transferType = 'to';
+            }
+            THIS_COLLECTOR.displayed = false;
+            THIS_COLLECTOR.updateObjectInFirebase();
+            THIS_COLLECTOR.displayObjectInfo();
+        }
+        resource_edit_container.addEventListener('click', this.resourceToggleButtonListener);
+
+        const active_toggle = document.getElementById("building-info-collector-active-toggle");
+        this.activeToggleListener = function toggleActive() {
+            THIS_COLLECTOR.active = active_toggle.checked;
+            THIS_COLLECTOR.displayed = false;
+            THIS_COLLECTOR.updateObjectInFirebase();
+            THIS_COLLECTOR.displayObjectInfo();
+        }
+        active_toggle.addEventListener('click', this.activeToggleListener, {'once': true});
+    }
+    removeListeners() {
+        this.removeUpgradeListener();
+        this.removeDeleteListener();
+        this.removeResourceListener();
+        this.removeResourceToggleListener();
+        this.removeActiveToggleListener();
+    }
+    removeUpgradeListener() {
+        const upgrade_button = document.getElementById("building-info-collector-upgrade");
+        upgrade_button.removeEventListener('click', this.upgradeButtonListener);
+    }
+    removeDeleteListener() {
+        const delete_button = document.getElementById("building-info-collector-delete");
+        delete_button.removeEventListener('click', this.deleteButtonListener);
+    }
+    removeResourceListener() {
+        const resource_input = document.getElementById("building-info-collector-resource-rate");
+        resource_input.removeEventListener('change', this.resourceInputListener);
+    }
+    removeResourceToggleListener() {
+        const resource_edit_container = document.getElementById("building-info-collector-resource-edit-container");
+        resource_edit_container.removeEventListener('click', this.resourceToggleButtonListener);
+    }
+    removeActiveToggleListener() {
+        const active_toggle = document.getElementById("building-info-collector-active-toggle");
+        active_toggle.removeEventListener('click', this.activeToggleListener);
+    }
+    remove() {
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY)].highlightable = true;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY)].highlightable = true;
+        image_draw_infos[getGrassBlockId(this.coordX, this.coordY - 1)].highlightable = true;
+        image_draw_infos[getGrassBlockId(this.coordX - 1, this.coordY - 1)].highlightable = true;
+        grid[`${this.coordX}_${this.coordY}`] = '';
+        grid[`${this.coordX + 1}_${this.coordY}`] = '';
+        grid[`${this.coordX}_${this.coordY + 1}`] = '';
+        grid[`${this.coordX + 1}_${this.coordY + 1}`] = '';
+        delete buildings[this.id];
+        delete circles['z1'][this.outelineId];
+        delete circles['z2'][this.circleId];
+        currencies[`${this.color.toLowerCase()}_squares`] += this.totalCost;
+        document.getElementById(`resource-display-${this.id}`).remove();
+        this.removeUpgradeListener();
+        hideInfos('no-content');
+        remove(ref(db, `users/${userId}/game-data/building-data/${this.id}`));
     }
     updateResourceDisplay() {
+        document.getElementById(`resource-display-${this.id}`).style.visibility = this.active ? 'visible' : 'hidden';
         document.getElementById(`resource-display-${this.id}`).style.top = (this.y + 2.5 * 2 * global_scale) + 'px';
         document.getElementById(`resource-display-${this.id}`).style.left = (this.x + 1 * 2 * global_scale) + 'px';
         document.getElementById(`resource-display-${this.id}`).style.fontSize = (20 * global_scale) + 'px';
         document.getElementById(`resource-display-resource-icon-${this.id}`).style.height = (10 * global_scale) + 'px';
         document.getElementById(`resource-display-resource-icon-${this.id}`).style.width = (10 * global_scale) + 'px';
         document.getElementById(`resource-display-resource-icon-${this.id}`).style.borderWidth = (2 * global_scale) + 'px';
+    }
+    transferResource() {
+        const amount_converted = convert(this.conversionRates, this.transferType, this.earningsPerSecond);
+        document.getElementById(`resource-display-${this.id}-count`).textContent = `${this.transferType === 'to' ? '+' : '-'}${amount_converted}`;
+    }
+    collectAfktime(milliseconds) {
+        if (this.active) convert(this.conversionRates, this.transferType, this.earningsPerSecond * Math.floor(milliseconds / 1000));
+    }
+    export() {
+        return {
+            'level': this.level,
+            'type': `${this.color}_${this.type}`,
+            'created-at': this.createdAt,
+            'total-cost': this.totalCost,
+            'coordX': this.coordX,
+            'coordY': this.coordY,
+            'earnings-per-second': this.earningsPerSecond,
+            'conversion-type': this.transferType,
+            'active': this.active
+        };
+    }
+    updateObjectInFirebase() {
+        update(ref(db, `users/${userId}/game-data/building-data/${this.id}`), {
+            "level": this.level,
+            "total-cost": this.totalCost,
+            "coordX": this.coordX,
+            "coordY": this.coordY,
+            "earnings-per-second": this.earningsPerSecond,
+            "conversion-type": this.transferType,
+            "active": this.active
+        });
     }
 }
 
@@ -1278,6 +1537,7 @@ class Defense extends Building {
 class Wall {
 
 }
+
 
 function createGrass() {
     for (let current_block_y = 1; current_block_y <= GAME_BLOCK_AMOUNT_HEIGHT + GAME_BORDER * 2; current_block_y++) {
@@ -1329,7 +1589,7 @@ function copy(value) {
     return JSON.parse(JSON.stringify(value));
 }
 
-function eventListners() {
+function eventListeners() {
     for (const color of Object.keys(colors)) {
         document.getElementById(`${color.toLowerCase()}-square-buy`).addEventListener('click', function () {
             if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_squares`] &&
@@ -1339,12 +1599,28 @@ function eventListners() {
             const new_square = new Square({'color': color});
             if  (new_square.removed) return;
             currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_squares`];
-            buy_costs[`${color.toLowerCase()}_squares`] = buy_costs[`${color.toLowerCase()}_squares`] + 2;
+            buy_costs[`${color.toLowerCase()}_squares`] += 2;
             document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${getFormatedNumber(buy_costs[`${color.toLowerCase()}_squares`])}`;
             updateBuyCosts();
         });
         if (buy_costs[`${color.toLowerCase()}_squares`] > 0) {
             document.getElementById(`${color.toLocaleLowerCase()}-square-cost`).textContent = `Buy ${getFormatedNumber(buy_costs[`${color.toLowerCase()}_squares`])}`;
+        }
+        if (color === 'Blue') continue;
+        document.getElementById(`${color.toLowerCase()}-collector-buy`).addEventListener('click', function () {
+            if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_collectors`] &&
+                user_settings['notification-not-enough-new-square'] &&
+                user_settings['all-notifications']) return notification('Not enough resources');
+            if (currencies[`${color.toLowerCase()}_squares`] < buy_costs[`${color.toLowerCase()}_collectors`]) return;
+            const collector = new Collector({'color': color});
+            if  (collector.removed) return;
+            currencies[`${color.toLowerCase()}_squares`] -= buy_costs[`${color.toLowerCase()}_collectors`];
+            buy_costs[`${color.toLowerCase()}_collectors`] += 2;
+            document.getElementById(`${color.toLocaleLowerCase()}-collector-cost`).textContent = `Buy ${getFormatedNumber(buy_costs[`${color.toLowerCase()}_collectors`])}`;
+            updateBuyCosts();
+        });
+        if (buy_costs[`${color.toLowerCase()}_squares`] > 0) {
+            document.getElementById(`${color.toLocaleLowerCase()}-collector-cost`).textContent = `Buy ${getFormatedNumber(buy_costs[`${color.toLowerCase()}_collectors`])}`;
         }
     }
     
@@ -1368,24 +1644,28 @@ function eventListners() {
     
     document.getElementById("settings").addEventListener('click', function () {
         document.getElementById("settings-tab-container").style.display = 'block';
-        if (user_settings['all-notifications']) {
-            document.getElementById('other-notification-contianer').className = '';
-            document.getElementById('other-notification-contianer').style.height = '112px';
-            document.getElementById('other-notification-contianer').style.opacity = '1';
-        } else {
-            document.getElementById('other-notification-contianer').className = '';
-            document.getElementById('other-notification-contianer').style.height = '0px';
-            document.getElementById('other-notification-contianer').style.opacity = '0';
-        }
-        if (!user_settings['no-delete']) {
-            document.getElementById('double-delete-container').className = 'toggle';
-        } else {
-            document.getElementById('double-delete-container').className = 'toggle collasped-selector';
-        }
-        if (!user_settings['no-square-movement']) {
-            document.getElementById('open-square-after-move-container').className = 'toggle';
-        } else {
-            document.getElementById('open-square-after-move-container').className = 'toggle collasped-selector';
+        for (const multi_toggle_element of document.getElementsByClassName('multi-toggle-container')) {
+            const childern_count = multi_toggle_element.childElementCount;
+            const setting_type = multi_toggle_element.id.split('-sub-toggles-container').join('');
+            multi_toggle_element.className = 'multi-toggle-container';
+            multi_toggle_element.style.setProperty('--max-height', `${childern_count * 28}px`);
+            if (setting_type.includes('no-')) {
+                if (!user_settings[setting_type]) {
+                    multi_toggle_element.style.height = `${childern_count * 28}px`;
+                    multi_toggle_element.style.opacity = '1';
+                } else {
+                    multi_toggle_element.style.height = '0px';
+                    multi_toggle_element.style.opacity = '0';
+                }
+            } else {
+                if (user_settings[setting_type]) {
+                    multi_toggle_element.style.height = `${childern_count * 28}px`;
+                    multi_toggle_element.style.opacity = '1';
+                } else {
+                    multi_toggle_element.style.height = '0px';
+                    multi_toggle_element.style.opacity = '0';
+                }
+            }
         }
     });
 
@@ -1400,23 +1680,15 @@ function eventListners() {
     for (const type of Object.keys(user_settings)) {
         document.getElementById(`${type}-toggle`).addEventListener('click', function () {
             user_settings[type] = this.checked;
-            if (type === 'all-notifications') {
-                if (user_settings[type]) {
-                    document.getElementById('other-notification-contianer').className = 'collapse-selectors uncollapse-selectors ';
+            if (document.getElementById(`${type}-sub-toggles-container`)) {
+                if (type.includes('no-')) {
+                    document.getElementById(`${type}-sub-toggles-container`).className = `multi-toggle-container collapse-selectors${
+                        !user_settings[type] ? ' uncollapse-selectors' : ''
+                    }`;
                 } else {
-                    document.getElementById('other-notification-contianer').className = 'collapse-selectors';
-                }
-            } else if (type === 'no-delete') {
-                if (!user_settings[type]) {
-                    document.getElementById('double-delete-container').className = 'toggle collapse-selector uncollapse-selector';
-                } else {
-                    document.getElementById('double-delete-container').className = 'toggle collapse-selector';
-                }
-            } else if (type === 'no-square-movement') {
-                if (!user_settings[type]) {
-                    document.getElementById('open-square-after-move-container').className = 'toggle collapse-selector uncollapse-selector';
-                } else {
-                    document.getElementById('open-square-after-move-container').className = 'toggle collapse-selector';
+                    document.getElementById(`${type}-sub-toggles-container`).className = `multi-toggle-container collapse-selectors${
+                        user_settings[type] ? ' uncollapse-selectors' : ''
+                    }`;
                 }
             }
             updateUserSettings();
@@ -1547,8 +1819,13 @@ function setScales(multiplier) {
         building.setScale(multiplier);
     }
     for (const z of Object.keys(rects)) {
-        for (const shape of Object.values(rects[z])) {
-            shape.setScale(multiplier);
+        for (const rect of Object.values(rects[z])) {
+            rect.setScale(multiplier);
+        }
+    }
+    for (const z of Object.keys(circles)) {
+        for (const circle of Object.values(circles[z])) {
+            circle.setScale(multiplier);
         }
     }
     for (const image of Object.values(image_draw_infos)) {
@@ -1580,8 +1857,13 @@ function setScales(multiplier) {
         building.translate(translateX, translateY);
     }
     for (const z of Object.keys(rects)) {
-        for (const shape of Object.values(rects[z])) {
-        shape.translate(translateX, translateY);
+        for (const rect of Object.values(rects[z])) {
+           rect.translate(translateX, translateY);
+        }
+    }
+    for (const z of Object.keys(circles)) {
+        for (const circle of Object.values(circles[z])) {
+            circle.translate(translateX, translateY);
         }
     }
     for (const image of Object.values(image_draw_infos)) {
@@ -1611,8 +1893,13 @@ function centerBoard() {
         building.translate(translateX, translateY);
     }
     for (const z of Object.keys(rects)) {
-        for (const shape of Object.values(rects[z])) {
-        shape.translate(translateX, translateY);
+        for (const rect of Object.values(rects[z])) {
+            rect.translate(translateX, translateY);
+        }
+    }
+    for (const z of Object.keys(circles)) {
+        for (const circle of Object.values(circles[z])) {
+            circle.translate(translateX, translateY);
         }
     }
     for (const image of Object.values(image_draw_infos)) {
@@ -1648,6 +1935,47 @@ function updateUserSettings() {
     });
 }
 
+function hideInfos(expect) {
+    for (const info_type of [
+        'no-content',
+        'square',
+        'collector'
+    ]) {
+        if (info_type === expect)
+            document.getElementById(`building-info-${info_type}-container`).style.display = 'block';
+        else
+            document.getElementById(`building-info-${info_type}-container`).style.display = 'none';
+    }
+}
+
+function convert(convert_info, conversion_type, amount) {
+    let input_resources;
+    input_resources = convert_info["resource-types"];  
+    let max_conversion_amounts = [];
+    if (conversion_type === 'to') {
+        for (const input_resource of input_resources) {
+            max_conversion_amounts.push(Math.floor(currencies[`${input_resource}_squares`] / convert_info["resource-count"]));
+        }
+    } else {
+        max_conversion_amounts.push(currencies[`${convert_info["color"]}_squares`]);
+    }
+    max_conversion_amounts.push(amount);
+    const amount_converted = Math.min(...max_conversion_amounts);
+    if (conversion_type === 'to') {
+        for (const input_resource of input_resources) {
+            currencies[`${input_resource}_squares`] -= amount_converted * convert_info["resource-count"];
+        }
+        currencies[`${convert_info["color"]}_squares`] += amount_converted;
+    } else {
+        for (const input_resource of input_resources) {
+            currencies[`${input_resource}_squares`] += amount_converted * convert_info["resource-count"];
+        }
+        currencies[`${convert_info["color"]}_squares`] -= amount_converted;
+    }
+    updateCurrincies();
+    return amount_converted;
+}
+
 export function createGame() {
     username = sessionStorage.getItem('blue-squares:username');
     notification(`Hello ${username}`);
@@ -1658,33 +1986,52 @@ export function createGame() {
     buy_costs = intial_player_data['buy-costs'];
     username = intial_player_data['username'];
     createGrass();
-    eventListners();
+    eventListeners();
     centerBoard();
     createPlotButtons();
     const building_data = intial_player_data['building-data'];
     for (const building_key of Object.keys(building_data)) {
         const building = building_data[building_key];
         const color = building.type.split('_')[0];
-        new Square({
-            'id': building_key,
-            'level': building.level,
-            'createdAt': building['created-at'],
-            'totalCost': building['total-cost'],
-            'color': color,
-            'coordX': building.coordX,
-            'coordY': building.coordY
-        });
+        const type = building.type.split('_')[1];
+        if (type === 'square') {
+            new Square({
+                'id': building_key,
+                'level': building.level,
+                'createdAt': building['created-at'],
+                'totalCost': building['total-cost'],
+                'color': color,
+                'coordX': building.coordX,
+                'coordY': building.coordY
+            });
+        } else if (type === 'collector') {
+            new Collector({
+                'id': building_key,
+                'level': building.level,
+                'createdAt': building['created-at'],
+                'totalCost': building['total-cost'],
+                'color': color,
+                'coordX': building.coordX,
+                'coordY': building.coordY,
+                'earningsPerSecond': building["earnings-per-second"],
+                'transferType': building["conversion-type"],
+                'active': building.active
+            });
+        } else {
+            notification('error: type inncorrect on building load')
+        }
     }
     const afked_time = sessionStorage.getItem('blue-squares:afk-collected');
     const afked_time_formated = afkTime(parseInt(afked_time));
     for (const building of Object.values(buildings)) {
-        building.collectAfktime(afked_time);
+        if ((building.type === 'square') || (building.type === 'collector')) building.collectAfktime(afked_time);
     }
     notification(`Collceted ${afked_time_formated} worth of time`);
     const log_in_number = sessionStorage.getItem('blue-squares:login_in_number');
     const UP_RESOURCES = setInterval(() => {
         for (const building of Object.values(buildings)) {
-            building.upResource();
+            if (building.type === 'square') building.upResource();
+            if (building.type === 'collector') building.transferResource();
         }
         for (const color of Object.keys(colors)) {
             document.getElementById(`${color.toLowerCase()}-squares-count`).textContent = getFormatedNumber(currencies[`${color.toLowerCase()}_squares`]);
